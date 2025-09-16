@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Format-Table ProcessName,Id,CPU -AutoSize)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(cmd /c:*)",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:venturebeat.com)",
+      "WebFetch(domain:www.ciodive.com)",
+      "WebFetch(domain:biztechmagazine.com)",
+      "WebSearch",
+      "WebFetch(domain:taehwatrans.com)",
+      "WebFetch(domain:www.siemens-energy.com)",
+      "WebFetch(domain:www.hubbell.com)",
+      "WebFetch(domain:new.abb.com)",
+      "WebFetch(domain:www.siemens.com)",
+      "WebFetch(domain:blog.se.com)",
+      "WebFetch(domain:library.grid.gevernova.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

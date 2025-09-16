@@ -126,5 +126,8 @@
     "vscode.microsoft-authentication",
     "ms-vscode.references-view",
     "ms-python.vscode-pylance"
-  ]
+  ],
+  "dependencies": {
+    "bindings": "^1.5.0"
+  }
 }
