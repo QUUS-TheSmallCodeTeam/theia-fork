@@ -1,5 +1,5 @@
 // *****************************************************************************
-// Copyright (C) 2018 TypeFox and others.
+// Copyright (C) 2025 EclipseSource GmbH and others.
 //
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,14 +14,15 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
 // *****************************************************************************
 
-import { isObject } from '@theia/core/lib/common';
+/* note: this bogus test file is required so that
+   we are able to run mocha unit tests on this
+   package, without having any actual unit tests in it.
+   This way a coverage report will be generated,
+   showing 0% coverage, instead of no report.
+   This file can be removed once we have real unit
+   tests in place. */
 
-export interface FileDownloadData {
-    readonly uris: string[];
-}
+describe('ai-mcp-server package', () => {
 
-export namespace FileDownloadData {
-    export function is(arg: unknown): arg is FileDownloadData {
-        return isObject(arg) && 'uris' in arg;
-    }
-}
+    it('support code coverage statistics', () => true);
+});
