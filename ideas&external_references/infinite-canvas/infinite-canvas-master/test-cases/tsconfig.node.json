@@ -1,0 +1,13 @@
+{
+    "extends": "../tsconfig.node.json",
+    "compilerOptions": {
+        "paths": {
+            "test-case-metadata": ["./backend/test-case-metadata.ts"]
+        },
+        "outDir": "./dist",
+    },
+    "include": [
+        "backend/**/*",
+        "vite-plugins/**/*"
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "extends": "../../tsconfig.frontend.json",
+    "compilerOptions": {
+        "outDir": "dist"
+    },
+    "references": [
+        {"path": "../window-messages/tsconfig.json"},
+        {"path": "../frontend"}
+    ],
+    "include": [
+        "shared/**/*",
+        "frontend/**/*",
+    ]
+}

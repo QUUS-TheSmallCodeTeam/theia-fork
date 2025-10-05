@@ -1,0 +1,1823 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`an infinite canvas context > that adds a drawing that depends on the transformation > and then draws using a non-identity transformation > should have set the transformed version of the state 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineDashOffset = 2",
+  "context.setLineDash([2,2])",
+  "context.lineWidth = 2",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(20,0)",
+  "context.lineTo(20,20)",
+  "context.lineTo(0,20)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that clips and fills with shadow and then clears a rect > should not have added a clearRect 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that clips and then draws an image > and then clears an area covering the clipped area but not the image > should forget about the image and not add a clearRect 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that clips and then puts image data > and then clears an area covering the clipped area but not the image > should not forget about the image and add a clearRect 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.setTransform(1,0,0,1,0,0)",
+  "context.imageSmoothingEnabled = false",
+  "context.translate(0,0)",
+  "context.fillStyle = "[pattern-0]"",
+  "context.fillRect(0,0,200,200)",
+  "context.restore()",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.clearRect(9,9,12,12)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then creates a path > and then fills using the linear gradient > and then clears the drawing > and then fills the path again > should create a linear gradient again 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(1,1)",
+  "context.lineTo(1,2)",
+  "context.lineTo(2,2)",
+  "context.lineTo(2,1)",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-1]",
+  "context.fillStyle = "[linear-gradient-1]"",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then creates a path > and then fills using the linear gradient > and then clears the drawing > should no longer create a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then creates a path > and then fills using the linear gradient > should have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(1,1)",
+  "context.lineTo(1,2)",
+  "context.lineTo(2,2)",
+  "context.lineTo(2,1)",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-0]",
+  "context.fillStyle = "[linear-gradient-0]"",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then creates a path > and then strokes using the linear gradient > and then clears the drawing > and then strokes the path again > should create a linear gradient again 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(1,1)",
+  "context.lineTo(1,2)",
+  "context.lineTo(2,2)",
+  "context.lineTo(2,1)",
+  "context.lineWidth = 1",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-1]",
+  "context.strokeStyle = "[linear-gradient-1]"",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then creates a path > and then strokes using the linear gradient > and then clears the drawing > should no longer create a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then creates a path > and then strokes using the linear gradient > should have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(1,1)",
+  "context.lineTo(1,2)",
+  "context.lineTo(2,2)",
+  "context.lineTo(2,1)",
+  "context.lineWidth = 1",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-0]",
+  "context.strokeStyle = "[linear-gradient-0]"",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then fills using the linear gradient > and then fills again using the same linear gradient > and then clears both drawings with the linear gradient > should not have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then fills using the linear gradient > and then fills again using the same linear gradient > and then clears one drawing with the linear gradient > and then clears the other drawing with the linear gradient > and then draws again using the linear gradient > should have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-3]",
+  "context.fillStyle = "[linear-gradient-3]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then fills using the linear gradient > and then fills again using the same linear gradient > and then clears one drawing with the linear gradient > and then clears the other drawing with the linear gradient > should not have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then fills using the linear gradient > and then fills again using the same linear gradient > and then clears one drawing with the linear gradient > should still have created only one linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-2]",
+  "context.fillStyle = "[linear-gradient-2]"",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.lineTo(60,0)",
+  "context.lineTo(60,10)",
+  "context.lineTo(50,10)",
+  "context.closePath()",
+  "context.moveTo(50,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then fills using the linear gradient > and then fills again using the same linear gradient > should still have created only one linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-1]",
+  "context.fillStyle = "[linear-gradient-1]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.fill()",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.lineTo(60,0)",
+  "context.lineTo(60,10)",
+  "context.lineTo(50,10)",
+  "context.closePath()",
+  "context.moveTo(50,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then fills using the linear gradient > should have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-0]",
+  "context.fillStyle = "[linear-gradient-0]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then strokes using the linear gradient > and then strokes again using the same linear gradient > and then clears both drawings with the linear gradient > should not have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then strokes using the linear gradient > and then strokes again using the same linear gradient > and then clears one drawing with the linear gradient > and then clears the other drawing with the linear gradient > and then draws again using the linear gradient > should have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-3]",
+  "context.strokeStyle = "[linear-gradient-3]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then strokes using the linear gradient > and then strokes again using the same linear gradient > and then clears one drawing with the linear gradient > and then clears the other drawing with the linear gradient > should not have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then strokes using the linear gradient > and then strokes again using the same linear gradient > and then clears one drawing with the linear gradient > should still have created only one linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-2]",
+  "context.strokeStyle = "[linear-gradient-2]"",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.lineTo(60,0)",
+  "context.lineTo(60,10)",
+  "context.lineTo(50,10)",
+  "context.closePath()",
+  "context.moveTo(50,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then strokes using the linear gradient > and then strokes again using the same linear gradient > should still have created only one linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-1]",
+  "context.strokeStyle = "[linear-gradient-1]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.stroke()",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.lineTo(60,0)",
+  "context.lineTo(60,10)",
+  "context.lineTo(50,10)",
+  "context.closePath()",
+  "context.moveTo(50,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > and then strokes using the linear gradient > should have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+  "context.createLinearGradient(10,0,10,30)",
+  "=> [linear-gradient-0]",
+  "context.strokeStyle = "[linear-gradient-0]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > should not have created a linear gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a linear gradient > and then draws without using the linear gradient > should not have created a linear gradient 2`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a pattern > and then uses it to fill a rect > should wrap the fill command in a transform 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.fillStyle = "[pattern-0]"",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(1,0)",
+  "context.lineTo(1,1)",
+  "context.lineTo(0,1)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.fill()",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a pattern > and then uses it to fill the entire plane > should wrap the fill command in a transform 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.fillStyle = "[pattern-0]"",
+  "context.beginPath()",
+  "context.save()",
+  "context.setTransform(1,0,0,1,0,0)",
+  "context.rect(0,0,200,200)",
+  "context.restore()",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.fill()",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then creates a path > and then fills using the radial gradient > and then clears the drawing > and then fills the path again > should create a radial gradient again 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(1,1)",
+  "context.lineTo(1,2)",
+  "context.lineTo(2,2)",
+  "context.lineTo(2,1)",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-1]",
+  "context.fillStyle = "[radial-gradient-1]"",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then creates a path > and then fills using the radial gradient > and then clears the drawing > should no longer create a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then creates a path > and then fills using the radial gradient > should have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(1,1)",
+  "context.lineTo(1,2)",
+  "context.lineTo(2,2)",
+  "context.lineTo(2,1)",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-0]",
+  "context.fillStyle = "[radial-gradient-0]"",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then creates a path > and then strokes using the radial gradient > and then clears the drawing > and then strokes the path again > should create a radial gradient again 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(1,1)",
+  "context.lineTo(1,2)",
+  "context.lineTo(2,2)",
+  "context.lineTo(2,1)",
+  "context.lineWidth = 1",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-1]",
+  "context.strokeStyle = "[radial-gradient-1]"",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then creates a path > and then strokes using the radial gradient > and then clears the drawing > should no longer create a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then creates a path > and then strokes using the radial gradient > should have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(1,1)",
+  "context.lineTo(1,2)",
+  "context.lineTo(2,2)",
+  "context.lineTo(2,1)",
+  "context.lineWidth = 1",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-0]",
+  "context.strokeStyle = "[radial-gradient-0]"",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then fills using the radial gradient > and then fills again using the same radial gradient > and then clears both drawings with the radial gradient > should not have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then fills using the radial gradient > and then fills again using the same radial gradient > and then clears one drawing with the radial gradient > and then clears the other drawing with the radial gradient > and then draws again using the radial gradient > should have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-3]",
+  "context.fillStyle = "[radial-gradient-3]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then fills using the radial gradient > and then fills again using the same radial gradient > and then clears one drawing with the radial gradient > and then clears the other drawing with the radial gradient > should not have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then fills using the radial gradient > and then fills again using the same radial gradient > and then clears one drawing with the radial gradient > should still have created only one radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-2]",
+  "context.fillStyle = "[radial-gradient-2]"",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.lineTo(60,0)",
+  "context.lineTo(60,10)",
+  "context.lineTo(50,10)",
+  "context.closePath()",
+  "context.moveTo(50,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then fills using the radial gradient > and then fills again using the same radial gradient > should still have created only one radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-1]",
+  "context.fillStyle = "[radial-gradient-1]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.fill()",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.lineTo(60,0)",
+  "context.lineTo(60,10)",
+  "context.lineTo(50,10)",
+  "context.closePath()",
+  "context.moveTo(50,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then fills using the radial gradient > should have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-0]",
+  "context.fillStyle = "[radial-gradient-0]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then strokes using the radial gradient > and then strokes again using the same radial gradient > and then clears both drawings with the radial gradient > should not have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then strokes using the radial gradient > and then strokes again using the same radial gradient > and then clears one drawing with the radial gradient > and then clears the other drawing with the radial gradient > and then draws again using the radial gradient > should have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-3]",
+  "context.strokeStyle = "[radial-gradient-3]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then strokes using the radial gradient > and then strokes again using the same radial gradient > and then clears one drawing with the radial gradient > and then clears the other drawing with the radial gradient > should not have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then strokes using the radial gradient > and then strokes again using the same radial gradient > and then clears one drawing with the radial gradient > should still have created only one radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-2]",
+  "context.strokeStyle = "[radial-gradient-2]"",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.lineTo(60,0)",
+  "context.lineTo(60,10)",
+  "context.lineTo(50,10)",
+  "context.closePath()",
+  "context.moveTo(50,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then strokes using the radial gradient > and then strokes again using the same radial gradient > should still have created only one radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-1]",
+  "context.strokeStyle = "[radial-gradient-1]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.stroke()",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.lineTo(60,0)",
+  "context.lineTo(60,10)",
+  "context.lineTo(50,10)",
+  "context.closePath()",
+  "context.moveTo(50,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > and then strokes using the radial gradient > should have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+  "context.createRadialGradient(0,0,1,5,5,5)",
+  "=> [radial-gradient-0]",
+  "context.strokeStyle = "[radial-gradient-0]"",
+  "context.beginPath()",
+  "context.moveTo(30,0)",
+  "context.lineTo(40,0)",
+  "context.lineTo(40,10)",
+  "context.lineTo(30,10)",
+  "context.closePath()",
+  "context.moveTo(30,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > should not have created a radial gradient 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that creates a radial gradient > and then draws without using the radial gradient > should not have created a radial gradient 2`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.stroke()",
+]
+`;
+
+exports[`an infinite canvas context > that creates image data > and then puts it on the context > and then the bitmap is ready > and then drawing is executed > and then part of the drawing is cleared > should have added a clearRect 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.setTransform(1,0,0,1,0,0)",
+  "context.imageSmoothingEnabled = false",
+  "context.translate(10,10)",
+  "context.fillStyle = "[pattern-0]"",
+  "context.fillRect(0,0,10,10)",
+  "context.restore()",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.clearRect(5,5,10,10)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that creates image data > and then puts it on the context > and then the bitmap is ready > and then drawing is executed > and then the entire drawing is cleared > should have forgotten everything 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that creates image data > and then puts it on the context > and then the bitmap is ready > and then drawing is executed > should have filled a rect using a pattern created from the bitmap 1`] = `
+[
+  "context.createPattern({"height":10,"width":10},"no-repeat")",
+  "=> [pattern-0]",
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.setTransform(1,0,0,1,0,0)",
+  "context.imageSmoothingEnabled = false",
+  "context.translate(10,10)",
+  "context.fillStyle = "[pattern-0]"",
+  "context.fillRect(0,0,10,10)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that creates image data > and then puts part of it on the context > and then the bitmap is ready > and then drawing is executed > should have filled a rect using a pattern created from the bitmap 1`] = `
+[
+  "context.createPattern({"height":8,"width":8},"no-repeat")",
+  "=> [pattern-0]",
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.setTransform(1,0,0,1,0,0)",
+  "context.imageSmoothingEnabled = false",
+  "context.translate(10,10)",
+  "context.fillStyle = "[pattern-0]"",
+  "context.fillRect(0,0,8,8)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that draws a bezier curve > and then clear a rect that fully covers the bezier curve > should no longer draw a bezier curve 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that draws a bezier curve > and then clears a rect that does not overlap the bezier curve > should not do anything else 1`] = `[]`;
+
+exports[`an infinite canvas context > that draws a bezier curve > and then clears a rect that partially covers the bezier curve > should add a clearRect command 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.bezierCurveTo(100,50,0,50,50,0)",
+  "context.lineWidth = 1",
+  "context.fill()",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.clearRect(0,30,100,100)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that draws a bezier curve > should draw a bezier curve 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.setTransform(1,0,0,1,20,20)",
+  "context.moveTo(0,0)",
+  "context.bezierCurveTo(20,0,20,20,40,20)",
+  "context.lineTo(40,40)",
+  "context.lineTo(0,40)",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that draws a bezier curve > should draw a bezier curve 2`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(50,0)",
+  "context.bezierCurveTo(100,50,0,50,50,0)",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that draws a quadratic curve > and then clears a rect that covers the quadratic curve > should no longer draw a quadratic curve 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that draws a quadratic curve > and then clears a rect that does not cover the quadratic curve > should still draw a quadratic curve 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(10,10)",
+  "context.quadraticCurveTo(60,60,110,10)",
+  "context.lineWidth = 1",
+  "context.fill()",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.clearRect(5,5,110,25)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that draws a quadratic curve > should draw a quadratic curve 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(20,20)",
+  "context.lineTo(40,20)",
+  "context.setTransform(1,0,0,1,40,20)",
+  "context.quadraticCurveTo(20,0,20,20)",
+  "context.lineTo(20,60)",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that draws a quadratic curve > should draw a quadratic curve 2`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(10,10)",
+  "context.quadraticCurveTo(60,60,110,10)",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that draws an arc > should draw an arc 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(60,30)",
+  "context.save()",
+  "context.transform(1,0,0,1,30,30)",
+  "context.arc(0,0,30,0,6.28318531,)",
+  "context.restore()",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that draws an ellipse > should draw an ellipse 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(150,50)",
+  "context.ellipse(50,50,100,40,0,0,3.14159265,)",
+  "context.lineWidth = 1",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that fills a rect, begins a new path, translates and then clears a rect > should add a clearRect with the right arguments 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(5,0)",
+  "context.lineTo(5,5)",
+  "context.lineTo(0,5)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.setTransform(1,0,0,1,1,1)",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.clearRect(1,1,1,1)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that has this screen transformation > and that uses canvas units > and that draws a square using a drop-shadow filter > and that transforms in this way > should set the filter correctly 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,150)",
+  "context.setTransform(2,0,0,0.5,0,-25)",
+  "context.filter = "drop-shadow(120px -30px)"",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,200)",
+  "context.lineTo(0,120)",
+  "context.lineTo(80,120)",
+  "context.lineTo(80,200)",
+  "context.closePath()",
+  "context.moveTo(0,200)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that has this screen transformation > and that uses canvas units > and that draws a square using a shadow > and that transforms in this way > should set the shadow offset correctly 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,150)",
+  "context.setTransform(2,0,0,0.5,0,-25)",
+  "context.lineWidth = 1",
+  "context.shadowOffsetX = 120",
+  "context.shadowOffsetY = -30",
+  "context.shadowColor = "#f00"",
+  "context.beginPath()",
+  "context.moveTo(0,200)",
+  "context.lineTo(0,120)",
+  "context.lineTo(80,120)",
+  "context.lineTo(80,200)",
+  "context.closePath()",
+  "context.moveTo(0,200)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that has this screen transformation > and that uses css units > and that draws a square using a drop-shadow filter > and that transforms in this way > should set the filter correctly 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,150)",
+  "context.setTransform(0.75,0,0,0.375,0,0)",
+  "context.filter = "drop-shadow(45px -22.5px)"",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,200)",
+  "context.lineTo(0,120)",
+  "context.lineTo(80,120)",
+  "context.lineTo(80,200)",
+  "context.closePath()",
+  "context.moveTo(0,200)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that has this screen transformation > and that uses css units > and that draws a square using a shadow > and that transforms in this way > should set the shadow offset correctly 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,150)",
+  "context.setTransform(0.75,0,0,0.375,0,0)",
+  "context.lineWidth = 1",
+  "context.shadowOffsetX = 45",
+  "context.shadowOffsetY = -22.5",
+  "context.shadowColor = "#f00"",
+  "context.beginPath()",
+  "context.moveTo(0,200)",
+  "context.lineTo(0,120)",
+  "context.lineTo(80,120)",
+  "context.lineTo(80,200)",
+  "context.closePath()",
+  "context.moveTo(0,200)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that is translated > and then adds a rectangular path and fills it > and then clears a rectangle partly covering the place where the rectangle was drawn > should have added an instruction to clear a rect 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.setTransform(1,0,0,1,2,0)",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(1,0)",
+  "context.lineTo(1,1)",
+  "context.lineTo(0,1)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.lineWidth = 1",
+  "context.fill()",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.clearRect(0.5,0,3,3)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that is translated > and then draws a rectangle > and then clears a rectangle partly covering the place where the rectangle was drawn > should have added an instruction to clear a rect 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.setTransform(1,0,0,1,2,0)",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(1,0)",
+  "context.lineTo(1,1)",
+  "context.lineTo(0,1)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.clearRect(0.5,0,3,3)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that is translated > and then draws a rectangle > should have called setTransform on the context 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 1",
+  "context.setTransform(1,0,0,1,2,0)",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(1,0)",
+  "context.lineTo(1,1)",
+  "context.lineTo(0,1)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that is translated > and then the viewbox is transformed and it draws a rectangle > should have called setTransform on the context with the right transformation 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 2",
+  "context.setTransform(1,0,0,1,4,0)",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(2,0)",
+  "context.lineTo(2,2)",
+  "context.lineTo(0,2)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that makes a drawing and then resets > and then calls fill > should have done nothing 1`] = `[]`;
+
+exports[`an infinite canvas context > that makes a drawing and then resets > should have no drawing anymore 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that makes a path consisting of two subpaths > and the fills it using a fill rule > should take the fill rule into account 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(10,10)",
+  "context.lineTo(110,10)",
+  "context.lineTo(110,110)",
+  "context.lineTo(10,110)",
+  "context.closePath()",
+  "context.moveTo(10,10)",
+  "context.moveTo(30,30)",
+  "context.lineTo(60,30)",
+  "context.lineTo(60,60)",
+  "context.lineTo(30,60)",
+  "context.closePath()",
+  "context.moveTo(30,30)",
+  "context.lineWidth = 1",
+  "context.fill("evenodd")",
+]
+`;
+
+exports[`an infinite canvas context > that makes a rect, strokes it and then strokes text > should set the line width twice 1`] = `
+[
+  "context.save()",
+  "context.restore()",
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.lineWidth = 2",
+  "context.stroke()",
+  "context.lineWidth = 1",
+  "context.save()",
+  "context.transform(2,0,0,2,0,0)",
+  "context.strokeText("text",10,10)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that sets a line width, makes a rect, strokes it and then strokes text > should set the line width twice 1`] = `
+[
+  "context.save()",
+  "context.restore()",
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.lineWidth = 2",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(10,0)",
+  "context.lineTo(10,10)",
+  "context.lineTo(0,10)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.lineWidth = 4",
+  "context.stroke()",
+  "context.lineWidth = 2",
+  "context.save()",
+  "context.transform(2,0,0,2,0,0)",
+  "context.strokeText("text",10,10)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that sets a nonzero line dash and fills a rect > and then sets a pattern as fill style and fills another rect > and then sets the fill style to something other than a pattern and fills a third rect > and then clears the rect that was filled with a pattern > should set the line dash one fewer time 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.setLineDash([2,2])",
+  "context.lineWidth = 2",
+  "context.beginPath()",
+  "context.moveTo(2,2)",
+  "context.lineTo(4,2)",
+  "context.lineTo(4,4)",
+  "context.lineTo(2,4)",
+  "context.closePath()",
+  "context.moveTo(2,2)",
+  "context.fill()",
+  "context.beginPath()",
+  "context.moveTo(18,2)",
+  "context.lineTo(20,2)",
+  "context.lineTo(20,4)",
+  "context.lineTo(18,4)",
+  "context.closePath()",
+  "context.moveTo(18,2)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that sets a nonzero line dash and fills a rect > and then sets a pattern as fill style and fills another rect > and then sets the fill style to something other than a pattern and fills a third rect > should set the correct line dash again 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.setLineDash([2,2])",
+  "context.lineWidth = 2",
+  "context.beginPath()",
+  "context.moveTo(2,2)",
+  "context.lineTo(4,2)",
+  "context.lineTo(4,4)",
+  "context.lineTo(2,4)",
+  "context.closePath()",
+  "context.moveTo(2,2)",
+  "context.fill()",
+  "context.fillStyle = "[pattern-0]"",
+  "context.setLineDash([1,1])",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(10,2)",
+  "context.lineTo(12,2)",
+  "context.lineTo(12,4)",
+  "context.lineTo(10,4)",
+  "context.closePath()",
+  "context.moveTo(10,2)",
+  "context.save()",
+  "context.transform(2,0,0,2,0,0)",
+  "context.fill()",
+  "context.restore()",
+  "context.fillStyle = "#000"",
+  "context.setLineDash([2,2])",
+  "context.lineWidth = 2",
+  "context.beginPath()",
+  "context.moveTo(18,2)",
+  "context.lineTo(20,2)",
+  "context.lineTo(20,4)",
+  "context.lineTo(18,4)",
+  "context.closePath()",
+  "context.moveTo(18,2)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that sets a nonzero line dash and fills a rect > and then sets a pattern as fill style and fills another rect > should set the correct line dash again 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.setLineDash([2,2])",
+  "context.lineWidth = 2",
+  "context.beginPath()",
+  "context.moveTo(2,2)",
+  "context.lineTo(4,2)",
+  "context.lineTo(4,4)",
+  "context.lineTo(2,4)",
+  "context.closePath()",
+  "context.moveTo(2,2)",
+  "context.fill()",
+  "context.fillStyle = "[pattern-0]"",
+  "context.setLineDash([1,1])",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(10,2)",
+  "context.lineTo(12,2)",
+  "context.lineTo(12,4)",
+  "context.lineTo(10,4)",
+  "context.closePath()",
+  "context.moveTo(10,2)",
+  "context.save()",
+  "context.transform(2,0,0,2,0,0)",
+  "context.fill()",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that sets a nonzero line dash and fills a rect > should set the correct line dash 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.setLineDash([2,2])",
+  "context.lineWidth = 2",
+  "context.beginPath()",
+  "context.moveTo(2,2)",
+  "context.lineTo(4,2)",
+  "context.lineTo(4,4)",
+  "context.lineTo(2,4)",
+  "context.closePath()",
+  "context.moveTo(2,2)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that takes text > and fills it > and clears it > should forget the instructions 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that takes text > and fills it > should contain the instruction to transform and fill text 1`] = `
+[
+  "context.save()",
+  "context.restore()",
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.fillText("Some text",100,100)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that takes text > and strokes it > and clears it > should forget the instructions 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that takes text > and strokes it > should contain the instruction to transform and stroke text 1`] = `
+[
+  "context.save()",
+  "context.restore()",
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.strokeText("Some text",100,100)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that uses an image > and draws it using five arguments > and then clears the rectangle where the image was drawn > should no longer draw the image 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that uses an image > and draws it using five arguments > should call the context using five arguments 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.drawImage({"width":100,"height":100},10,10,40,40)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that uses an image > and draws it using nine arguments > and then clears the rectangle where the image was drawn > should no longer draw the image 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that uses an image > and draws it using nine arguments > should call the context using nine arguments 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.drawImage({"width":100,"height":100},10,10,80,80,10,10,40,40)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that uses an image > and draws it using three arguments > and then clears the rectangle where the image was drawn > should no longer draw the image 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+]
+`;
+
+exports[`an infinite canvas context > that uses an image > and draws it using three arguments > should call the context using three arguments 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.save()",
+  "context.transform(1,0,0,1,0,0)",
+  "context.drawImage({"width":100,"height":100},10,10)",
+  "context.restore()",
+]
+`;
+
+exports[`an infinite canvas context > that uses shadow styles > and then transforms > should transform the shadow offsets together 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.fillStyle = "#f00"",
+  "context.lineWidth = 0.5",
+  "context.shadowOffsetX = -5",
+  "context.shadowOffsetY = 5",
+  "context.shadowColor = "#000"",
+  "context.beginPath()",
+  "context.moveTo(-5,25)",
+  "context.lineTo(-5,75)",
+  "context.lineTo(-55,75)",
+  "context.lineTo(-55,25)",
+  "context.closePath()",
+  "context.moveTo(-5,25)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > that uses shadow styles > should use shadow styles 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.fillStyle = "#f00"",
+  "context.lineWidth = 1",
+  "context.shadowOffsetX = 10",
+  "context.shadowOffsetY = 10",
+  "context.shadowColor = "#000"",
+  "context.beginPath()",
+  "context.moveTo(30,30)",
+  "context.lineTo(130,30)",
+  "context.lineTo(130,130)",
+  "context.lineTo(30,130)",
+  "context.closePath()",
+  "context.moveTo(30,30)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > whose canvas has a non-identity screen transformation > and that uses canvas units > and then draws a square > and then rotates > and then resizes the canvas to exacerbate the distortion > and then draws again > and then rotates again > should have applied an initial transformation that makes the drawing appear with the same distortion, but rotated 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,300)",
+  "context.setTransform(0.5,0,0,2,-4,-34)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(20,20)",
+  "context.lineTo(0,20)",
+  "context.lineTo(0,0)",
+  "context.lineTo(20,0)",
+  "context.closePath()",
+  "context.moveTo(20,20)",
+  "context.fill()",
+  "context.beginPath()",
+  "context.moveTo(15,15)",
+  "context.lineTo(5,15)",
+  "context.lineTo(5,5)",
+  "context.lineTo(15,5)",
+  "context.closePath()",
+  "context.moveTo(15,15)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > whose canvas has a non-identity screen transformation > and that uses canvas units > and then draws a square > and then rotates > and then resizes the canvas to exacerbate the distortion > and then draws again > should have applied an initial transformation that makes the drawing appear more distorted 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,300)",
+  "context.setTransform(2,0,0,0.5,0,-4)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,20)",
+  "context.lineTo(0,0)",
+  "context.lineTo(20,0)",
+  "context.lineTo(20,20)",
+  "context.closePath()",
+  "context.moveTo(0,20)",
+  "context.fill()",
+  "context.beginPath()",
+  "context.moveTo(5,15)",
+  "context.lineTo(5,5)",
+  "context.lineTo(15,5)",
+  "context.lineTo(15,15)",
+  "context.closePath()",
+  "context.moveTo(5,15)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > whose canvas has a non-identity screen transformation > and that uses canvas units > and then draws a square > and then rotates > should have applied an initial transformation that makes the square appear with the same distortion, only rotated 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,300)",
+  "context.setTransform(2,0,0,0.5,0,-4)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,20)",
+  "context.lineTo(0,0)",
+  "context.lineTo(20,0)",
+  "context.lineTo(20,20)",
+  "context.closePath()",
+  "context.moveTo(0,20)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > whose canvas has a non-identity screen transformation > and that uses canvas units > and then draws a square > should not have applied an initial transformation 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,300)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(20,0)",
+  "context.lineTo(20,20)",
+  "context.lineTo(0,20)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > whose canvas has a non-identity screen transformation > that uses CSS units > and then draws a square > and then rotates > should have applied the same initial transformation 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,300)",
+  "context.setTransform(0.6,0,0,0.3,0,0)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,20)",
+  "context.lineTo(0,0)",
+  "context.lineTo(20,0)",
+  "context.lineTo(20,20)",
+  "context.closePath()",
+  "context.moveTo(0,20)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > whose canvas has a non-identity screen transformation > that uses CSS units > and then draws a square > should have applied an initial transformation that is the inverse of the screen transformation 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,300,300)",
+  "context.setTransform(0.6,0,0,0.3,0,0)",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(20,0)",
+  "context.lineTo(20,20)",
+  "context.lineTo(0,20)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;
+
+exports[`an infinite canvas context > whose state is changed > and then draws something > should have modified the context correctly 1`] = `
+[
+  "context.restore()",
+  "context.save()",
+  "context.clearRect(0,0,200,200)",
+  "context.fillStyle = "#f00"",
+  "context.lineWidth = 1",
+  "context.beginPath()",
+  "context.moveTo(0,0)",
+  "context.lineTo(20,0)",
+  "context.lineTo(20,20)",
+  "context.lineTo(0,20)",
+  "context.closePath()",
+  "context.moveTo(0,0)",
+  "context.fill()",
+]
+`;

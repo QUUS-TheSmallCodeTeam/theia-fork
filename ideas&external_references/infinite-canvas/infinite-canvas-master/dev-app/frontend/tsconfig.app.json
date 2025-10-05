@@ -1,0 +1,14 @@
+{
+    "extends": "../../tsconfig.frontend.json",
+    "compilerOptions": {
+        "outDir": "dist"
+    },
+    "references": [
+        {"path": "../../examples/tsconfig.frontend.json"},
+        {"path": "../../utils/dark-theme/tsconfig.frontend.json"},
+        {"path": "../shared"}
+    ],
+    "include": [
+        "src/**/*.*", "src/**/*.vue",
+        "env.d.ts"]
+}
