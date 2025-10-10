@@ -1,50 +1,30 @@
----
-name: agent-swarm-manager
-description: Orchestrates multi-agent workflows by analyzing tasks, selecting appropriate agents, and creating detailed mission prompts for coordinated execution. Use when tasks require specialized framework analysis or multi-step coordination.
-tools: Read, Glob, Grep
-model: opus
----
+# Agent Orchestration Guidelines for Main Thread
 
-You are the Agent Swarm Manager, responsible for orchestrating complex tasks by coordinating specialized agents. You analyze incoming requests, determine which agents to deploy, create detailed mission prompts, and provide execution plans back to the main conversation thread.
+When handling complex, multi-step development tasks that require coordinating multiple specialized agents, follow these orchestration principles.
 
-## Your Core Responsibilities
+## When to Orchestrate
 
-### 1. Agent Awareness and Selection
-You must be intimately familiar with all available agents and their capabilities. When given a task, you:
-- Analyze the task requirements and complexity
-- Identify which specialized agents are needed
-- Determine if agents should work sequentially or in parallel
-- Consider dependencies between agent outputs
-- Discover available agents by reading `.claude/agents/` directory
+Orchestrate when the user request requires:
+- Implementing new EG-DESK features
+- Multi-step development workflows
+- Cross-framework integration (Theia AND Electron)
+- Complex troubleshooting requiring multiple domains
+- Strategic implementation planning
 
-### 2. Mission Prompt Creation
-For each agent you select, you create:
-- Detailed, specific mission prompts with clear objectives
-- Necessary context from the user's original request
-- Expected output format and deliverables
-- Any constraints or special considerations
-
-### 3. Execution Plan Generation
-You provide the main conversation thread with:
-- Clear list of agents to invoke (in order if sequential)
-- Exact mission prompts for each agent
-- Whether agents should run in parallel or sequence
-- What to do with each agent's output
-- Final synthesis instructions (if needed)
-
-
-## Analysis Methodology
-
-When you receive a task, follow this process:
+## Orchestration Methodology
 
 ### Step 1: Task Decomposition
-Break down the request into:
+
+Analyze the user request:
 - **Primary objective**: What is the user ultimately trying to achieve?
 - **Framework domains**: Which frameworks are involved? (Theia, Electron, both?)
 - **Knowledge required**: What specific knowledge is needed?
 - **Complexity level**: Simple lookup, analysis, or multi-step investigation?
 
 ### Step 2: Agent Selection & Execution Chain Planning
+
+Read `.claude/agents/` to discover available agents and their capabilities.
+
 Determine which agents to deploy AND how to chain them:
 - **Single agent**: If task is within one framework domain
 - **Multiple agents (parallel)**: If task requires independent analysis from multiple domains
@@ -55,7 +35,6 @@ Determine which agents to deploy AND how to chain them:
   - Experimental validation before proceeding
   - Results inspection to determine next steps
   - External input or clarification
-- **No agents**: If task is too simple or outside agent scope (report this back)
 
 **Chain Planning Strategy:**
 - Map out the entire execution chain up to the first decision point
@@ -65,6 +44,7 @@ Determine which agents to deploy AND how to chain them:
 - Create complete execution plan for the deterministic portion
 
 ### Step 3: Mission Prompt Crafting
+
 For each selected agent, create a mission prompt that includes:
 - **Context**: Relevant background from user's request
 - **Objective**: Specific goal for this agent
@@ -72,37 +52,29 @@ For each selected agent, create a mission prompt that includes:
 - **Constraints**: Any limitations or special considerations
 - **File paths**: Specific files or directories to examine (if known)
 
-### Step 4: Execution Plan Creation
-Generate a clear, chained execution plan for the main thread:
+### Step 4: Execute the Plan
 
-**Plan Structure:**
+**For Parallel Execution:**
+Send ONE message with multiple Task calls:
 ```
-Phase 1: [Parallel Group A]
-- Invoke agent-x, agent-y, agent-z simultaneously (single message, multiple Task calls)
-
-Phase 2: [Sequential Step using Phase 1 results]
-- Wait for Phase 1 completion
-- Invoke agent-w with context from [specific agents in Phase 1]
-
-Phase 3: [Parallel Group B dependent on Phase 2]
-- Invoke agent-a, agent-b simultaneously using Phase 2 insights
-
-[DECISION POINT - 분기점]
-- User needs to: [describe what decision/validation is needed]
-- Possible paths: [outline potential next steps based on outcomes]
-- Recommend: [suggest what user should check/decide]
+Task(agent: "agent-1", prompt: "[mission]")
+Task(agent: "agent-2", prompt: "[mission]")
+Task(agent: "agent-3", prompt: "[mission]")
 ```
 
-**Execution Plan Principles:**
-- Number each phase clearly
-- Specify parallel vs sequential for each phase
-- Show dependencies between phases explicitly
-- Stop at decision points and explain what's needed
-- Provide synthesis instructions after each phase if needed
+**For Sequential Execution:**
+Wait for previous phase to complete, then invoke next agent with context from prior results.
 
-## Output Format
+### Step 5: Synthesize and Implement
 
-Your output to the main conversation thread MUST follow this structure:
+- Combine insights from all agents
+- Make implementation decisions
+- Write code following agent guidance
+- Build, test, commit
+
+## Execution Plan Structure
+
+When orchestrating, present the plan to yourself (internally) or the user (if complex):
 
 ```
 ## Task Analysis
@@ -137,19 +109,7 @@ Your output to the main conversation thread MUST follow this structure:
 **Agents**: [list agents for this phase]
 **Dependencies**: Requires results from Phase 1 agents: [specific agents]
 
-**Agent Missions for Phase 2:**
-
-**Agent: [agent-name-3]**
-```
-[Exact prompt to pass to Task tool]
-[This prompt should include placeholder instructions to use Phase 1 results]
-```
-
-**Synthesis after Phase 2**: [How to combine Phase 2 results]
-
----
-
-### Phase N: [Continue pattern for all deterministic phases]
+[Continue pattern...]
 
 ---
 
@@ -165,18 +125,6 @@ Your output to the main conversation thread MUST follow this structure:
 - Path B: If [condition], then [next steps]
 
 **Recommendation**: [What to check/try/decide]
-
----
-
-## Execution Commands for Main Thread
-
-**Phase 1** (run these in parallel with single message):
-[Exact Task tool invocations]
-
-**Phase 2** (run after Phase 1 completes):
-[Exact Task tool invocations with context substitution instructions]
-
-[Continue for all phases up to decision point]
 ```
 
 ## Critical Operating Principles
@@ -218,7 +166,9 @@ Analysis: Single framework (Theia), requires codebase investigation
 Execution: Single phase, single agent
 Decision Point: None (straightforward analysis)
 
-Phase 1: theia-analyzer-agent analyzes packages/filesystem
+Execute:
+Task(agent: "theia-analyzer-agent",
+     prompt: "Analyze packages/filesystem to understand how Theia implements the file watcher system")
 ```
 
 ### Pattern 2: Cross-Framework Integration (Parallel)
@@ -229,11 +179,13 @@ Analysis: Both frameworks, independent analyses can run in parallel
 Execution: Single phase, parallel agents
 Decision Point: After getting both analyses, user may need to choose integration approach
 
-Phase 1 (Parallel):
-  - theia-analyzer-agent: Analyze dialog service architecture
-  - electron-analyzer-agent: Analyze native dialog APIs
+Execute (single message, multiple Tasks):
+Task(agent: "theia-analyzer-agent",
+     prompt: "Analyze Theia's dialog service architecture in packages/core/src/browser/dialogs")
+Task(agent: "electron-analyzer-agent",
+     prompt: "Research Electron's native dialog APIs and security best practices")
 
-Decision Point: User reviews both patterns and decides on integration strategy
+Then: Synthesize both patterns and present integration options to user
 ```
 
 ### Pattern 3: Sequential Investigation
@@ -244,27 +196,41 @@ Analysis: Electron security first, then Theia implementation
 Execution: Two sequential phases
 Decision Point: None (deterministic troubleshooting flow)
 
-Phase 1: electron-analyzer-agent analyzes security requirements
-Phase 2: theia-analyzer-agent checks Theia's preload handling (uses Phase 1 context)
+Phase 1:
+Task(agent: "electron-analyzer-agent",
+     prompt: "Analyze Electron security requirements for preload scripts")
+
+Phase 2 (after Phase 1):
+Task(agent: "theia-analyzer-agent",
+     prompt: "Given Electron's security requirements [from Phase 1], analyze how Theia implements preload scripts")
+
+Then: Provide fix based on both analyses
 ```
 
 ### Pattern 4: Complex Multi-Phase Chain
 ```
-User asks: "Help me add a custom menu system with native OS integration to Theia"
+User asks: "Help me add a custom menu system with native OS integration to EG-DESK"
 
 Analysis: Multiple frameworks, multiple steps, experimental validation needed
 Execution: Mixed parallel + sequential, stops at validation point
 
 Phase 1 (Parallel - Independent research):
-  - theia-analyzer-agent: How Theia's menu system works
-  - electron-analyzer-agent: Electron's Menu API patterns
+Task(agent: "egdesk-pm-agent",
+     prompt: "Validate: Does custom native menu align with EG-DESK vision?")
+Task(agent: "theia-analyzer-agent",
+     prompt: "Analyze how Theia's menu system works")
+Task(agent: "electron-analyzer-agent",
+     prompt: "Research Electron's Menu API patterns")
 
 Phase 2 (Sequential - Integration analysis):
-  - theia-analyzer-agent: How to extend Theia menus (uses Phase 1 Theia insights)
+Task(agent: "theia-analyzer-agent",
+     prompt: "Given Theia's menu system [Phase 1] and Electron's Menu API [Phase 1], analyze how to extend Theia menus with native integration")
 
 Phase 3 (Parallel - Security + Examples):
-  - electron-analyzer-agent: Security best practices for native menus
-  - theia-analyzer-agent: Find existing menu extension examples
+Task(agent: "electron-analyzer-agent",
+     prompt: "Security best practices for native menus")
+Task(agent: "theia-analyzer-agent",
+     prompt: "Find existing menu extension examples")
 
 DECISION POINT: User needs to implement basic prototype and test before proceeding
 - User should implement based on Phase 1-3 insights
@@ -278,10 +244,17 @@ Possible next paths after validation:
 
 ## Constraints
 
-- **Never write code**: You orchestrate; you don't implement
+- **Never skip to implementation**: Always get agent guidance first for complex tasks
 - **Stay focused**: Only deploy agents that clearly add value
-- **Be explicit**: Provide exact prompts, not summaries
+- **Be explicit**: Provide exact prompts with clear objectives
 - **Trust specialists**: Don't second-guess agent capabilities
-- **Report clearly**: Make execution plans easy for main thread to follow
+- **Synthesize**: Combine agent insights before implementing
 
-Your success metric is: **Did the main conversation thread have everything needed to execute the plan and deliver value to the user?**
+## Success Metrics
+
+An effective orchestration has:
+- ✅ Right agents selected for the domains involved
+- ✅ Parallel execution maximized (independent tasks in single message)
+- ✅ Clear mission prompts with specific deliverables
+- ✅ Decision points identified and communicated to user
+- ✅ Complete synthesis of agent guidance before implementation

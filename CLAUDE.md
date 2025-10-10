@@ -43,15 +43,16 @@ For questions specifically about Theia or Electron frameworks, invoke the approp
 - "What's the correct way to use Electron's dialog API?" → electron-analyzer-agent
 - "Explain Theia's dependency injection pattern" → theia-analyzer-agent
 
-### 3. EG-DESK Development Planning & Execution → Invoke Swarm Manager
-For actual development tasks, multi-step workflows, or cross-framework implementation:
+### 3. EG-DESK Development Planning & Execution → Orchestrate Agents
 
-**Delegate to agent-swarm-manager when:**
+For actual development tasks, multi-step workflows, or cross-framework implementation, follow the agent orchestration guidelines in @.claude/prompts/agent-orchestration.md
+
+**When to orchestrate:**
 - Implementing new features for the EG-DESK application
 - Multi-step development workflows
 - Tasks involving both Theia AND Electron frameworks
 - Complex troubleshooting requiring multiple agents
-- Planning implementation strategies
+- Strategic implementation planning
 - Coordinated analysis across multiple systems
 
 **Examples:**
@@ -59,6 +60,12 @@ For actual development tasks, multi-step workflows, or cross-framework implement
 - "Implement a new sidebar panel with Electron integration"
 - "Debug this issue that involves both Theia's extension system and Electron's IPC"
 - "Plan out how to add collaborative editing to EG-DESK"
+
+**How it works:**
+1. You analyze the task and discover available agents (read `.claude/agents/`)
+2. You create detailed mission prompts for each needed agent
+3. You invoke agents in parallel or sequential phases (using Task tool)
+4. You synthesize their guidance and implement the solution
 
 ### 4. Agent Creation
 
@@ -101,13 +108,14 @@ This is a fork of Eclipse Theia with Electron integration. The project contains:
 ## Operating Principles
 
 1. **Analyze first, act second**: Always categorize the request type before taking action
-2. **Direct > Framework Agent > Swarm Manager**: Use the simplest approach that solves the problem
+2. **Direct > Framework Agent > Orchestration**: Use the simplest approach that solves the problem
 3. **Framework agents are for knowledge**: Use theia-analyzer-agent or electron-analyzer-agent for single-framework questions
-4. **Swarm manager is for development**: Use agent-swarm-manager for actual EG-DESK development work
+4. **Orchestrate for development**: Follow `@.claude/prompts/agent-orchestration.md` for complex EG-DESK development work
 5. **Stay framework-focused**: When discussing Theia or Electron, reference framework patterns and official documentation
 6. **Maintain context**: Keep track of ongoing work and reference previous decisions
+7. **Metaphysical separation**: When orchestrating, delegate domain file reading to specialized agents
 
-## Delegation Patterns
+## Execution Patterns
 
 ### Pattern 1: Direct Framework Agent (single framework question)
 ```
@@ -116,11 +124,16 @@ This is a fork of Eclipse Theia with Electron integration. The project contains:
 [Use Task tool to invoke theia-analyzer-agent OR electron-analyzer-agent with the question]
 ```
 
-### Pattern 2: Swarm Manager (development work)
+### Pattern 2: Orchestrate Agents (development work)
 ```
 [Analyze: This is EG-DESK development work requiring planning/multi-step execution]
 
-I'll delegate this to the agent-swarm-manager to create an execution plan.
+I'll orchestrate the needed agents to plan and implement this.
 
-[Use Task tool to invoke agent-swarm-manager with detailed context]
+[Follow orchestration guidelines to:]
+1. Discover available agents (Glob .claude/agents/)
+2. Create mission prompts for each needed agent
+3. Plan execution phases (parallel/sequential)
+4. Invoke agents using Task tool
+5. Synthesize results and implement
 ```

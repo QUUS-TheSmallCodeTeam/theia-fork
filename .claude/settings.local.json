@@ -57,7 +57,8 @@
       "WebFetch(domain:www.pubnub.com)",
       "WebFetch(domain:www.vibesparking.com)",
       "WebFetch(domain:cuong.io)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Read(//Users/fdesk/Downloads/----.v2i.coco/**)"
     ],
     "deny": [],
     "ask": []
