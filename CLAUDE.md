@@ -43,11 +43,11 @@ For questions specifically about Theia or Electron frameworks, invoke the approp
 - "What's the correct way to use Electron's dialog API?" → electron-analyzer-agent
 - "Explain Theia's dependency injection pattern" → theia-analyzer-agent
 
-### 3. EG-DESK Development Planning & Execution → Orchestrate Agents
+### 3. EG-DESK Development Planning & Execution → PM-Driven Workflow
 
-For actual development tasks, multi-step workflows, or cross-framework implementation, follow the agent orchestration guidelines in @.claude/prompts/agent-orchestration.md
+For actual development tasks, multi-step workflows, or cross-framework implementation, follow the PM-driven workflow where PM Agent provides strategic direction.
 
-**When to orchestrate:**
+**When to use PM-driven workflow:**
 - Implementing new features for the EG-DESK application
 - Multi-step development workflows
 - Tasks involving both Theia AND Electron frameworks
@@ -61,23 +61,55 @@ For actual development tasks, multi-step workflows, or cross-framework implement
 - "Debug this issue that involves both Theia's extension system and Electron's IPC"
 - "Plan out how to add collaborative editing to EG-DESK"
 
-**How it works:**
-1. You analyze the task and discover available agents (read `.claude/agents/`)
-2. You create detailed mission prompts for each needed agent
-3. You invoke agents in parallel or sequential phases (using Task tool)
-4. You synthesize their guidance and implement the solution
+**How it works (PM-Driven):**
+1. **Consult PM for strategic guide**:
+   - Invoke `egdesk-pm-agent` with user request
+   - PM provides: Framework choice, code location, implementation phasing, considerations
+   - PM creates PRD if feature approved
+
+2. **Create execution plan** based on PM's strategic guide:
+   - Follow PM's recommended phasing
+   - Identify which framework agents to query (per PM's direction)
+
+3. **Query framework agents** (as directed by PM):
+   - Invoke framework agents to get technical patterns
+   - Framework agents return: Patterns, file lists (CREATE/MODIFY/DELETE/REFERENCE)
+
+4. **(Optional) Return to PM for plan review**:
+   - If complex: Present your plan + framework findings to PM
+   - PM validates plan, suggests improvements, flags user decisions
+
+5. **Synthesize** PM guide + framework patterns into coding instructions:
+   - Direction: What to implement
+   - File list: CREATE/MODIFY/DELETE/REFERENCE files
+
+6. **Spawn coding-agent(s)**:
+   - Provide direction + file list
+   - coding-agent reads files for implementation details
+
+7. **Build, test, and commit** the changes
+
+**Your role**: Communicator & Executor (not decision-maker)
+- Present user requests to PM
+- Create plans based on PM's strategic guide
+- Query technical agents as PM directs
+- Execute implementation via coding-agent
+- Build, test, commit
 
 ### 4. Agent Creation
 
 #### Permanent Agents
 When the user requests a new specialized agent or when you identify a recurring need:
 
-**Create new agents by:**
-1. Reading `C:\Projects\theia-fork\ideas&external_references\claude-agent-sdk\subagent-best-practices.md` for best practices
-2. Designing appropriate YAML frontmatter (name, description, tools, model)
-3. Writing comprehensive agent instructions following best practices
-4. Using Write tool to create `.claude/agents/[agent-name].md`
-5. Informing user that agent is created (may need session restart to use)
+**Delegate to claude-agent-sdk-analyzer-agent:**
+1. Invoke `claude-agent-sdk-analyzer-agent` with agent requirements
+2. The agent will:
+   - Read `subagent-best-practices.md` for design patterns
+   - Examine existing agents to extract proven patterns
+   - Design YAML frontmatter (name, description, tools, model)
+   - Write comprehensive agent instructions
+   - Create `.claude/agents/[agent-name].md` file
+3. Inform user that agent is created (may need session restart to use)
 
 #### Temporary "Pseudo-Agents" (Prompt Files)
 For one-off or experimental specialized tasks without creating a full agent:
@@ -124,16 +156,32 @@ This is a fork of Eclipse Theia with Electron integration. The project contains:
 [Use Task tool to invoke theia-analyzer-agent OR electron-analyzer-agent with the question]
 ```
 
-### Pattern 2: Orchestrate Agents (development work)
+### Pattern 2: PM-Driven Development (development work)
 ```
-[Analyze: This is EG-DESK development work requiring planning/multi-step execution]
+[Analyze: This is EG-DESK development work requiring strategic planning]
 
-I'll orchestrate the needed agents to plan and implement this.
+I'll consult PM for strategic guidance, then execute the implementation.
 
-[Follow orchestration guidelines to:]
-1. Discover available agents (Glob .claude/agents/)
-2. Create mission prompts for each needed agent
-3. Plan execution phases (parallel/sequential)
-4. Invoke agents using Task tool
-5. Synthesize results and implement
+[PM-Driven Workflow:]
+1. Invoke egdesk-pm-agent: "User wants [feature]. Provide strategic guide."
+   → PM returns: Framework, location, phasing, considerations, creates PRD
+
+2. Create execution plan based on PM's guide:
+   → Phase 1: Query [framework-agent] per PM's direction
+   → Phase 2: Implement based on findings
+
+3. Query framework agents as PM directed:
+   → Invoke framework agents for technical patterns
+   → Receive: Patterns, file lists (CREATE/MODIFY/DELETE/REFERENCE)
+
+4. (Optional) Return to PM for plan review if complex:
+   → "I created this plan: [...]. Agent reports: [...]. Review?"
+   → PM validates or suggests improvements
+
+5. Synthesize into coding instructions:
+   → Direction + File list from PM guide + framework patterns
+
+6. Spawn coding-agent(s) with synthesized instructions
+
+7. Build, test, commit
 ```

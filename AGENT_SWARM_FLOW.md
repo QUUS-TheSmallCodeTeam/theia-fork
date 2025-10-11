@@ -12,11 +12,34 @@ Main Thread (analyzes & routes)
      │
      ├─ Simple? → Execute directly
      ├─ Framework question? → Direct to framework analyzer agent
-     ├─ Development task? → Main Thread orchestrates agents (follows @.claude/prompts/agent-orchestration.md)
-     └─ New agent? → Main Thread reads SDK docs and creates agent file directly
+     ├─ New agent? → Invoke claude-agent-sdk-analyzer-agent
      │
-     ▼
-Main Thread implements (ONLY entity that writes code)
+     └─ Development task? → PM-driven workflow:
+            │
+            ▼
+         PM Agent (Strategic Guide)
+            ├─ Vision alignment
+            ├─ Framework selection (Theia/Electron/Both)
+            ├─ Code location (packages/X/src/Y/)
+            ├─ Implementation phasing
+            ├─ Creates PRD (if approved)
+            └─ Returns strategic guide to Main Thread
+                 │
+                 ▼
+         Main Thread (Executor)
+            ├─ Creates plan based on PM's guide
+            ├─ Queries framework agents (per PM's direction)
+            ├─ (Optional) Returns to PM for plan review
+            ├─ Synthesizes PM guide + framework patterns
+            └─ Spawns coding-agent(s):
+                 • Direction (what to implement)
+                 • File list (CREATE/MODIFY/DELETE/REFERENCE)
+                 • coding-agent reads files for details
+            │
+            ▼
+         Main Thread builds, tests, commits
+
+Roles: PM guides strategy → Main Thread executes → coding-agent implements
 ```
 
 ## Critical Architecture Principle: Metaphysical Separation
@@ -31,15 +54,16 @@ Main Thread implements (ONLY entity that writes code)
 │                                                  │
 │ Main Thread:                                    │
 │  • Routes requests                              │
-│  • Discovers agents (Read .claude/agents/)      │
+│  • Identifies agents (from system prompt)       │
 │  • Creates mission prompts (orchestration)      │
 │  • Invokes agents                               │
 │  • Synthesizes results                          │
 │  • Writes code (implementation)                 │
+│  • Preserves context (delegates heavy reading)  │
 │                                                  │
 │ Can read for orchestration:                     │
-│  • .claude/agents/ (agent discovery)            │
 │  • .claude/prompts/ (orchestration guidelines)  │
+│  • .claude/agents/ (OPTIONAL - only for details)│
 │                                                  │
 │ Cannot read when orchestrating:                 │
 │  • vision docs, codebase (delegate to agents)   │
@@ -113,7 +137,7 @@ Main Thread implements (ONLY entity that writes code)
 
 ---
 
-### Scenario 3: Strategic Decision (Vision-Focused)
+### Scenario 3: Strategic Decision with Insight Provision (Vision Conflict)
 
 **User Request:**
 ```
@@ -125,15 +149,14 @@ Main Thread implements (ONLY entity that writes code)
 | Step | Entity | Action | Tools Used | Output |
 |------|--------|--------|------------|--------|
 | 1 | User | Proposes feature idea | None | Request sent |
-| 2 | Main Thread | Analyzes: EG-DESK feature, needs vision validation | None | Follows orchestration guidelines |
-| 3 | Main Thread | Discovers available agents | `Glob(".claude/agents/*.md")`<br>`Read(agent definitions)` | Identifies egdesk-pm-agent as relevant |
-| 4 | Main Thread | Creates mission prompt | None (orchestration logic) | Detailed prompt for PM agent |
-| 5 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "Analyze vision documents to validate: Does floating cursor-following AI assistant align with EG-DESK spatial canvas principles?")` | PM agent starts |
-| 6 | egdesk-pm-agent | Discovers vision docs | `Glob("ideas&external_references/eg-desk ideas/*.md")` | Finds relevant docs |
-| 7 | egdesk-pm-agent | Analyzes vision docs | `Read("EG-DESK_Whitepaper.md")`<br>`Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")`<br>`Grep("spatial", "proximity")` | Extracts principles |
-| 8 | egdesk-pm-agent | Evaluates alignment | None (analysis) | Decision: REJECT |
-| 9 | egdesk-pm-agent | Returns decision | None | "REJECT: Conflicts with spatial canvas paradigm. Recommend proximity-based activation instead." |
-| 10 | Main Thread | Presents to user | None | User sees rejection with alternative |
+| 2 | Main Thread | Analyzes: EG-DESK feature, needs PM strategic guide | None | Follows orchestration guidelines |
+| 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants floating AI assistant that follows mouse cursor. Provide strategic guide.")` | PM agent starts |
+| 4 | egdesk-pm-agent | Discovers vision docs | `Glob("ideas&external_references/eg-desk ideas/**/*.md")` | Finds UX and whitepaper docs |
+| 5 | egdesk-pm-agent | Analyzes vision docs | `Read("EG-DESK_Whitepaper.md")`<br>`Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")`<br>`Grep("spatial", "proximity", "floating")` | Finds: Previous decision against floating UI |
+| 6 | egdesk-pm-agent | Evaluates alignment | None (analysis) | Decision: REJECT - conflicts with spatial canvas principles |
+| 7 | egdesk-pm-agent | **Provides insight to user** (not just reject) | None | Explains conflict, suggests alternative |
+| 8 | egdesk-pm-agent | Returns strategic guide | None | **Summary**: Floating cursor-following AI conflicts with spatial canvas principles.<br>**Decision**: REJECT<br>**Insight**: "In EG-DESK_Spatial_Canvas_UX_Solutions.md, we decided against floating/following UI because it breaks spatial affordances. Users lose sense of place when elements follow cursor."<br>**Alternative**: Proximity-based AI activation - AI appears NEAR relevant canvas objects, not following cursor<br>**Why alternative is better**: Maintains spatial relationships while providing contextual AI |
+| 9 | Main Thread | Presents insight to user | None | User understands WHY it conflicts and sees vision-aligned alternative |
 
 **Total Agents Invoked:** 1 (egdesk-pm-agent)
 
@@ -141,14 +164,16 @@ Main Thread implements (ONLY entity that writes code)
 
 **Duration:** Single agent invocation
 
-**Key Point:**
-- **Main Thread** discovered agents and created mission prompt (orchestration)
-- **PM Agent** did the actual vision document reading and analysis
-- Feature rejected before any technical analysis - vision validation is the first gate
+**Key Points:**
+- **PM provides insight, not just rejection**: Explains why conflict exists
+- **Institutional memory**: "We previously decided X in document Y because Z"
+- **Alternative suggestion**: Vision-aligned approach that solves same user need
+- **User understands vision**: Not just "no", but "no because... and here's better way"
+- **Context Preservation**: Main Thread didn't read vision docs - PM synthesized everything
 
 ---
 
-### Scenario 4: Cross-Framework Implementation (Full Orchestration)
+### Scenario 4: Development with PM Strategic Guide
 
 **User Request:**
 ```
@@ -159,48 +184,42 @@ Main Thread implements (ONLY entity that writes code)
 
 | Step | Entity | Action | Tools Used | Output |
 |------|--------|--------|------------|--------|
-| **PHASE 0: ROUTING & ORCHESTRATION** |
+| **PHASE 0: PM STRATEGIC GUIDE** |
 | 1 | User | Requests feature | None | Request sent |
-| 2 | Main Thread | Analyzes: Development task, multi-domain | None | Follows orchestration guidelines |
-| 3 | Main Thread | Discovers available agents | `Glob(".claude/agents/*.md")`<br>`Read(agent definitions)` | Understands agent capabilities |
-| 4 | Main Thread | Identifies needed agents | None (orchestration logic) | List: egdesk-pm-agent, theia-analyzer-agent |
-| 5 | Main Thread | Creates mission prompts | None (orchestration) | Detailed prompts for each agent |
-| 6 | Main Thread | Plans phases | None (orchestration) | Phase 1: Parallel validation, Phase 2: Sequential architecture |
-| **PHASE 1: VALIDATION (Parallel)** |
-| 7 | Main Thread | Executes Phase 1 (parallel) | `Task(agent: "egdesk-pm-agent", prompt: "[mission]")`<br>`Task(agent: "theia-analyzer-agent", prompt: "[mission]")` | Both agents start simultaneously |
-| 8a | egdesk-pm-agent | Validates vision alignment | `Read("EG-DESK_Whitepaper.md")`<br>`Grep("ambient AI")` | Finds: Aligns with principles |
-| 8b | theia-analyzer-agent | Analyzes theme system | `Read("packages/terminal/src/browser/terminal-theme-service.ts")`<br>`Grep("@injectable.*Theme")` | Finds: Theme registration pattern |
-| 9a | egdesk-pm-agent | Returns decision | None | "APPROVE: Aligns with ambient AI" |
-| 9b | theia-analyzer-agent | Returns technical analysis | None | "Pattern: ThemeService.register() at line 45" |
-| **PHASE 2: ARCHITECTURE (Sequential)** |
-| 10 | Main Thread | Synthesizes Phase 1 results | None (internal) | Decision: Approved + Pattern identified |
-| 11 | Main Thread | Executes Phase 2 | `Task(agent: "theia-analyzer-agent", prompt: "Using ThemeService pattern, analyze how to create TimeBasedSwitcher")` | Agent starts |
-| 12 | theia-analyzer-agent | Designs architecture | `Read("packages/workspace/src/browser/workspace-service.ts")`<br>`Grep("@injectable.*Service")` | Finds: DI patterns |
-| 13 | theia-analyzer-agent | Returns architecture | None | "Create TimeBasedThemeSwitcher service, register in DI, hook into lifecycle" |
+| 2 | Main Thread | Analyzes: Development task, needs strategic direction | None | Routes to PM for initial guide |
+| 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants time-based terminal theme. Provide strategic guide.")` | PM agent starts |
+| 4 | egdesk-pm-agent | Dynamic discovery | `Glob("ideas&external_references/eg-desk ideas/**/*.md")`<br>`Glob("packages/*/package.json")`<br>`Grep("theme", "terminal")` | Finds vision docs + existing theme code |
+| 5 | egdesk-pm-agent | Analyzes vision + structure | `Read("EG-DESK_Whitepaper.md")`<br>`Read("packages/terminal/package.json")`<br>`Read("packages/terminal/src/browser/terminal-theme-service.ts")` | Extracts principles + discovers structure |
+| 6 | egdesk-pm-agent | Creates PRD | `Write("ideas&external_references/eg-desk ideas/features/time-based-terminal-theme-prd.md", "[PRD content]")` | PRD file created |
+| 7 | egdesk-pm-agent | Returns strategic guide | None | **Decision**: APPROVE<br>**Framework**: Theia (terminal theming is Theia domain)<br>**Location**: `packages/terminal/src/browser/`<br>**Approach**: Phase 1 - analyze theme system, Phase 2 - design service, Phase 3 - implement<br>**Considerations**: Manual override needed, preference persistence<br>**PRD Created**: time-based-terminal-theme-prd.md |
+| **PHASE 1: MAIN THREAD CREATES PLAN** |
+| 8 | Main Thread | Creates execution plan based on PM guide | None (planning) | Plan: Query theia-analyzer for theme patterns, design TimeBasedSwitcher, implement |
+| **PHASE 2: FRAMEWORK INVESTIGATION** |
+| 9 | Main Thread | Queries framework agent (per PM's guide) | `Task(agent: "theia-analyzer-agent", prompt: "Analyze terminal theme system at packages/terminal/src/browser/terminal-theme-service.ts for registration and DI patterns")` | Agent starts |
+| 10 | theia-analyzer-agent | Analyzes theme system | `Read("packages/terminal/src/browser/terminal-theme-service.ts")`<br>`Read("packages/terminal/src/browser/terminal-frontend-module.ts")`<br>`Grep("@injectable")` | Finds patterns |
+| 11 | theia-analyzer-agent | Returns analysis | None | **Files Analyzed**: terminal-theme-service.ts:45, terminal-frontend-module.ts:32<br>**Pattern**: ThemeService.register() with DI binding<br>**File List**: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, REFERENCE workspace-service.ts:89 for @injectable() |
 | **PHASE 3: IMPLEMENTATION (Main Thread)** |
-| 14 | Main Thread | Creates service file | `Write("packages/terminal/src/browser/time-based-theme-switcher.ts", "[code]")` | New file created |
-| 15 | Main Thread | Registers in DI | `Read("terminal-frontend-module.ts")`<br>`Edit(old: "export default", new: "bind(TimeBasedSwitcher)...")` | DI binding added |
-| 16 | Main Thread | Integrates with contribution | `Read("terminal-frontend-contribution.ts")`<br>`Edit(old: "export class", new: "@inject(TimeBasedSwitcher)...")` | Integration complete |
-| 17 | Main Thread | Builds package | `Bash("npm run build")` | Build succeeds |
-| 18 | Main Thread | Stages files | `Bash("git add packages/terminal/...")` | Files staged |
-| 19 | Main Thread | Commits | `Bash("git commit -m 'feat(terminal): add time-based theme switcher'")` | Commit created |
-| 20 | Main Thread | Reports to user | None | "Feature implemented and committed" |
+| 12 | Main Thread | Implements directly (small change) | `Write("time-based-theme-switcher.ts")`<br>`Edit("terminal-frontend-module.ts")`<br>`Edit("terminal-contribution.ts")` | Code written |
+| 13 | Main Thread | Builds, tests, commits | `Bash("npm run build && git add . && git commit")` | Committed |
 
-**Total Agents Invoked:** 3 invocations (PM agent + Theia agent in parallel → Theia agent sequential)
+**Total Agents Invoked:** 2 (PM strategic guide → framework analyzer)
 
-**Who Wrote Code:** Main Thread ONLY (steps 14-19)
+**Who Wrote Code:** Main Thread directly (small implementation)
 
-**Duration:** Multi-phase (orchestration → parallel validation → sequential architecture → implementation)
+**Duration:** Multi-phase (PM guide → plan → framework investigation → implementation)
 
 **Critical Observations:**
-- **Main Thread** orchestrated everything: discovered agents, created mission prompts, planned phases
-- **Agents** only analyzed and returned guidance (never touched code)
-- **Main Thread** did ALL code writing, building, and committing
-- **Parallel execution** in Phase 1 saved time
+- **PM provides complete strategic direction**: Framework, location, approach, considerations
+- **PM creates PRD**: Documents approved feature
+- **Main Thread creates plan** based on PM's guide
+- **Framework agent** provides technical patterns (not strategic direction)
+- **Main Thread implements** following both PM's strategy and framework patterns
+
+**Note**: This shows direct implementation. For larger changes, Main Thread would delegate to coding-agent (see Scenario 4b).
 
 ---
 
-### Scenario 4b: Cross-Framework Implementation (With Coding Agent)
+### Scenario 4b: Development with PM Guide + Coding Agent Delegation
 
 **User Request:**
 ```
@@ -213,42 +232,45 @@ Main Thread implements (ONLY entity that writes code)
 
 | Step | Entity | Action | Tools Used | Output |
 |------|--------|--------|------------|--------|
-| **PHASE 0-2: SAME AS SCENARIO 4** |
-| 1-13 | Various | (Same orchestration and validation phases) | (See Scenario 4) | All agent guidance collected |
+| **PHASE 0-2: SAME AS SCENARIO 4 (Steps 1-11)** |
+| 1-11 | Various | PM provides strategic guide → Main Thread creates plan → Framework agent investigates | (See Scenario 4) | Strategic guide + Framework patterns collected |
 | **PHASE 3: IMPLEMENTATION (Delegated to Coding Agent)** |
-| 14 | Main Thread | Synthesizes all guidance | None (internal) | Complete implementation instructions |
-| 15 | Main Thread | Delegates to coding agent | `Task(agent: "coding-agent", prompt: "[detailed implementation instructions with all agent guidance]")` | Coding agent starts |
-| 16 | coding-agent | Reads pattern examples | `Read("packages/workspace/src/browser/workspace-service.ts")` | Understands DI pattern |
-| 17 | coding-agent | Creates service file | `Write("packages/terminal/src/browser/time-based-theme-switcher.ts", "[code following pattern]")` | New file created |
-| 18 | coding-agent | Reads module file | `Read("terminal-frontend-module.ts")` | Current structure |
-| 19 | coding-agent | Registers in DI | `Edit(old: "export default", new: "bind(TimeBasedSwitcher)...")` | DI binding added |
-| 20 | coding-agent | Reads contribution file | `Read("terminal-frontend-contribution.ts")` | Current structure |
-| 21 | coding-agent | Integrates service | `Edit(old: "export class", new: "@inject(TimeBasedSwitcher)...")` | Integration complete |
-| 22 | coding-agent | Returns report | None | "Implementation complete: 1 file created, 2 files modified" |
+| 12 | Main Thread | Synthesizes PM guide + framework findings | None (internal) | Direction: Create TimeBasedThemeSwitcher<br>File List: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, terminal-contribution.ts:89, REFERENCE workspace-service.ts:89 |
+| 13 | Main Thread | Delegates to coding agent | `Task(agent: "coding-agent", prompt: "Implement time-based terminal theme switcher.<br><br>Direction: Create TimeBasedThemeSwitcher service following Theia DI pattern with automatic time-based switching + manual override + preference persistence.<br><br>Files:<br>CREATE: packages/terminal/src/browser/time-based-theme-switcher.ts<br>MODIFY: packages/terminal/src/browser/terminal-frontend-module.ts:36 (add DI binding)<br>MODIFY: packages/terminal/src/browser/terminal-contribution.ts:89 (inject service)<br>REFERENCE: packages/workspace/src/browser/workspace-service.ts:89 (follow @injectable() pattern)<br><br>[You will read files for implementation details]")` | Coding agent starts |
+| 14 | coding-agent | Reads pattern reference | `Read("packages/workspace/src/browser/workspace-service.ts")` | Understands DI pattern |
+| 15 | coding-agent | Creates service file | `Write("packages/terminal/src/browser/time-based-theme-switcher.ts", "[code following pattern]")` | New file created |
+| 16 | coding-agent | Reads module file | `Read("packages/terminal/src/browser/terminal-frontend-module.ts")` | Current structure |
+| 17 | coding-agent | Registers in DI | `Edit(old: "export default", new: "bind(TimeBasedThemeSwitcher)...")` | DI binding added |
+| 18 | coding-agent | Reads contribution file | `Read("packages/terminal/src/browser/terminal-contribution.ts")` | Current structure |
+| 19 | coding-agent | Integrates service | `Edit(old: "export class", new: "@inject(TimeBasedThemeSwitcher)...")` | Integration complete |
+| 20 | coding-agent | Returns report | None | **Implementation Complete**: 1 CREATE, 2 MODIFY following workspace-service.ts pattern |
 | **PHASE 4: VERIFICATION (Main Thread)** |
-| 23 | Main Thread | Builds package | `Bash("npm run build")` | Build succeeds |
-| 24 | Main Thread | Stages files | `Bash("git add packages/terminal/...")` | Files staged |
-| 25 | Main Thread | Commits | `Bash("git commit -m 'feat(terminal): add time-based theme switcher'")` | Commit created |
-| 26 | Main Thread | Reports to user | None | "Feature implemented and committed" |
+| 21 | Main Thread | Builds package | `Bash("npm run build")` | Build succeeds |
+| 22 | Main Thread | Stages and commits | `Bash("git add packages/terminal && git commit -m 'feat(terminal): add time-based theme switcher'")` | Committed |
+| 23 | Main Thread | Reports to user | None | "Feature implemented and committed" |
 
-**Total Agents Invoked:** 4 invocations (PM agent + Theia agent in parallel → Theia agent sequential → coding-agent for implementation)
+**Total Agents Invoked:** 3 (PM strategic guide → framework analyzer → coding-agent)
 
-**Who Wrote Code:** coding-agent (steps 17-21)
+**Who Wrote Code:** coding-agent (steps 15-19)
 
 **Duration:** Multi-phase with coding delegation
 
 **Critical Observations:**
-- **Main Thread** orchestrated and synthesized but delegated actual coding
-- **Main Thread's context** stayed clean - no file edit history
-- **coding-agent** executed in separate context with fresh token budget
-- **Main Thread** handled build, test, commit (Bash operations)
-- **Benefit**: Main Thread can continue orchestrating other features while coding agent works
+- **PM's strategic guide** drove entire workflow (framework choice, location, approach)
+- **Main Thread synthesized** PM guide + framework patterns into precise coding-agent instructions
+- **coding-agent received**:
+  - Clear direction (what to implement)
+  - File list with actions (CREATE/MODIFY/REFERENCE)
+  - Pattern references (which files to learn from)
+  - Implementation details left to coding-agent (reads files as needed)
+- **Main Thread's context** stayed clean - coding-agent handled all file reading/editing
+- **Main Thread** retained control of build/test/commit
 
 **When to use this pattern:**
 - Large implementations (3+ files)
-- Many file edits expected
-- Main Thread context filling up
-- Need to preserve Main Thread for continued orchestration
+- Main Thread needs to stay available for orchestration
+- Multiple features being developed in parallel
+- Context preservation is critical
 
 ---
 
@@ -264,23 +286,28 @@ Main Thread implements (ONLY entity that writes code)
 | Step | Entity | Action | Tools Used | Output |
 |------|--------|--------|------------|--------|
 | 1 | User | Requests new agent | None | Request sent |
-| 2 | Main Thread | Analyzes: Agent creation (meta-level task) | None | Handles directly without agents |
-| 3 | Main Thread | Reads SDK best practices | `Read("ideas&external_references/claude-agent-sdk/subagent-best-practices.md")` | Learns agent design patterns |
-| 4 | Main Thread | Examines existing agents | `Glob(".claude/agents/*.md")`<br>`Read(".claude/agents/theia-analyzer-agent.md")` | Finds proven patterns |
-| 5 | Main Thread | Designs agent structure | None (planning) | YAML frontmatter + instructions |
-| 6 | Main Thread | Creates agent file | `Write(".claude/agents/konva-analyzer-agent.md", "[complete agent spec]")` | Agent file created |
-| 7 | Main Thread | Informs user | None | "Agent created. Restart session to use." |
+| 2 | Main Thread | Analyzes: Agent creation task | None | Routes to claude-agent-sdk-analyzer-agent |
+| 3 | Main Thread | Invokes claude-agent | `Task(agent: "claude-agent-sdk-analyzer-agent", prompt: "Create an agent that analyzes Konva.js integration patterns in the codebase")` | Agent starts |
+| 4 | claude-agent | Reads best practices | `Read("ideas&external_references/claude-agent-sdk/subagent-best-practices.md")` | Learns agent design patterns |
+| 5 | claude-agent | Examines existing analyzer agents | `Glob(".claude/agents/*-analyzer-agent.md")`<br>`Read(".claude/agents/theia-analyzer-agent.md")`<br>`Read(".claude/agents/infinite-canvas-analyzer-agent.md")` | Extracts proven patterns |
+| 6 | claude-agent | Designs agent architecture | None (analysis) | YAML frontmatter + instruction structure planned |
+| 7 | claude-agent | Creates agent file | `Write(".claude/agents/konva-analyzer-agent.md", "[complete agent spec following best practices]")` | Agent file created |
+| 8 | claude-agent | Returns report (standard format) | None | **Summary**: Created konva-analyzer-agent following framework analyzer patterns.<br>**Specifications**: Tools: Bash, Read, Glob, Grep, WebSearch; Model: inherit<br>**Best Practices Applied**: Evidence-based analysis, contextual tool restriction, standard reporting format<br>**File Created**: `.claude/agents/konva-analyzer-agent.md`<br>**Next Steps**: Session restart may be needed to use new agent |
+| 9 | Main Thread | Presents to user | None | "Agent created. Restart session to use konva-analyzer-agent." |
 
-**Total Agents Invoked:** 0
+**Total Agents Invoked:** 1 (claude-agent-sdk-analyzer-agent)
 
-**Who Wrote Code:** Main Thread (designed and created agent file)
+**Who Wrote Code:** claude-agent-sdk-analyzer-agent (created agent file)
 
-**Duration:** Direct execution (reads → plans → writes)
+**Duration:** Single agent invocation
 
-**Key Point:**
-- **Main Thread** handles agent creation directly - this is a meta-level orchestration task
-- **No agents needed** - Main Thread reads SDK best practices and designs the agent itself
-- **claude-agent-sdk-analyzer-agent's actual purpose**: Implementing Claude Code SDK features into forked applications, NOT for creating new agents
+**Key Points:**
+- **Main Thread** delegates agent creation to specialized claude-agent
+- **claude-agent** reads best practices, examines existing agents, designs and creates new agent file
+- **claude-agent's dual purpose**:
+  1. Create new subagents (primary)
+  2. Provide SDK implementation guidance (secondary)
+- **Evidence-based design**: claude-agent always reads `subagent-best-practices.md` before creating agents
 
 ---
 
@@ -320,9 +347,9 @@ Main Thread implements (ONLY entity that writes code)
 | **File Edit** | Direct execution | 0 | Main Thread | "Fix typo", "Update version" |
 | **Framework Question** | Direct to framework agent | 1 | Nobody | "How does Theia DI work?" |
 | **Strategic Decision** | Main Thread orchestrates → PM agent | 1 | Nobody | "Should we add feature X?" |
-| **Small Implementation** | Main Thread orchestrates → analyzers | 1-2 | Main Thread | "Add simple Theia widget" |
-| **Large Implementation** | Main Thread orchestrates → analyzers + coding-agent | 3-4+ | coding-agent | "Implement multi-file feature" |
-| **Agent Creation** | Main Thread directly | 0 | Main Thread | "Create Konva analyzer agent" |
+| **Small Implementation** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | "Add simple Theia widget" |
+| **Large Implementation** | Main Thread orchestrates → analyzers + coding-agent(s) | 3-4+ | coding-agent(s) | "Implement multi-file feature" |
+| **Agent Creation** | Main Thread → claude-agent | 1 | claude-agent | "Create Konva analyzer agent" |
 
 ---
 
@@ -342,56 +369,101 @@ User Request
          ├─ Single framework question? ───> Framework Agent ──> ANSWER
          │                                   (1 agent)
          │
-         ├─ Complex development task? ────> Main Thread Orchestrates:
-         │                                   1. Discover agents (.claude/agents/)
-         │                                   2. Create mission prompts
-         │                                   3. Plan phases (parallel/sequential)
-         │                                   4. Invoke agents (Task tool)
-         │                                   5. Synthesize results
-         │                                   6. IMPLEMENT (write code)
+         ├─ Development task? ────────────> PM-Driven Workflow:
          │                                        │
-         │                                        ├─> Phase 1 (parallel agents)
-         │                                        ├─> Phase 2 (sequential agents)
-         │                                        └─> [DECISION POINT] → User
+         │                                        ▼
+         │                                  ┌──────────────────┐
+         │                                  │ PM Agent         │
+         │                                  │ Strategic Guide: │
+         │                                  │ • Framework      │
+         │                                  │ • Location       │
+         │                                  │ • Phasing        │
+         │                                  │ • Create PRD     │
+         │                                  └────────┬─────────┘
+         │                                           │
+         │                                           ▼
+         │                                  ┌──────────────────────┐
+         │                                  │ Main Thread          │
+         │                                  │ • Creates plan       │
+         │                                  │ • Queries framework  │
+         │                                  │   agents             │
+         │                                  │ • (Optional) PM      │
+         │                                  │   plan review        │
+         │                                  │ • Synthesizes        │
+         │                                  │ • Spawns coding-agent│
+         │                                  └────────┬─────────────┘
+         │                                           │
+         │                                           ▼
+         │                                  coding-agent implements
+         │                                           │
+         │                                           ▼
+         │                                  Main Thread: build, test, commit
          │
-         └─ New agent needed? ────────────> Main Thread reads SDK docs
-                                             and creates agent file directly
-                                             (0 agents)
+         └─ New agent needed? ────────────> Invoke claude-agent-sdk-analyzer-agent
+                                             (reads best practices, creates agent file)
+                                             (1 agent)
 
-All code writing: Main Thread ONLY
+Hierarchy: PM guides → Main Thread executes → coding-agent codes
 All agent invocations: Main Thread executes Task() calls
-All mission prompts: Created by Main Thread (following orchestration guidelines)
+Strategic direction: PM Agent provides
+Technical patterns: Framework agents provide
 ```
 
 ---
 
 ## Key Execution Principles
 
-### 1. Tool Ownership
+### 1. Tool Ownership (Contextual Restriction)
 
-| Tool | Only Used By |
-|------|--------------|
-| `Write` | Main Thread, coding-agent |
-| `Edit` | Main Thread, coding-agent |
-| `Bash` (with modifications) | Main Thread ONLY |
-| `Task` (to invoke agents) | Main Thread ONLY |
-| `Read`, `Glob`, `Grep` | Main Thread & All Agents |
+**PRINCIPLE**: Tools are restricted **contextually through prompts**, not mechanically removed. Agents have tools but their role descriptions define HOW to use them.
 
-### 2. When to Use coding-agent vs Direct Implementation
+| Entity | Tool Access | Usage Restriction (Contextual) |
+|--------|-------------|--------------------------------|
+| **Analyzer Agents** | Bash, Glob, Grep, Read, WebFetch, WebSearch | **Bash for READ-ONLY analysis** (inspect outputs, run tests to understand behavior). **NEVER for implementation** (commits, builds, installations). Role enforced via agent prompt. |
+| **coding-agent** | Write, Edit, Read, Glob, Grep | **Code execution only**. NO Bash (no builds/tests/commits). |
+| **Main Thread** | ALL tools | **Full access**: Orchestration, implementation, builds, commits, everything. |
+| **Task tool** | Main Thread ONLY | Agent invocation exclusive to Main Thread. |
 
-**Use coding-agent when:**
+**Why Contextual Works**:
+- Agents understand their role from prompts
+- More flexible (agents can investigate runtime behavior)
+- No artificial tool removal needed
+- Trust agent instructions to enforce boundaries
+
+### 2. When to Spawn Subagent (Context Preservation Strategy)
+
+**PRINCIPLE**: Spawn subagent when task requires heavy domain-specific reading that would pollute Main Thread's context.
+
+**Spawn subagent when:**
+- ✅ Task requires extensive domain reading (vision docs, framework docs, large codebase sections)
+- ✅ Need to synthesize knowledge from reference materials before action
+- ✅ Domain analysis needed (Theia patterns, Electron security, EG-DESK vision alignment)
+- ✅ Task is "learn this domain, then apply to implementation"
+- ✅ Would burden Main Thread context with reference material not needed later
+
+**Main Thread handles directly when:**
+- ✅ Simple questions answerable from system knowledge
+- ✅ File operations with clear instructions
+- ✅ Orchestration tasks (creating mission prompts, invoking agents)
+- ✅ Implementation with guidance already received from agents
+
+**Effect of Context Preservation**:
+```
+WITHOUT subagent:
+Main Thread reads 50 files → synthesizes patterns → implements
+(Context polluted with all 50 files)
+
+WITH subagent:
+Main Thread → Task(agent: "analyzer") → Agent reads 50 files, synthesizes
+→ Returns 3-paragraph summary
+(Main Thread context: clean, only has summary)
+```
+
+**Specific: coding-agent for Large Implementations**
 - ✅ Implementing 3+ files
 - ✅ Large file edits (500+ lines total)
-- ✅ Main Thread context > 200k tokens used
 - ✅ Need to preserve Main Thread for continued orchestration
-- ✅ Multiple features being implemented in parallel
-
-**Code directly in Main Thread when:**
-- ✅ Single file edit
-- ✅ Small changes (< 100 lines)
-- ✅ Simple implementations
-- ✅ Main Thread context < 100k tokens
-- ✅ Last task before commit (no more orchestration needed)
+- ✅ Multiple features planned in single session
 
 ### 3. Prompt Creation Flow
 
@@ -436,6 +508,81 @@ Task(agent: "theia-analyzer-agent", prompt: "Given the security reqs from previo
 - **Parallel**: Independent analyses (e.g., "How does each framework handle menus?")
 - **Sequential**: Later agent needs earlier agent's findings (e.g., "Given security requirements, analyze implementation")
 
+### 5. Conversational Re-query Pattern (Handling Incomplete Reports)
+
+**PRINCIPLE**: Agents are stateless (single invocation, single response), but Main Thread maintains conversation state and can contextually re-query by including previous context.
+
+**Scenario: Agent returns incomplete report**
+
+```
+Main Thread receives report:
+✓ Summary: Present
+✓ Findings: Present
+✗ Files Analyzed: MISSING (REQUIRED!)
+
+Main Thread re-queries contextually:
+Task(agent: "theia-analyzer-agent",
+     prompt: "You previously provided this analysis:
+
+[ENTIRE PREVIOUS REPORT]
+
+However, the 'Files Analyzed' section is missing, which is REQUIRED.
+Please provide the complete list of files you analyzed with file:line references.
+No need to re-analyze - just add the missing Files Analyzed section to your previous report.")
+```
+
+**Why this works:**
+- Agent is stateless, BUT Main Thread provides full context
+- Prompt is longer, but keeps conversation flexible
+- Agent can extract file list from its previous analysis
+- More natural than strict mechanical validation
+
+**When to use:**
+- Report missing required sections
+- Need clarification on specific findings
+- Want more detail on particular aspect
+- Need file list broken down differently
+
+**Example flow:**
+```
+Phase 1: Initial query
+→ Agent returns: Good analysis, but Files Analyzed incomplete
+
+Phase 2: Contextual re-query
+→ Main Thread includes previous report + specific request
+→ Agent completes the missing section
+
+Phase 3: Continue conversation
+→ Main Thread uses complete report for next phase
+```
+
+**File List Format Enforcement:**
+
+When agents DO include file lists, ensure proper categorization:
+
+```markdown
+**File List for Implementation**:
+
+1. **CREATE**:
+   - `packages/terminal/src/browser/time-based-theme-switcher.ts` - New service
+
+2. **MODIFY**:
+   - `packages/terminal/src/browser/terminal-frontend-module.ts:36` - Add DI binding
+   - `packages/terminal/src/browser/terminal-contribution.ts:89` - Inject service
+
+3. **DELETE** (if applicable):
+   - `packages/terminal/src/browser/deprecated-service.ts` - Remove old implementation
+
+4. **REFERENCE** (for patterns, not to modify):
+   - `packages/workspace/src/browser/workspace-service.ts:89` - Follow @injectable() pattern
+```
+
+This structure allows Main Thread to:
+- Extract exact action list for coding-agent
+- Know which files need creation vs modification
+- Identify pattern references separately from implementation targets
+- Provide precise instructions: "CREATE 1 file, MODIFY 2 files, following pattern from REFERENCE"
+
 ---
 
 ## Orchestration Guidelines Deep Dive
@@ -444,10 +591,10 @@ Task(agent: "theia-analyzer-agent", prompt: "Given the security reqs from previo
 
 When handling complex development tasks, Main Thread follows orchestration guidelines from `@.claude/prompts/agent-orchestration.md`:
 
-1. ✅ **Discovers agents** by reading `.claude/agents/` directory
-2. ✅ **Understands agent capabilities** by reading agent definition files
+1. ✅ **Identifies agents** from system prompt knowledge (Task tool description lists all agents)
+2. ✅ **Selects** appropriate agents based on capabilities from descriptions
 3. ✅ **Analyzes task requirements** from user request
-4. ✅ **Selects** appropriate agents based on capabilities
+4. ✅ **(Optional) Reads agent details** if needs specific implementation examples from agent files
 5. ✅ **Creates** detailed mission prompts for each agent
 6. ✅ **Plans** execution phases (parallel/sequential)
 7. ✅ **Identifies** decision points (분기점)
@@ -458,17 +605,22 @@ When handling complex development tasks, Main Thread follows orchestration guide
 ### File Reading Scope (Critical)
 
 **Main Thread CAN Read for Orchestration:**
-- `.claude/agents/*.md` - Agent definitions (for agent discovery)
 - `.claude/prompts/agent-orchestration.md` - Orchestration guidelines
+- `.claude/agents/*.md` - **OPTIONAL**: Only when needs detailed implementation examples from agent files (agent discovery already in system prompt)
 - Meta-level orchestration files only
 
 **Main Thread CANNOT Read When Orchestrating:**
-- `ideas&external_references/eg-desk ideas/` - That's PM agent's domain
-- `packages/` - That's framework analyzer agents' domain
-- Any application or framework code
-- Any vision or strategy documents
+- `ideas&external_references/eg-desk ideas/` - That's PM agent's domain (preserves Main Thread context)
+- `packages/` - That's framework analyzer agents' domain (they synthesize and return conclusions)
+- Any application or framework code (unless already guided by agents)
+- Any vision or strategy documents (PM agent reads these)
 
-**Principle**: Main Thread operates at the metaphysical level when orchestrating - it coordinates but delegates actual domain analysis to specialized agents.
+**Principle**: Main Thread operates at the metaphysical level when orchestrating - it coordinates but delegates actual domain analysis to specialized agents to preserve context.
+
+**Why Context Preservation Matters:**
+- PM agent reads ALL vision docs → returns summary → Main Thread's context stays clean
+- Framework agents read codebase → return patterns → Main Thread doesn't load 50 files
+- Main Thread only gets synthesized conclusions, not raw reference materials
 
 **Exception**: Main Thread CAN read domain files when directly implementing (after receiving agent guidance) or handling simple tasks that don't need orchestration.
 
@@ -516,7 +668,7 @@ The Main Thread then executes this plan exactly as specified.
 ## Complete Agent Ecosystem
 
 ### Vision & Strategy
-- **egdesk-pm-agent**: Vision document analysis, strategic alignment validation
+- **egdesk-pm-agent**: Strategic PM - provides implementation guidance (framework choice, code location, phasing), reviews Main Thread's plans, creates/updates PRDs and vision docs, maintains institutional memory, dynamically discovers project structure
 
 ### Framework Analysis
 - **theia-analyzer-agent**: Theia codebase analysis
@@ -525,16 +677,19 @@ The Main Thread then executes this plan exactly as specified.
 - **gemini-cli-analyzer-agent**: Gemini CLI codebase analysis
 
 ### Development Tools
-- **claude-agent-sdk-analyzer-agent**: For implementing Claude Code SDK features into forked applications (NOT for creating new agents)
-- **coding-agent**: Code execution specialist - implements code based on Main Thread instructions to keep Main Thread's context clean
+- **claude-agent-sdk-analyzer-agent**: Subagent Architect - designs and creates new specialized agents by analyzing best practices, also provides Claude Code SDK implementation guidance
+- **coding-agent**: Code execution specialist - implements code based on Main Thread's direction (what to fix/create + file list), reads files for details, keeps Main Thread's context clean
+- **error-recovery-agent**: Analyzes build/test failures, traces root causes, provides specific recovery strategies with file:line references
+- **ux-flow-simulator-agent**: Simulates user interaction flows, predicts runtime errors, identifies race conditions and UX issues before they reach production
 
 ### Orchestration
 - **Main Thread**: Orchestrates agents following guidelines in `.claude/prompts/agent-orchestration.md`
-  - Discovers available agents
+  - Identifies available agents (from system prompt)
   - Creates mission prompts
   - Plans execution phases
   - Invokes agents
   - Synthesizes results
+  - **Preserves context** by delegating heavy domain reading to specialized agents
   - **Can delegate coding to coding-agent** to preserve its context
   - Or implements directly for smaller changes
 
@@ -566,7 +721,7 @@ User → Main Thread orchestrates → egdesk-pm-agent → Decision
 ### Pattern 3: Full Development Cycle
 ```
 User → Main Thread orchestrates:
-         ├─ Discovers agents (.claude/agents/)
+         ├─ Identifies agents (from system prompt)
          ├─ Creates mission prompts
          ├─ Plans phases
          └─ Executes:
@@ -578,22 +733,33 @@ User → Main Thread orchestrates:
 
 ### Pattern 4: Agent Creation
 ```
-User → Main Thread reads SDK docs → Main Thread designs + creates agent file
-(No agents - meta-level task handled directly)
+User → Main Thread → claude-agent-sdk-analyzer-agent:
+                      ├─ Reads best practices
+                      ├─ Examines existing agents
+                      ├─ Designs new agent
+                      └─ Creates agent file
+(1 agent - claude-agent handles complete agent creation)
 ```
 
 ### Pattern 5: Large Implementation (Context Preservation)
 ```
 User → Main Thread orchestrates:
-         ├─ Discovers agents (.claude/agents/)
-         ├─ Gets guidance from PM + Framework analyzers
-         ├─ Synthesizes into detailed implementation plan
-         └─ Delegates to coding-agent:
-               ├─ coding-agent writes all code (in separate context)
+         ├─ Phase 1-N: Queries sub-agents, gathers insights
+         │   (PM validation, framework patterns, architecture guidance)
+         │
+         ├─ Synthesizes insights:
+         │   - What needs to be changed (direction)
+         │   - Which files need modification (file list)
+         │
+         └─ Spawns coding-agent(s):
+               ├─ Provides: direction + file list
+               ├─ coding-agent reads files for implementation details
+               ├─ coding-agent writes/edits code (in separate context)
                ├─ Returns status report
                └─ Main Thread builds, tests, commits
 
 Benefit: Main Thread's context stays clean for continued orchestration
+Details: coding-agent handles file reading and implementation specifics
 ```
 
 ---
@@ -693,11 +859,11 @@ An effective agent swarm flow has:
 
 | Entity | CAN Do | CANNOT Do | Tools Available |
 |--------|--------|-----------|-----------------|
-| **Main Conversation Thread** | • Analyze and route requests<br>• **Orchestrate agents** (following `@.claude/prompts/agent-orchestration.md`):<br>  - Discover agents (Read `.claude/agents/`)<br>  - Create mission prompts<br>  - Plan execution phases<br>  - Identify decision points (분기점)<br>  - Design parallel/sequential workflows<br>• Invoke agents (Task tool)<br>• Synthesize agent outputs<br>• Write/Edit/Read files<br>• Execute bash commands<br>• Run git operations<br>• Commit code<br>• Create PRs<br>• Install packages<br>• Run builds and tests<br>• Make implementation decisions | • **When orchestrating**: Read domain files (vision docs, codebase) - delegate to agents<br>• Delegate simple tasks unnecessarily<br>• Guess framework patterns without agent consultation<br>• Implement EG-DESK features without vision validation | Write, Edit, Read, Glob, Grep, Bash, Task (all tools) |
-| **Specialized Analyzer Agents**<br>(theia, electron, infinite-canvas, etc.) | • Analyze codebase/documentation<br>• Provide evidence-based guidance<br>• Explain framework patterns<br>• Troubleshoot issues<br>• Reference specific files/APIs<br>• Find proven patterns<br>• Return detailed reports | • Write ANY code<br>• Execute bash commands<br>• Create files<br>• Edit files<br>• Commit changes<br>• Invoke other agents<br>• Implement features | Read, Glob, Grep (analysis only) |
-| **egdesk-pm-agent** | • Analyze vision documents<br>• Validate strategic alignment<br>• Provide APPROVE/MODIFY/REJECT decisions<br>• Recommend architecture<br>• Ensure vision consistency<br>• Extract project principles | • Write ANY code<br>• Make implementation decisions without vision analysis<br>• Approve features without document evidence<br>• Execute commands<br>• Commit changes | Read, Glob, Grep (for vision docs) |
+| **Main Conversation Thread** | • Analyze and route requests<br>• **Orchestrate agents** (following `@.claude/prompts/agent-orchestration.md`):<br>  - Identify agents (from system prompt - Task tool lists all)<br>  - Create mission prompts<br>  - Plan execution phases<br>  - Identify decision points (분기점)<br>  - Design parallel/sequential workflows<br>• Invoke agents (Task tool)<br>• Synthesize agent outputs<br>• Write/Edit/Read files<br>• Execute bash commands<br>• Run git operations<br>• Commit code<br>• Create PRs<br>• Install packages<br>• Run builds and tests<br>• Make implementation decisions<br>• **Preserve own context** by delegating heavy reading to agents | • **When orchestrating**: Read domain files (vision docs, codebase) - delegate to agents to preserve context<br>• Delegate simple tasks unnecessarily<br>• Guess framework patterns without agent consultation<br>• Implement EG-DESK features without vision validation | Write, Edit, Read, Glob, Grep, Bash, Task (all tools) |
+| **Specialized Analyzer Agents**<br>(theia, electron, infinite-canvas, etc.) | • Analyze codebase/documentation<br>• Provide evidence-based guidance<br>• Explain framework patterns<br>• Troubleshoot issues<br>• Reference specific files/APIs<br>• Find proven patterns<br>• Return detailed reports<br>• **Use Bash for READ-ONLY analysis** (inspect outputs, run tests to understand behavior) | • Write ANY code<br>• **Use Bash for implementation** (commits, builds, installations) - contextually restricted<br>• Create files<br>• Edit files<br>• Commit changes<br>• Invoke other agents<br>• Implement features | Bash, Read, Glob, Grep, WebFetch, WebSearch (Bash for analysis only, contextually enforced) |
+| **egdesk-pm-agent** | • **Strategic PM**: Provide implementation guide (framework, location, phasing)<br>• **Plan Reviewer**: Validate Main Thread's plans, suggest improvements<br>• **Documentation Manager**: Create PRDs, update vision/ideas docs<br>• **Institutional Memory**: Recall previous decisions, record new ones<br>• **Insight Provider**: Explain vision conflicts, suggest alternatives<br>• **Dynamic Discovery**: Glob vision docs + packages to understand project structure<br>• **Framework Selection**: Decide which framework to use based on vision + requirements<br>• **Code Location**: Specify exact package/directory for implementation<br>• **Preserve Main Thread's context**: Read vision docs, synthesize strategic direction | • Write application code (only writes documentation: PRDs, vision docs, ideas files)<br>• Execute implementation commands (Bash for discovery only)<br>• Commit changes<br>• Invoke other agents<br>• Provide technical patterns (framework agents do this) | Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch (Bash for discovery only, Write/Edit for documentation) |
 | **coding-agent** | • **Execute code writing/editing** based on Main Thread instructions<br>• Create new files following provided patterns<br>• Edit existing files precisely<br>• Follow framework patterns from analyzer guidance<br>• Handle multi-file implementations<br>• Return implementation status reports | • Make architectural decisions<br>• Choose implementation approaches<br>• Execute bash commands<br>• Run builds/tests<br>• Commit changes<br>• Invoke other agents<br>• Analyze frameworks<br>• Validate vision | Write, Edit, Read, Glob, Grep |
-| **claude-agent-sdk-analyzer-agent** | • **Analyze how to implement Claude Code SDK into forked apps**<br>• Explain SDK integration patterns<br>• Guide SDK feature implementation<br>• Troubleshoot SDK usage issues | • **Create new agents** (Main Thread does this)<br>• Write ANY code<br>• Execute commands<br>• Commit changes<br>• Invoke other agents | Read, Glob, Grep (for SDK docs) |
+| **claude-agent-sdk-analyzer-agent** | • **Subagent Architect**: Design and create new specialized agents<br>• Read best practices from `subagent-best-practices.md`<br>• Examine existing agents to extract proven patterns<br>• Write agent definition files (`.claude/agents/*.md`)<br>• **SDK Integration Guidance**: Explain Claude Code SDK patterns<br>• Guide SDK feature implementation into forked apps<br>• Troubleshoot SDK usage issues | • Write application code (only writes agent files)<br>• Execute commands<br>• Commit changes<br>• Invoke other agents | Bash, Read, Write, Glob, Grep, WebFetch, WebSearch (Write for agent files only) |
 | **User** | • Make final decisions at decision points<br>• Provide preferences<br>• Validate experimental results<br>• Approve/reject architectural plans<br>• Request clarifications<br>• Override any recommendation | (User has full authority) | None (human input) |
 
 ### Code Ownership Hierarchy
@@ -715,9 +881,10 @@ An effective agent swarm flow has:
 │                                                           │
 │   Orchestrates by following:                             │
 │   • @.claude/prompts/agent-orchestration.md              │
-│   • Discovers agents (.claude/agents/)                   │
+│   • Identifies agents (from system prompt)               │
 │   • Creates mission prompts                              │
 │   • Plans execution phases                               │
+│   • Preserves context (delegates heavy reading)          │
 │                                                           │
 │   Can write code:                                        │
 │   ├─ Directly (for small changes)                        │
@@ -770,7 +937,7 @@ User: "Implement feature X"
 Main Thread:
          ├─ Analyzes request (complex development task)
          ├─ Follows @.claude/prompts/agent-orchestration.md
-         ├─ Discovers agents (Read .claude/agents/)
+         ├─ Identifies agents (from system prompt - Task tool lists all)
          ├─ Selects agents needed
          ├─ Creates detailed mission prompts:
          │  ├─ "egdesk-pm-agent: Validate feature X against vision docs..."
@@ -810,40 +977,52 @@ Main Thread:
 
 This agent swarm system provides a scalable, efficient framework for developing EG-DESK through clear role separation:
 
-**Main Thread (Orchestrator & Decision Maker):**
-- Routes requests intelligently
-- **Orchestrates complex tasks** (following `@.claude/prompts/agent-orchestration.md`):
-  - Discovers available agents
-  - Creates mission prompts
-  - Plans execution phases
-  - Invokes agents
-  - Synthesizes guidance
+**Main Thread (Communicator & Executor):**
+- Routes user requests to appropriate agents
+- **Communicates with PM and sub-agents**:
+  - Presents user requests to PM for strategic guide
+  - Queries framework agents based on PM's guide
+  - Reports agent findings back to PM for plan review (if needed)
+  - Presents PM's insights/alternatives to user
+- **Creates execution plans** based on PM's strategic guidance
+- **Synthesizes** PM guide + framework patterns into coding instructions
 - **Controls all code writing**:
-  - Directly for small changes
-  - Via coding-agent for large implementations (context preservation)
-- Builds, tests, commits (exclusive Bash access)
+  - Via coding-agent delegation (direction + file list)
+  - Directly for trivial changes only
+- **Executes implementation**: Builds, tests, commits (exclusive Bash for implementation)
 
-**Specialized Analyzer Agents (Domain Experts):**
+**egdesk-pm-agent (Strategic PM & Administrative Orchestrator):**
+- **Provides strategic guide**: Framework choice, code location, implementation phasing
+- **Reviews execution plans**: Validates completeness, suggests improvements
+- **Manages documentation**: Creates PRDs, updates vision docs
+- **Maintains institutional memory**: Recalls decisions, records new ones
+- **Provides insights**: Explains vision conflicts, suggests alternatives to user
+- **Dynamically discovers structure**: Globs vision docs + packages to understand project state
+- **Never writes application code** (only documentation)
+
+**Specialized Analyzer Agents (Technical Experts):**
 - Analyze codebases and documentation in their domains
-- Provide evidence-based guidance
-- Return patterns and file references
-- Never write code
-- Never orchestrate other agents
+- Provide technical patterns and file references
+- Return evidence-based guidance with file lists (CREATE/MODIFY/DELETE/REFERENCE)
+- Never write code or make strategic decisions
 
 **coding-agent (Code Executor):**
-- Executes code writing/editing in separate context
-- Follows detailed instructions from Main Thread
-- Implements based on analyzer guidance
+- Executes code writing/editing based on Main Thread's direction + file list
+- Reads files for implementation details
+- Follows patterns from framework analyzers
 - Returns status reports
-- **Preserves Main Thread's context** for continued orchestration
+- **Preserves Main Thread's context** for continued communication
 
 **Architectural Principles:**
-1. **Meta-level** (Main Thread): Orchestrates and decides, delegates domain reading and (optionally) coding
-2. **Domain-level** (Analyzer Agents): Read and analyze domain files, return guidance
-3. **Execution-level** (coding-agent): Executes code in separate context to preserve Main Thread's token budget
+1. **Strategic Level** (PM Agent): Guides what to build, where, and how - manages vision alignment
+2. **Communication Level** (Main Thread): Facilitates between user, PM, and technical agents - executes plans
+3. **Technical Level** (Analyzer Agents): Provides framework-specific patterns and guidance
+4. **Execution Level** (coding-agent): Implements code following all guidance
 
-**Result:** Streamlined flow from ideation → strategic validation → framework research → architectural design → implementation, with:
-- Main Thread as the single point of orchestration and decision-making
-- Context preservation through coding delegation
-- Parallel execution for efficiency
-- Evidence-based implementation through specialized agents
+**Result:** PM-driven strategic flow with Main Thread as facilitator:
+- PM provides strategic direction (framework, location, approach)
+- Main Thread creates plans and queries technical agents
+- Framework agents provide implementation patterns
+- coding-agent executes code
+- Main Thread builds, tests, commits
+- Clear separation: strategy (PM) → planning (Main Thread) → patterns (analyzers) → execution (coding-agent)

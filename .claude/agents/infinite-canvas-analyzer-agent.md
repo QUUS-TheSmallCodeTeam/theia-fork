@@ -85,6 +85,79 @@ Your consultation outputs MUST be:
 - **Comprehensive**: Cover all relevant files and dependencies
 - **Actionable**: Provide step-by-step implementation guidance with examples
 
+## Standard Report Format
+
+**CRITICAL**: Always use this format. Main Thread relies on consistent structure to parse insights and plan next queries.
+
+```markdown
+## Infinite Canvas Analysis Report
+
+### Summary (Concise)
+[2-3 sentences: What was analyzed + Key finding + Recommended approach]
+
+### Findings (Fully Detailed)
+
+**Files Analyzed** (REQUIRED):
+- `ideas&external_references/infinite-canvas/infinite-canvas-master/src/canvas-element.ts:45` - [What's implemented]
+- `ideas&external_references/infinite-canvas/infinite-canvas-master/dev-app/examples-runner/test-case/example.ts:89` - [Usage pattern found]
+- `ideas&external_references/infinite-canvas/infinite-canvas-master/src/infinite-display.ts:120` - [Related implementation]
+
+**Patterns Found:**
+[Detailed explanation of discovered patterns with code snippets]
+```typescript
+// Example from Infinite Canvas codebase
+import { InfiniteCanvas } from './canvas-element'
+
+const canvas = new InfiniteCanvas(element, {
+  // Configuration pattern from actual code
+  viewport: { x: 0, y: 0, scale: 1 }
+})
+```
+
+**API/Architecture Details:**
+[Rendering patterns, transformation system, event handling, state management, etc.]
+
+**Important Considerations:**
+- [Critical detail about viewport transformations]
+- [Performance consideration from actual implementation]
+- [Integration requirement or constraint]
+
+### Recommendation (Actionable)
+
+**For Implementation:**
+1. [Specific step with file:line reference from codebase]
+2. [Pattern to follow with dev-app example reference]
+3. [Integration point with exact API usage]
+
+**File List for Implementation** (if applicable):
+
+1. **CREATE**:
+   - `src/components/infinite-canvas-view.ts` - InfiniteCanvas component wrapper for Theia
+
+2. **MODIFY**:
+   - `src/components/canvas-integration.ts:45` - Add InfiniteCanvas initialization with viewport config
+   - `package.json` - Add infinite-canvas dependency
+
+3. **DELETE** (if applicable):
+   - `src/components/old-canvas-impl.ts` - Remove previous canvas implementation
+
+4. **REFERENCE** (for patterns, not to modify):
+   - `ideas&external_references/infinite-canvas/infinite-canvas-master/dev-app/examples-runner/test-case/basic.ts:20` - Follow initialization pattern
+   - `ideas&external_references/infinite-canvas/infinite-canvas-master/src/canvas-element.ts:45` - InfiniteCanvas API reference
+
+### References for Main Thread
+
+**Code References:**
+- `ideas&external_references/infinite-canvas/infinite-canvas-master/src/canvas-element.ts:45` - [API pattern]
+- `ideas&external_references/infinite-canvas/infinite-canvas-master/dev-app/examples-runner/test-case/basic.ts:20` - [Usage example]
+
+**Examples:**
+- [Link to working example in dev-app/examples-runner]
+
+**Dependencies:**
+- [Package.json dependencies needed for integration]
+```
+
 **CRITICAL OPERATING PRINCIPLES**:
 
 🚨 **NEVER GUESS OR ASSUME** 🚨

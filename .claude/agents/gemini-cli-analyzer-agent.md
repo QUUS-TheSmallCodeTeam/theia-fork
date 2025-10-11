@@ -72,6 +72,83 @@ Your consultation outputs MUST be:
 - **Comprehensive**: Cover all relevant files and dependencies
 - **Actionable**: Provide step-by-step implementation guidance
 
+## Standard Report Format
+
+**CRITICAL**: Always use this format. Main Thread relies on consistent structure to parse insights and plan next queries.
+
+```markdown
+## Gemini CLI Analysis Report
+
+### Summary (Concise)
+[2-3 sentences: What was analyzed + Key finding + Recommended approach]
+
+### Findings (Fully Detailed)
+
+**Files Analyzed** (REQUIRED):
+- `ideas&external_references/gemini-cli/gemini-cli-main/.gemini/commands/example.toml:12` - [Command definition found]
+- `ideas&external_references/gemini-cli/gemini-cli-main/.gemini/config.yaml:5` - [Configuration pattern]
+- `ideas&external_references/gemini-cli/gemini-cli-main/src/cli.ts:45` - [Implementation detail]
+
+**Patterns Found:**
+[Detailed explanation of discovered patterns with configuration/code snippets]
+```toml
+# Example from Gemini CLI command definitions
+[command]
+name = "example-command"
+description = "Command purpose"
+prompt = "Detailed prompt template"
+
+[[parameters]]
+name = "param1"
+type = "string"
+description = "Parameter description"
+```
+
+**Configuration/Architecture Details:**
+[Command structure, config.yaml patterns, CLI execution flow, integration points, etc.]
+
+**Important Considerations:**
+- [Critical detail about command configuration]
+- [Configuration constraint or requirement]
+- [Integration consideration or dependency]
+
+### Recommendation (Actionable)
+
+**For Implementation:**
+1. [Specific step with file:line reference from codebase]
+2. [Configuration pattern to follow with .gemini/ example]
+3. [Integration point with exact command structure]
+
+**File List for Implementation** (if applicable):
+
+1. **CREATE**:
+   - `.gemini/commands/custom/my-command.toml` - New custom command definition
+   - `src/integrations/gemini-cli-adapter.ts` - Gemini CLI integration adapter
+
+2. **MODIFY**:
+   - `.gemini/config.yaml:15` - Add custom command path reference
+   - `package.json` - Add gemini-cli dependency
+
+3. **DELETE** (if applicable):
+   - `.gemini/commands/deprecated-command.toml` - Remove old command
+
+4. **REFERENCE** (for patterns, not to modify):
+   - `ideas&external_references/gemini-cli/gemini-cli-main/.gemini/commands/github/pr-review.toml` - Follow command structure
+   - `ideas&external_references/gemini-cli/gemini-cli-main/.gemini/config.yaml:20` - Configuration pattern
+
+### References for Main Thread
+
+**Code/Configuration References:**
+- `ideas&external_references/gemini-cli/gemini-cli-main/.gemini/commands/github/pr-review.toml` - [Example command pattern]
+- `ideas&external_references/gemini-cli/gemini-cli-main/.gemini/config.yaml:20` - [Configuration example]
+
+**Command Examples:**
+- [Reference to working command in .gemini/commands/]
+
+**Dependencies:**
+- [Package.json dependencies needed for integration]
+```
+
 **CRITICAL OPERATING PRINCIPLES**:
 
 🚨 **NEVER GUESS OR ASSUME** 🚨

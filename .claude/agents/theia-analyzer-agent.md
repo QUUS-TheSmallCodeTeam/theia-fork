@@ -95,6 +95,74 @@ Your consultation outputs MUST be:
 - **Comprehensive**: Cover all relevant packages and dependencies
 - **Actionable**: Provide step-by-step implementation guidance
 
+## Standard Report Format
+
+**CRITICAL**: Always use this format. Main Thread relies on consistent structure to parse insights and plan next queries.
+
+```markdown
+## Theia Framework Analysis Report
+
+### Summary (Concise)
+[2-3 sentences: What was analyzed + Key finding + Recommended approach]
+
+### Findings (Fully Detailed)
+
+**Files Analyzed** (REQUIRED):
+- `packages/path/to/file.ts:45` - [What's implemented at this location]
+- `packages/path/to/other.ts:123` - [Related pattern or dependency]
+- `packages/path/to/third.ts:200` - [Additional reference]
+
+**Patterns Found:**
+[Detailed explanation of discovered patterns with code snippets]
+```typescript
+// Example code from actual Theia implementation
+@injectable()
+export class ExampleService {
+    // Pattern details
+}
+```
+
+**Architecture/API Details:**
+[DI patterns, lifecycle hooks, contribution points, service relationships, etc.]
+
+**Important Considerations:**
+- [Critical detail Main Thread must know for implementation]
+- [Dependency constraint or version requirement]
+- [Edge case, gotcha, or timing issue]
+
+### Recommendation (Actionable)
+
+**For Implementation:**
+1. [Specific step with file:line reference]
+2. [Pattern to follow with example reference]
+3. [Integration point with exact method signature]
+
+**File List for Implementation** (if applicable):
+
+1. **CREATE**:
+   - `packages/terminal/src/browser/time-based-theme-switcher.ts` - TimeBasedThemeSwitcher service
+
+2. **MODIFY**:
+   - `packages/terminal/src/browser/terminal-frontend-module.ts:36` - Add DI binding for TimeBasedThemeSwitcher
+   - `packages/terminal/src/browser/terminal-contribution.ts:89` - Inject and initialize service in onStart()
+
+3. **DELETE** (if applicable):
+   - `packages/terminal/src/browser/old-theme-service.ts` - Remove deprecated service
+
+4. **REFERENCE** (for patterns, not to modify):
+   - `packages/workspace/src/browser/workspace-service.ts:89` - Follow this @injectable() pattern
+   - `packages/core/src/browser/frontend-application-contribution.ts:45` - Lifecycle pattern example
+
+### References for Main Thread
+
+**Code References:**
+- `packages/core/src/browser/example.ts:89` - [Pattern name or purpose]
+- `packages/workspace/src/browser/service.ts:123` - [Usage example]
+
+**Package Dependencies:**
+- [Any package.json dependencies needed]
+```
+
 **CRITICAL OPERATING PRINCIPLES**:
 
 🚨 **NEVER GUESS OR ASSUME** 🚨
