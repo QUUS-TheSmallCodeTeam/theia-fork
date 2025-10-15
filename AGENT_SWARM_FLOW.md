@@ -18,9 +18,11 @@ Main Thread (analyzes & routes)
             │
             ▼
          PM Agent (Strategic Guide)
-            ├─ Vision alignment
-            ├─ Framework selection (Theia/Electron/Both)
-            ├─ Code location (packages/X/src/Y/)
+            ├─ Discovers tech stack (Glob technology-stack.md)
+            ├─ Vision alignment check
+            ├─ Technology stack selection (from discovered stack)
+            ├─ Implementation status check (already implemented?)
+            ├─ Code location (eg-desk_taehwa/ or packages/)
             ├─ Implementation phasing
             ├─ Creates PRD (if approved)
             └─ Returns strategic guide to Main Thread
@@ -274,6 +276,69 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 
 ---
 
+### Scenario 4c: Development with Conflict Detection (EG-DESK Custom Code)
+
+**User Request:**
+```
+"Bind Ctrl+K to the new QuickSearch feature"
+```
+
+**Why this scenario:** EG-DESK custom feature that needs conflict checking against existing keybindings
+
+**Step-by-Step Flow:**
+
+| Step | Entity | Action | Tools Used | Output |
+|------|--------|--------|------------|--------|
+| **PHASE 0-2: SAME AS SCENARIO 4b (Steps 1-11)** |
+| 1-11 | Various | PM provides strategic guide → Main Thread creates plan → Framework agent investigates | (See Scenario 4) | Strategic guide + Framework patterns collected |
+| **PHASE 3: CONFLICT DETECTION & IMPLEMENTATION** |
+| 12 | Main Thread | Synthesizes + adds conflict check instruction | None (internal) | Direction: Bind Ctrl+K to QuickSearch<br>File List: CREATE search-contribution.ts in eg-desk_taehwa/search/<br>**"Check CODEBASE_STRUCTURE.md for conflicts first"** |
+| 13 | Main Thread | Delegates to coding-agent | `Task(agent: "coding-agent", prompt: "Bind Ctrl+K to QuickSearch.<br><br>Direction: Create keybinding contribution for QuickSearch feature.<br><br>Files:<br>CREATE: eg-desk_taehwa/search/search-contribution.ts<br><br>BEFORE implementing: Check CODEBASE_STRUCTURE.md for Ctrl+K conflicts")` | Coding agent starts |
+| 14 | coding-agent | Discovers EG-DESK codebase | `Glob("eg-desk*/**/*.ts")` | Finds: eg-desk_taehwa/ |
+| 15 | coding-agent | Discovers structure document | `Glob("eg-desk*/CODEBASE_STRUCTURE.md")` | Finds: eg-desk_taehwa/CODEBASE_STRUCTURE.md |
+| 16 | coding-agent | Reads structure document | `Read("eg-desk_taehwa/CODEBASE_STRUCTURE.md")` | Current keybindings registry |
+| 17 | coding-agent | **Checks for conflicts** | Grep "Ctrl+K" in structure doc | **CONFLICT FOUND**: Ctrl+K already bound to DifferentFeature at search-old.ts:45 |
+| 18 | coding-agent | **STOPS implementation** | None | **Does NOT create any files** |
+| 19 | coding-agent | Returns conflict report | None | **❌ CONFLICT DETECTED**<br>**Type**: Keybinding conflict<br>**Requested**: Ctrl+K for QuickSearch<br>**Existing**: Ctrl+K for DifferentFeature (eg-desk_taehwa/search/search-old.ts:45)<br>**Severity**: BLOCKER<br>**Alternatives**: Ctrl+Shift+K, Ctrl+Alt+K, Ctrl+J<br>**User decision required** |
+| **PHASE 4: USER DECISION** |
+| 20 | Main Thread | Presents conflict to user | None | "Conflict: Ctrl+K already used for DifferentFeature.<br>Options:<br>A) Use Ctrl+Shift+K<br>B) Use Ctrl+Alt+K<br>C) Override DifferentFeature<br>D) Choose different key" |
+| 21 | User | Makes decision | None (human input) | "Use Ctrl+Shift+K" |
+| **PHASE 5: RETRY WITH RESOLUTION** |
+| 22 | Main Thread | Retries with resolved key | `Task(agent: "coding-agent", prompt: "Bind Ctrl+Shift+K to QuickSearch (Ctrl+K was conflicted).<br><br>Files:<br>CREATE: eg-desk_taehwa/search/search-contribution.ts")` | Coding agent starts (retry) |
+| 23 | coding-agent | Checks for conflicts (Ctrl+Shift+K) | Read + Grep CODEBASE_STRUCTURE.md | ✅ No conflicts - Ctrl+Shift+K available |
+| 24 | coding-agent | Implements code | `Write("eg-desk_taehwa/search/search-contribution.ts")` | File created with Ctrl+Shift+K binding |
+| 25 | coding-agent | **Updates structure document** | `Edit("eg-desk_taehwa/CODEBASE_STRUCTURE.md")` | Added: "Ctrl+Shift+K: QuickSearch (search-contribution.ts:67)"<br>Added timeline entry: "2025-10-15: QuickSearch keybinding" |
+| 26 | coding-agent | Returns success report | None | **✅ Implementation Complete**<br>**Conflict Check**: Passed (Ctrl+Shift+K available)<br>**Files Created**: search-contribution.ts<br>**Structure Updated**: Added keybinding + timeline entry |
+| **PHASE 6: VERIFICATION** |
+| 27 | Main Thread | Builds and commits | `Bash("npm run build && git add eg-desk_taehwa && git commit")` | Committed |
+| 28 | Main Thread | Reports to user | None | "QuickSearch bound to Ctrl+Shift+K, implemented and committed" |
+
+**Total Agents Invoked:** 3 (PM strategic guide → framework analyzer → coding-agent twice)
+
+**Who Wrote Code:** coding-agent (after conflict resolution)
+
+**Duration:** Multi-phase with conflict detection and user decision
+
+**Critical Observations:**
+- **coding-agent discovered EG-DESK codebase dynamically** (Glob eg-desk*/**/*.ts)
+- **Conflict detected BEFORE implementation** (prevented duplicate keybinding)
+- **coding-agent STOPPED immediately** when conflict found (no auto-resolve)
+- **User made final decision** on which alternative to use
+- **Structure document automatically updated** after successful implementation
+- **Always up-to-date registry** prevents future conflicts
+
+**When to use this pattern:**
+- Implementing EG-DESK custom features (not Theia framework modifications)
+- Adding keybindings, services, commands, or any named entities
+- Need to prevent naming/binding conflicts
+- Want automatic structure tracking
+
+**Key Difference from 4b:**
+- 4b: Theia framework code (packages/*) - no conflict checking needed
+- 4c: EG-DESK custom code (eg-desk_taehwa/*) - conflict checking required via CODEBASE_STRUCTURE.md
+
+---
+
 ### Scenario 5: Agent Creation Request
 
 **User Request:**
@@ -339,17 +404,83 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 
 ---
 
+### Scenario 7: Adding New Technology to Stack (Ideation/Research Phase)
+
+**User Request:**
+```
+"캔버스에 3D visualization을 추가하고 싶어. Three.js를 쓰면 어떨까?"
+```
+
+**Why this scenario:** User proposes new technology not currently in stack - requires PM evaluation and stack update
+
+**Step-by-Step Flow:**
+
+| Step | Entity | Action | Tools Used | Output |
+|------|--------|--------|------------|--------|
+| **PHASE 0: TECHNOLOGY EVALUATION** |
+| 1 | User | Proposes new technology | None | "Use Three.js for 3D viz" |
+| 2 | Main Thread | Analyzes: New technology proposal, needs PM evaluation | None | Routes to PM for strategic guide |
+| 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants 3D visualization using Three.js. Evaluate this technology addition.")` | PM agent starts |
+| 4 | egdesk-pm-agent | **Discovers tech stack doc** | `Glob("ideas*/**/eg-desk*ideas*/*tech*.md")` | Finds: technology-stack.md |
+| 5 | egdesk-pm-agent | Reads current stack | `Read("ideas&external_references/eg-desk ideas/technology-stack.md")` | Current: Theia, Electron, Infinite Canvas, Konva, Claude API |
+| 6 | egdesk-pm-agent | Checks if Three.js in stack | Grep "Three.js" in tech stack doc | **NOT FOUND**: Three.js not in current stack |
+| 7 | egdesk-pm-agent | Discovers vision docs | `Glob("ideas*/**/eg-desk*ideas*/**/*.md")` | Finds whitepaper, UX docs |
+| 8 | egdesk-pm-agent | Evaluates vision alignment | `Read("EG-DESK_Whitepaper.md")`<br>`Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")` | Analysis: 3D viz aligns with spatial canvas principles |
+| 9 | egdesk-pm-agent | Evaluates necessity | None (analysis) | Question: Can Infinite Canvas + Konva.js achieve 3D-like effect? Or is true 3D needed? |
+| 10 | egdesk-pm-agent | Returns strategic guide | None | **Decision**: MODIFY (needs user clarification)<br>**Technology Evaluation**: Three.js not in current stack<br>**Vision Alignment**: ✅ Spatial canvas + 3D = aligned<br>**Options**:<br>A) Add Three.js (requires research phase, larger bundle)<br>B) Use Infinite Canvas + Konva.js with perspective tricks (no new dependency)<br>**User decision required**: Which approach? |
+| **PHASE 1: USER DECISION** |
+| 11 | Main Thread | Presents options to user | None | "Three.js not in stack. Add it (research needed) or use existing tech?" |
+| 12 | User | Decides to add Three.js | None (human input) | "Add Three.js - true 3D is worth it" |
+| **PHASE 2: TECHNOLOGY STACK UPDATE** |
+| 13 | Main Thread | Re-invokes PM to update stack | `Task(agent: "egdesk-pm-agent", prompt: "User approved adding Three.js. Update technology-stack.md and create research PRD.")` | PM agent starts |
+| 14 | egdesk-pm-agent | Reads tech stack doc | `Read("ideas&external_references/eg-desk ideas/technology-stack.md")` | Current structure |
+| 15 | egdesk-pm-agent | **Updates tech stack doc** | `Edit("technology-stack.md", add: "### Three.js\n- Category: 3D Rendering\n- Status: Research\n- Purpose: 3D visualization...")` | Three.js entry added |
+| 16 | egdesk-pm-agent | Creates research PRD | `Write("ideas&external_references/eg-desk ideas/features/threejs-integration-research-prd.md", "[PRD content]")` | Research PRD created |
+| 17 | egdesk-pm-agent | Returns update report | None | **✅ Technology Stack Updated**<br>**Added**: Three.js (3D Rendering, Research phase)<br>**PRD Created**: threejs-integration-research-prd.md<br>**Next Steps**: Research phase - evaluate integration approach, bundle size, performance |
+| **PHASE 3: NEXT STEPS** |
+| 18 | Main Thread | Reports to user | None | "Three.js added to technology stack. Research PRD created. Ready to begin research phase." |
+
+**Total Agents Invoked:** 2 (PM evaluation → PM update)
+
+**Who Wrote Code:** Nobody (documentation only)
+
+**Duration:** Two-phase (evaluation → user decision → stack update)
+
+**Critical Observations:**
+- **PM discovered current stack dynamically** (not hardcoded framework list)
+- **PM evaluated new technology against vision**
+- **PM provided options** (add new tech vs use existing)
+- **User made strategic decision** (add Three.js)
+- **PM updated technology-stack.md automatically** (Write/Edit tools)
+- **Research PRD created** for integration phase
+- **Stack always up-to-date** for future technology selections
+
+**When to use this pattern:**
+- User proposes new framework/library
+- During ideation/research phases
+- Technology evaluation needed
+- Stack evolution
+
+**Key Point:**
+- Technology stack is **NOT fixed** - evolves with project needs
+- PM manages stack additions, not Main Thread
+- Always discover stack dynamically, never assume
+
+---
+
 ## Comparison Matrix: When to Use What
 
-| Request Type | Route | Agents Used | Who Codes | Example |
-|--------------|-------|-------------|-----------|---------|
-| **Simple Question** | Direct execution | 0 | Nobody | "List files", "Show git status" |
-| **File Edit** | Direct execution | 0 | Main Thread | "Fix typo", "Update version" |
-| **Framework Question** | Direct to framework agent | 1 | Nobody | "How does Theia DI work?" |
-| **Strategic Decision** | Main Thread orchestrates → PM agent | 1 | Nobody | "Should we add feature X?" |
-| **Small Implementation** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | "Add simple Theia widget" |
-| **Large Implementation** | Main Thread orchestrates → analyzers + coding-agent(s) | 3-4+ | coding-agent(s) | "Implement multi-file feature" |
-| **Agent Creation** | Main Thread → claude-agent | 1 | claude-agent | "Create Konva analyzer agent" |
+| Request Type | Route | Agents Used | Who Codes | Conflict Check? | Example |
+|--------------|-------|-------------|-----------|----------------|---------|
+| **Simple Question** | Direct execution | 0 | Nobody | N/A | "List files", "Show git status" |
+| **File Edit** | Direct execution | 0 | Main Thread | N/A | "Fix typo", "Update version" |
+| **Framework Question** | Direct to framework agent | 1 | Nobody | N/A | "How does Theia DI work?" |
+| **Strategic Decision** | Main Thread orchestrates → PM agent | 1 | Nobody | N/A | "Should we add feature X?" |
+| **Theia Framework Implementation** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | ❌ No (Theia packages/) | "Modify Theia terminal service" |
+| **EG-DESK Custom Feature** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | ✅ Yes (CODEBASE_STRUCTURE.md) | "Add custom QuickSearch with Ctrl+K" |
+| **Large Multi-Feature** | Main Thread orchestrates → analyzers + coding-agent(s) | 3-4+ | coding-agent(s) | ✅ If EG-DESK custom | "Implement custom dashboard system" |
+| **New Technology Proposal** | Main Thread → PM agent (evaluate → update stack) | 1-2 | Nobody (doc update) | N/A | "Add Three.js for 3D visualization" |
+| **Agent Creation** | Main Thread → claude-agent | 1 | claude-agent | N/A | "Create Konva analyzer agent" |
 
 ---
 
@@ -762,6 +893,39 @@ Benefit: Main Thread's context stays clean for continued orchestration
 Details: coding-agent handles file reading and implementation specifics
 ```
 
+### Pattern 6: Conflict Detection & Resolution (EG-DESK Custom Features)
+```
+User → Main Thread orchestrates:
+         ├─ PM provides strategic guide (EG-DESK custom feature)
+         ├─ Framework agents provide patterns
+         │
+         └─ Spawns coding-agent with conflict check instruction:
+               │
+               ├─ Step 1: Discover EG-DESK codebase (Glob eg-desk*/**/*.ts)
+               ├─ Step 2: Find structure document (Glob eg-desk*/CODEBASE_STRUCTURE.md)
+               ├─ Step 3: Read structure document
+               ├─ Step 4: Check for conflicts (service names, keybindings, etc.)
+               │
+               ├─ IF CONFLICT DETECTED:
+               │   ├─ STOP immediately (don't implement)
+               │   ├─ Report to Main Thread:
+               │   │   - What conflicts
+               │   │   - Where existing
+               │   │   - Alternatives suggested
+               │   └─ Main Thread → User decision
+               │       └─ User chooses alternative
+               │           └─ Main Thread retries with resolution
+               │
+               └─ IF NO CONFLICT:
+                   ├─ Implement code
+                   ├─ Update CODEBASE_STRUCTURE.md
+                   └─ Return success + structure updated
+
+Benefit: Prevents duplicate implementations and naming conflicts
+When to use: EG-DESK custom features (keybindings, services, commands)
+When to skip: Theia framework modifications (packages/*), bug fixes
+```
+
 ---
 
 ## Anti-Patterns to Avoid
@@ -837,6 +1001,49 @@ Don't use coding-agent when:
 ❌ Quick updates
 ```
 
+### ❌ Anti-Pattern 6: Hardcoding Paths
+```
+BAD:
+PM agent: "Implement in packages/terminal/src/browser/"
+coding-agent: Read("packages/terminal/src/browser/file.ts")
+(Assumes fixed structure)
+
+GOOD:
+PM agent: Glob("eg-desk*/**/*.ts") → discovers eg-desk_taehwa/
+PM agent: "Implement in eg-desk_taehwa/terminal/"
+coding-agent: Glob("eg-desk*/CODEBASE_STRUCTURE.md") → discovers dynamically
+(Structure-agnostic, flexible)
+
+Why bad:
+- Project structure may change
+- EG-DESK custom code might move
+- Hard to refactor
+- Breaks when directory renamed
+```
+
+### ❌ Anti-Pattern 7: Not Checking Conflicts for EG-DESK Features
+```
+BAD:
+User: "Bind Ctrl+K to QuickSearch"
+coding-agent: Implements immediately without checking
+→ Conflict: Ctrl+K already used elsewhere
+→ Discovered only after deployment (user confusion)
+
+GOOD:
+User: "Bind Ctrl+K to QuickSearch"
+coding-agent: Reads CODEBASE_STRUCTURE.md first
+→ Finds Ctrl+K conflict
+→ Reports to user with alternatives
+→ User chooses Ctrl+Shift+K
+→ Implements with correct key
+
+Why bad:
+- Duplicate keybindings confuse users
+- Hard to debug "which feature does Ctrl+K trigger?"
+- Wastes time fixing after implementation
+- No registry of what's used
+```
+
 ---
 
 ## Success Metrics
@@ -850,6 +1057,9 @@ An effective agent swarm flow has:
 - ✅ **Strategic Alignment**: Vision validated before implementation
 - ✅ **Decision Points**: User input requested when needed (분기점)
 - ✅ **No Redundancy**: Each agent contributes unique value
+- ✅ **Conflict Prevention**: EG-DESK custom features checked for naming conflicts before implementation
+- ✅ **Dynamic Discovery**: No hardcoded paths, all locations discovered via Glob
+- ✅ **Structure Tracking**: CODEBASE_STRUCTURE.md automatically maintained, always up-to-date
 
 ---
 
@@ -861,8 +1071,8 @@ An effective agent swarm flow has:
 |--------|--------|-----------|-----------------|
 | **Main Conversation Thread** | • Analyze and route requests<br>• **Orchestrate agents** (following `@.claude/prompts/agent-orchestration.md`):<br>  - Identify agents (from system prompt - Task tool lists all)<br>  - Create mission prompts<br>  - Plan execution phases<br>  - Identify decision points (분기점)<br>  - Design parallel/sequential workflows<br>• Invoke agents (Task tool)<br>• Synthesize agent outputs<br>• Write/Edit/Read files<br>• Execute bash commands<br>• Run git operations<br>• Commit code<br>• Create PRs<br>• Install packages<br>• Run builds and tests<br>• Make implementation decisions<br>• **Preserve own context** by delegating heavy reading to agents | • **When orchestrating**: Read domain files (vision docs, codebase) - delegate to agents to preserve context<br>• Delegate simple tasks unnecessarily<br>• Guess framework patterns without agent consultation<br>• Implement EG-DESK features without vision validation | Write, Edit, Read, Glob, Grep, Bash, Task (all tools) |
 | **Specialized Analyzer Agents**<br>(theia, electron, infinite-canvas, etc.) | • Analyze codebase/documentation<br>• Provide evidence-based guidance<br>• Explain framework patterns<br>• Troubleshoot issues<br>• Reference specific files/APIs<br>• Find proven patterns<br>• Return detailed reports<br>• **Use Bash for READ-ONLY analysis** (inspect outputs, run tests to understand behavior) | • Write ANY code<br>• **Use Bash for implementation** (commits, builds, installations) - contextually restricted<br>• Create files<br>• Edit files<br>• Commit changes<br>• Invoke other agents<br>• Implement features | Bash, Read, Glob, Grep, WebFetch, WebSearch (Bash for analysis only, contextually enforced) |
-| **egdesk-pm-agent** | • **Strategic PM**: Provide implementation guide (framework, location, phasing)<br>• **Plan Reviewer**: Validate Main Thread's plans, suggest improvements<br>• **Documentation Manager**: Create PRDs, update vision/ideas docs<br>• **Institutional Memory**: Recall previous decisions, record new ones<br>• **Insight Provider**: Explain vision conflicts, suggest alternatives<br>• **Dynamic Discovery**: Glob vision docs + packages to understand project structure<br>• **Framework Selection**: Decide which framework to use based on vision + requirements<br>• **Code Location**: Specify exact package/directory for implementation<br>• **Preserve Main Thread's context**: Read vision docs, synthesize strategic direction | • Write application code (only writes documentation: PRDs, vision docs, ideas files)<br>• Execute implementation commands (Bash for discovery only)<br>• Commit changes<br>• Invoke other agents<br>• Provide technical patterns (framework agents do this) | Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch (Bash for discovery only, Write/Edit for documentation) |
-| **coding-agent** | • **Execute code writing/editing** based on Main Thread instructions<br>• Create new files following provided patterns<br>• Edit existing files precisely<br>• Follow framework patterns from analyzer guidance<br>• Handle multi-file implementations<br>• Return implementation status reports | • Make architectural decisions<br>• Choose implementation approaches<br>• Execute bash commands<br>• Run builds/tests<br>• Commit changes<br>• Invoke other agents<br>• Analyze frameworks<br>• Validate vision | Write, Edit, Read, Glob, Grep |
+| **egdesk-pm-agent** | • **Strategic PM**: Provide implementation guide (technology stack, location, phasing)<br>• **Technology Stack Discovery**: Glob + Read technology-stack.md (NEVER hardcode tech list)<br>• **Technology Stack Selection**: Match requirements to discovered technology capabilities<br>• **Technology Stack Management**: Update technology-stack.md when new tech added<br>• **Implementation Status Check**: Grep/Glob to verify feature not already implemented (prevent duplicates)<br>• **Plan Reviewer**: Validate Main Thread's plans, suggest improvements<br>• **Documentation Manager**: Create PRDs, update vision/ideas/tech-stack docs<br>• **Institutional Memory**: Recall previous decisions, record new ones<br>• **Insight Provider**: Explain vision conflicts, suggest alternatives<br>• **Dynamic Discovery**: Glob all docs dynamically (vision, tech stack, codebase structure)<br>• **Code Location**: Specify exact package/directory (eg-desk_taehwa/ vs packages/)<br>• **Preserve Main Thread's context**: Read vision/tech docs, synthesize strategic direction | • Write application code (only writes documentation: PRDs, vision docs, tech-stack.md)<br>• Execute implementation commands (Bash for discovery only)<br>• Commit changes<br>• Invoke other agents<br>• Provide technical patterns (framework agents do this)<br>• **Hardcode technology stack** (always discover from technology-stack.md) | Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch (Bash for discovery only, Write/Edit for documentation) |
+| **coding-agent** | • **Execute code writing/editing** based on Main Thread instructions<br>• Create new files following provided patterns<br>• Edit existing files precisely<br>• Follow framework patterns from analyzer guidance<br>• Handle multi-file implementations<br>• **Discover EG-DESK codebase dynamically** (Glob eg-desk*/**/*.ts)<br>• **Check for naming conflicts** before implementing EG-DESK features (CODEBASE_STRUCTURE.md)<br>• **STOP immediately** when conflict detected (report to Main Thread, user decides)<br>• **Update structure document** after successful implementation<br>• **Prevent duplicate implementations** (conflict prevention system)<br>• Return implementation status reports | • Make architectural decisions<br>• Choose implementation approaches<br>• **Auto-resolve conflicts** (must report, user decides)<br>• **Hardcode paths** (always discover dynamically)<br>• Execute bash commands<br>• Run builds/tests<br>• Commit changes<br>• Invoke other agents<br>• Analyze frameworks<br>• Validate vision | Write, Edit, Read, Glob, Grep (NO Bash) |
 | **claude-agent-sdk-analyzer-agent** | • **Subagent Architect**: Design and create new specialized agents<br>• Read best practices from `subagent-best-practices.md`<br>• Examine existing agents to extract proven patterns<br>• Write agent definition files (`.claude/agents/*.md`)<br>• **SDK Integration Guidance**: Explain Claude Code SDK patterns<br>• Guide SDK feature implementation into forked apps<br>• Troubleshoot SDK usage issues | • Write application code (only writes agent files)<br>• Execute commands<br>• Commit changes<br>• Invoke other agents | Bash, Read, Write, Glob, Grep, WebFetch, WebSearch (Write for agent files only) |
 | **User** | • Make final decisions at decision points<br>• Provide preferences<br>• Validate experimental results<br>• Approve/reject architectural plans<br>• Request clarifications<br>• Override any recommendation | (User has full authority) | None (human input) |
 
@@ -992,12 +1202,15 @@ This agent swarm system provides a scalable, efficient framework for developing 
 - **Executes implementation**: Builds, tests, commits (exclusive Bash for implementation)
 
 **egdesk-pm-agent (Strategic PM & Administrative Orchestrator):**
-- **Provides strategic guide**: Framework choice, code location, implementation phasing
+- **Discovers technology stack dynamically**: Reads technology-stack.md (NEVER hardcodes tech list)
+- **Provides strategic guide**: Technology stack selection, code location, implementation phasing
+- **Checks implementation status**: Prevents duplicate implementations (Grep EG-DESK + Theia code)
 - **Reviews execution plans**: Validates completeness, suggests improvements
-- **Manages documentation**: Creates PRDs, updates vision docs
+- **Manages documentation**: Creates PRDs, updates vision docs, updates technology-stack.md
 - **Maintains institutional memory**: Recalls decisions, records new ones
 - **Provides insights**: Explains vision conflicts, suggests alternatives to user
-- **Dynamically discovers structure**: Globs vision docs + packages to understand project state
+- **Dynamically discovers structure**: Globs vision docs + tech stack + codebase to understand project state
+- **Evaluates new technologies**: When user proposes new framework, evaluates and updates stack
 - **Never writes application code** (only documentation)
 
 **Specialized Analyzer Agents (Technical Experts):**
@@ -1006,10 +1219,15 @@ This agent swarm system provides a scalable, efficient framework for developing 
 - Return evidence-based guidance with file lists (CREATE/MODIFY/DELETE/REFERENCE)
 - Never write code or make strategic decisions
 
-**coding-agent (Code Executor):**
+**coding-agent (Code Executor & Structure Manager):**
 - Executes code writing/editing based on Main Thread's direction + file list
 - Reads files for implementation details
 - Follows patterns from framework analyzers
+- **Discovers EG-DESK codebase dynamically** (never hardcodes paths)
+- **Checks for conflicts before implementing** EG-DESK custom features
+- **Stops immediately when conflict detected** (reports to Main Thread, user decides)
+- **Updates CODEBASE_STRUCTURE.md automatically** after implementation
+- **Prevents duplicate implementations** via conflict detection system
 - Returns status reports
 - **Preserves Main Thread's context** for continued communication
 
@@ -1019,10 +1237,19 @@ This agent swarm system provides a scalable, efficient framework for developing 
 3. **Technical Level** (Analyzer Agents): Provides framework-specific patterns and guidance
 4. **Execution Level** (coding-agent): Implements code following all guidance
 
-**Result:** PM-driven strategic flow with Main Thread as facilitator:
-- PM provides strategic direction (framework, location, approach)
+**Result:** PM-driven strategic flow with Main Thread as facilitator and built-in conflict prevention:
+- **PM discovers technology stack dynamically** (reads technology-stack.md, NEVER hardcoded)
+- **PM checks implementation status** (prevents duplicate implementations via Grep)
+- PM provides strategic direction (technology stack selection, location, approach)
+- PM updates technology-stack.md when new technologies added
 - Main Thread creates plans and queries technical agents
 - Framework agents provide implementation patterns
-- coding-agent executes code
+- **coding-agent checks for conflicts** (EG-DESK custom features only)
+- **User makes decisions** when conflicts detected or new tech proposed
+- coding-agent executes code (after conflict resolution)
+- **coding-agent updates structure document** (automatic maintenance)
 - Main Thread builds, tests, commits
-- Clear separation: strategy (PM) → planning (Main Thread) → patterns (analyzers) → execution (coding-agent)
+- Clear separation: strategy (PM) → planning (Main Thread) → patterns (analyzers) → conflict check (coding-agent) → execution (coding-agent) → structure update (coding-agent)
+- **Dynamic discovery**: All paths AND technology stack discovered via Glob, no hardcoding
+- **Conflict prevention**: CODEBASE_STRUCTURE.md prevents duplicate implementations, PM prevents duplicate tech stack
+- **Evolving tech stack**: Technology stack grows during ideation/research phases
