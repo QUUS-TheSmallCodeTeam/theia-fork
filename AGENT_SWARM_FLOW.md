@@ -60,7 +60,8 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 │  • Creates mission prompts (orchestration)      │
 │  • Invokes agents                               │
 │  • Synthesizes results                          │
-│  • Writes code (implementation)                 │
+│  • Builds/tests/commits (Bash only)             │
+│  • NEVER writes application code                │
 │  • Preserves context (delegates heavy reading)  │
 │                                                  │
 │ Can read for orchestration:                     │
@@ -79,8 +80,9 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 │ PM Agent: reads vision docs                     │
 │ Framework Agents: read codebase/docs            │
 │ SDK Analyzer: reads SDK docs                    │
+│ coding-agent: WRITES code (only entity)         │
 │                                                  │
-│ Each agent reads ONLY its domain files          │
+│ Each agent reads/writes ONLY its domain         │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -200,13 +202,22 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 | 9 | Main Thread | Queries framework agent (per PM's guide) | `Task(agent: "theia-analyzer-agent", prompt: "Analyze terminal theme system at packages/terminal/src/browser/terminal-theme-service.ts for registration and DI patterns")` | Agent starts |
 | 10 | theia-analyzer-agent | Analyzes theme system | `Read("packages/terminal/src/browser/terminal-theme-service.ts")`<br>`Read("packages/terminal/src/browser/terminal-frontend-module.ts")`<br>`Grep("@injectable")` | Finds patterns |
 | 11 | theia-analyzer-agent | Returns analysis | None | **Files Analyzed**: terminal-theme-service.ts:45, terminal-frontend-module.ts:32<br>**Pattern**: ThemeService.register() with DI binding<br>**File List**: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, REFERENCE workspace-service.ts:89 for @injectable() |
-| **PHASE 3: IMPLEMENTATION (Main Thread)** |
-| 12 | Main Thread | Implements directly (small change) | `Write("time-based-theme-switcher.ts")`<br>`Edit("terminal-frontend-module.ts")`<br>`Edit("terminal-contribution.ts")` | Code written |
-| 13 | Main Thread | Builds, tests, commits | `Bash("npm run build && git add . && git commit")` | Committed |
+| **PHASE 3: IMPLEMENTATION (via coding-agent)** |
+| 12 | Main Thread | Synthesizes guidance into instructions | None (internal) | Direction: Create TimeBasedThemeSwitcher<br>File List: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, terminal-contribution.ts:89, REFERENCE workspace-service.ts:89 |
+| 13 | Main Thread | Delegates to coding-agent | `Task(agent: "coding-agent", prompt: "Implement time-based terminal theme switcher. Direction: [what to implement]. Files: [file list]. [You will read files for details]")` | Coding agent starts |
+| 14 | coding-agent | Reads files and implements | `Read(...)` + `Write(...)` + `Edit(...)` | Implementation complete |
+| 15 | coding-agent | Returns report | None | "Implementation complete: 1 CREATE, 2 MODIFY" |
+| **PHASE 3.5: UX FLOW VALIDATION (Optional)** |
+| 16a | Main Thread | (Optional) Decides to validate UX flow | None | Complex feature, worth validating |
+| 16b | Main Thread | Invokes ux-flow-simulator | `Task(agent: "ux-flow-simulator-agent", prompt: "Trace execution flow: User opens terminal → theme should switch based on time. Files: [list]. Predict runtime behavior.")` | Agent starts |
+| 16c | ux-flow-simulator-agent | Traces code execution paths | `Read(files)` + traces logic | Finds: No race conditions, expected behavior correct |
+| 16d | ux-flow-simulator-agent | Returns validation report | None | "✅ Flow validated: No issues predicted" |
+| **PHASE 4: BUILD & COMMIT** |
+| 17 | Main Thread | Builds, tests, commits | `Bash("npm run build && git add . && git commit")` | Committed |
 
-**Total Agents Invoked:** 2 (PM strategic guide → framework analyzer)
+**Total Agents Invoked:** 3-4 (PM strategic guide → framework analyzer → coding-agent → optional: ux-flow-simulator)
 
-**Who Wrote Code:** Main Thread directly (small implementation)
+**Who Wrote Code:** coding-agent (step 14)
 
 **Duration:** Multi-phase (PM guide → plan → framework investigation → implementation)
 
@@ -215,9 +226,22 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 - **PM creates PRD**: Documents approved feature
 - **Main Thread creates plan** based on PM's guide
 - **Framework agent** provides technical patterns (not strategic direction)
-- **Main Thread implements** following both PM's strategy and framework patterns
+- **Main Thread synthesizes** PM guide + framework patterns into coding instructions
+- **coding-agent implements** following synthesized instructions
+- **(Optional) ux-flow-simulator validates logic** before build (Main Thread's discretion)
+- **Main Thread** retains control of build/test/commit
 
-**Note**: This shows direct implementation. For larger changes, Main Thread would delegate to coding-agent (see Scenario 4b).
+**Note**: ALL file changes go through coding-agent for consistency and context preservation.
+
+**When to use ux-flow-simulator (optional):**
+- ✅ Complex user interaction flows
+- ✅ State management with potential race conditions
+- ✅ Async operations or event handling
+- ✅ Critical features (security, data integrity)
+- ✅ Multi-step workflows
+- ❌ Simple CRUD operations
+- ❌ Pure UI styling changes
+- ❌ Documentation updates
 
 ---
 
@@ -376,7 +400,7 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 
 ---
 
-### Scenario 6: Simple Implementation (Direct, No Orchestration)
+### Scenario 6: Simple File Edit (coding-agent)
 
 **User Request:**
 ```
@@ -388,19 +412,21 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 | Step | Entity | Action | Tools Used | Output |
 |------|--------|--------|------------|--------|
 | 1 | User | Reports typo | None | Request sent |
-| 2 | Main Thread | Analyzes: Simple edit, no domain knowledge needed | None | Direct execution |
-| 3 | Main Thread | Reads README | `Read("README.md")` | Finds typo |
-| 4 | Main Thread | Fixes typo | `Edit("README.md", old: "intsall", new: "install")` | File corrected |
-| 5 | Main Thread | Commits | `Bash("git add README.md && git commit -m 'docs: fix typo'")` | Committed |
-| 6 | Main Thread | Reports to user | None | "Fixed and committed" |
+| 2 | Main Thread | Analyzes: Simple edit | None | Routes to coding-agent |
+| 3 | Main Thread | Delegates to coding-agent | `Task(agent: "coding-agent", prompt: "Fix typo in README.md: change 'intsall' to 'install'. Files: MODIFY README.md")` | Coding agent starts |
+| 4 | coding-agent | Reads README | `Read("README.md")` | Finds typo |
+| 5 | coding-agent | Fixes typo | `Edit("README.md", old: "intsall", new: "install")` | File corrected |
+| 6 | coding-agent | Returns report | None | "Fixed typo in README.md" |
+| 7 | Main Thread | Commits | `Bash("git add README.md && git commit -m 'docs: fix typo'")` | Committed |
+| 8 | Main Thread | Reports to user | None | "Fixed and committed" |
 
-**Total Agents Invoked:** 0
+**Total Agents Invoked:** 1 (coding-agent)
 
-**Who Wrote Code:** Main Thread
+**Who Wrote Code:** coding-agent (step 5)
 
-**Duration:** Immediate (direct execution)
+**Duration:** Single agent invocation + commit
 
-**Key Point:** No agents needed for simple, straightforward tasks.
+**Key Point:** ALL file changes go through coding-agent for consistency. Main Thread NEVER edits application files directly.
 
 ---
 
@@ -473,14 +499,14 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 | Request Type | Route | Agents Used | Who Codes | Conflict Check? | Example |
 |--------------|-------|-------------|-----------|----------------|---------|
 | **Simple Question** | Direct execution | 0 | Nobody | N/A | "List files", "Show git status" |
-| **File Edit** | Direct execution | 0 | Main Thread | N/A | "Fix typo", "Update version" |
+| **File Edit** | Main Thread → coding-agent | 1 | coding-agent | N/A | "Fix typo", "Update version" |
 | **Framework Question** | Direct to framework agent | 1 | Nobody | N/A | "How does Theia DI work?" |
 | **Strategic Decision** | Main Thread orchestrates → PM agent | 1 | Nobody | N/A | "Should we add feature X?" |
 | **Theia Framework Implementation** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | ❌ No (Theia packages/) | "Modify Theia terminal service" |
 | **EG-DESK Custom Feature** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | ✅ Yes (CODEBASE_STRUCTURE.md) | "Add custom QuickSearch with Ctrl+K" |
 | **Large Multi-Feature** | Main Thread orchestrates → analyzers + coding-agent(s) | 3-4+ | coding-agent(s) | ✅ If EG-DESK custom | "Implement custom dashboard system" |
-| **New Technology Proposal** | Main Thread → PM agent (evaluate → update stack) | 1-2 | Nobody (doc update) | N/A | "Add Three.js for 3D visualization" |
-| **Agent Creation** | Main Thread → claude-agent | 1 | claude-agent | N/A | "Create Konva analyzer agent" |
+| **New Technology Proposal** | Main Thread → PM agent (evaluate → update stack) | 1-2 | PM agent (docs) | N/A | "Add Three.js for 3D visualization" |
+| **Agent Creation** | Main Thread → claude-agent | 1 | claude-agent (agent file) | N/A | "Create Konva analyzer agent" |
 
 ---
 
@@ -714,6 +740,105 @@ This structure allows Main Thread to:
 - Identify pattern references separately from implementation targets
 - Provide precise instructions: "CREATE 1 file, MODIFY 2 files, following pattern from REFERENCE"
 
+### 6. Multi-turn Communication with PM Agent
+
+**PRINCIPLE**: Main Thread may return to PM Agent for additional guidance after initial strategic guide, especially for complex implementations requiring plan review, clarification, or progressive phasing.
+
+**When to Return to PM**:
+
+✅ **Return for**:
+- **Plan Review**: Created execution plan, want PM validation before implementing
+- **Clarification**: PM's guide ambiguous (desktop vs web? custom vs framework modification?)
+- **Progressive Phases**: Phase N complete, need guidance for Phase N+1 based on findings
+- **Decision Support**: Framework agents suggest multiple approaches, need vision-aligned choice
+- **Conflict Resolution**: Found existing feature, unclear whether to enhance/replace/separate
+
+❌ **Don't return for**:
+- Simple implementation details (ask framework agents)
+- Following PM's guide exactly as provided (just execute)
+- Minor code adjustments (handle directly)
+- Pure technical patterns (query framework agents)
+
+**Multi-turn Pattern**:
+
+```
+Turn 1: Initial Strategic Guide
+Main Thread → PM: "User wants [feature]. Provide strategic guide."
+PM → Main Thread: Strategic guide (framework, location, phasing)
+
+Turn 2: Plan Review (optional, if complex)
+Main Thread → PM: "I created this plan based on your guide:
+[PLAN]
+
+Framework agents reported:
+[FINDINGS]
+
+Review against vision?"
+PM → Main Thread: Plan assessment (PROCEED / REVISE / CONSULT USER)
+
+Turn 3: Implementation
+Main Thread executes (or revises plan based on PM feedback)
+```
+
+**Key Principle: Include Full Context**
+
+Since PM Agent is stateless, Main Thread must include previous guidance:
+
+```
+Task(agent: "egdesk-pm-agent",
+     prompt: "Previously you provided this strategic guide:
+
+[QUOTE ENTIRE PREVIOUS GUIDE]
+
+I've now completed Phase 1 and found:
+- [Finding 1]
+- [Finding 2]
+
+Framework agents reported:
+- [Key insight]
+
+My plan for Phase 2: [PLAN]
+
+Questions:
+1. Does this align with vision given findings?
+2. Should I adjust based on agent reports?
+
+Provide guidance for Phase 2.")
+```
+
+**Multi-turn Patterns Supported**:
+
+1. **Plan Review**: Validate execution plan against vision
+2. **Clarification**: Resolve ambiguity in strategic guide
+3. **Progressive Phases**: Get next-phase guidance after completing previous phase
+4. **Decision Support**: Choose between multiple valid approaches
+5. **Conflict Resolution**: Resolve tension between found implementations and new requirements
+
+**Benefits**:
+- Complex implementations get vision alignment at multiple checkpoints
+- Reduces risk of implementing wrong approach
+- Adapts strategy based on discoveries during execution
+- User makes informed decisions at critical junctures
+
+**Smart Judgment**:
+- Trust Main Thread to decide when PM consultation adds value
+- Don't over-consult (slows execution)
+- Do consult strategically (prevents costly rework)
+
+**Example: Plan Review Turn**
+
+```
+| Step | Entity | Action | Output |
+|------|--------|--------|--------|
+| 8a | Main Thread | Created plan, wants PM review | Plan: [3-phase implementation] |
+| 8b | Main Thread | Returns to PM | Task(agent: "egdesk-pm-agent", prompt: "Previously you said [GUIDE]. I created this plan: [PLAN]. Framework agents found [FINDINGS]. Review?") |
+| 8c | egdesk-pm-agent | Reviews plan | Assessment: "Add Phase 2.5 for preference persistence" |
+| 8d | Main Thread | Revises plan | Updated plan with PM suggestions |
+| 8e | Main Thread | Proceeds to framework investigation | Executes revised plan |
+```
+
+This pattern allows Main Thread to "course-correct" after gathering technical findings but before committing to implementation.
+
 ---
 
 ## Orchestration Guidelines Deep Dive
@@ -859,7 +984,7 @@ User → Main Thread orchestrates:
                ├─ Phase 1: Parallel validation (PM + Framework agents)
                ├─ Phase 2: Sequential architecture (Framework agent)
                ├─ Synthesizes all guidance
-               └─ Phase 3: Main Thread implements (writes code)
+               └─ Phase 3: coding-agent implements (Main Thread commits)
 ```
 
 ### Pattern 4: Agent Creation
@@ -926,6 +1051,40 @@ When to use: EG-DESK custom features (keybindings, services, commands)
 When to skip: Theia framework modifications (packages/*), bug fixes
 ```
 
+### Pattern 7: Optional UX Flow Validation (Pre-Build)
+```
+User → Main Thread orchestrates:
+         ├─ PM provides strategic guide
+         ├─ Framework agents provide patterns
+         ├─ coding-agent implements
+         │
+         └─ (Optional) Main Thread validates flow:
+               │
+               ├─ Decision: Is this complex/critical?
+               │   - Complex user flows? → Validate
+               │   - Race conditions possible? → Validate
+               │   - Critical feature? → Validate
+               │   - Simple CRUD? → Skip
+               │
+               └─ IF VALIDATE:
+                   ├─ Invoke ux-flow-simulator-agent:
+                   │   - "Trace execution: [user action] → [expected result]"
+                   │   - "Files: [implemented files]"
+                   │   - "Check for: race conditions, runtime errors, UX issues"
+                   │
+                   ├─ ux-flow-simulator traces code execution
+                   ├─ Predicts runtime behavior
+                   ├─ Identifies potential issues BEFORE build
+                   │
+                   └─ Returns validation:
+                       - ✅ No issues → Proceed to build
+                       - ⚠️ Issues found → Fix via coding-agent → Re-validate
+
+Benefit: Catch runtime errors, race conditions, UX issues before build/test
+When to use: Complex flows, async operations, state management, critical features
+When to skip: Simple changes, pure styling, documentation, obvious correctness
+```
+
 ---
 
 ## Anti-Patterns to Avoid
@@ -978,27 +1137,29 @@ Theia uses InversifyJS for DI. Example at line 89
 shows @injectable() decorator usage."
 ```
 
-### ❌ Anti-Pattern 5: Using coding-agent for Small Edits
+### ❌ Anti-Pattern 5: Main Thread Writing Code Directly
 ```
 BAD:
 User asks: "Fix typo in README"
-Main Thread → coding-agent → Edit README
-(Adds unnecessary agent invocation overhead)
+Main Thread → Edit("README.md", ...) directly
+(Breaks separation of concerns - Main Thread should NEVER edit application files)
 
 GOOD:
 User asks: "Fix typo in README"
-Main Thread → Edit("README.md", ...) directly
-(Immediate execution)
+Main Thread → coding-agent → Edit README
+(Consistent delegation pattern)
 
-Use coding-agent when:
-✅ Large multi-file implementations
-✅ Main Thread context filling up
-✅ Need to preserve Main Thread for orchestration
+Why always use coding-agent:
+✅ Consistent separation of concerns
+✅ Main Thread stays clean (orchestration only)
+✅ Single responsibility: Main Thread orchestrates, coding-agent executes
+✅ Context preservation for Main Thread
 
-Don't use coding-agent when:
-❌ Single small edit
-❌ Simple typo fixes
-❌ Quick updates
+Main Thread responsibilities:
+✅ Orchestrate (create plans, invoke agents)
+✅ Build/test/commit (Bash commands)
+✅ Synthesize agent reports
+❌ NEVER Write/Edit application files
 ```
 
 ### ❌ Anti-Pattern 6: Hardcoding Paths
@@ -1069,7 +1230,7 @@ An effective agent swarm flow has:
 
 | Entity | CAN Do | CANNOT Do | Tools Available |
 |--------|--------|-----------|-----------------|
-| **Main Conversation Thread** | • Analyze and route requests<br>• **Orchestrate agents** (following `@.claude/prompts/agent-orchestration.md`):<br>  - Identify agents (from system prompt - Task tool lists all)<br>  - Create mission prompts<br>  - Plan execution phases<br>  - Identify decision points (분기점)<br>  - Design parallel/sequential workflows<br>• Invoke agents (Task tool)<br>• Synthesize agent outputs<br>• Write/Edit/Read files<br>• Execute bash commands<br>• Run git operations<br>• Commit code<br>• Create PRs<br>• Install packages<br>• Run builds and tests<br>• Make implementation decisions<br>• **Preserve own context** by delegating heavy reading to agents | • **When orchestrating**: Read domain files (vision docs, codebase) - delegate to agents to preserve context<br>• Delegate simple tasks unnecessarily<br>• Guess framework patterns without agent consultation<br>• Implement EG-DESK features without vision validation | Write, Edit, Read, Glob, Grep, Bash, Task (all tools) |
+| **Main Conversation Thread** | • Analyze and route requests<br>• **Orchestrate agents** (following `@.claude/prompts/agent-orchestration.md`):<br>  - Identify agents (from system prompt - Task tool lists all)<br>  - Create mission prompts<br>  - Plan execution phases<br>  - Identify decision points (분기점)<br>  - Design parallel/sequential workflows<br>• Invoke agents (Task tool)<br>• Synthesize agent outputs<br>• **NEVER Write/Edit application files** (always delegate to coding-agent)<br>• Execute bash commands (build/test/commit)<br>• Run git operations<br>• Commit code<br>• Create PRs<br>• Install packages<br>• Run builds and tests<br>• Make implementation decisions<br>• **Preserve own context** by delegating heavy reading to agents | • **Write/Edit application code** (ALWAYS delegate to coding-agent)<br>• **When orchestrating**: Read domain files (vision docs, codebase) - delegate to agents to preserve context<br>• Delegate simple tasks unnecessarily<br>• Guess framework patterns without agent consultation<br>• Implement EG-DESK features without vision validation | Bash, Task, Read, Glob, Grep (NO Write/Edit for application code) |
 | **Specialized Analyzer Agents**<br>(theia, electron, infinite-canvas, etc.) | • Analyze codebase/documentation<br>• Provide evidence-based guidance<br>• Explain framework patterns<br>• Troubleshoot issues<br>• Reference specific files/APIs<br>• Find proven patterns<br>• Return detailed reports<br>• **Use Bash for READ-ONLY analysis** (inspect outputs, run tests to understand behavior) | • Write ANY code<br>• **Use Bash for implementation** (commits, builds, installations) - contextually restricted<br>• Create files<br>• Edit files<br>• Commit changes<br>• Invoke other agents<br>• Implement features | Bash, Read, Glob, Grep, WebFetch, WebSearch (Bash for analysis only, contextually enforced) |
 | **egdesk-pm-agent** | • **Strategic PM**: Provide implementation guide (technology stack, location, phasing)<br>• **Technology Stack Discovery**: Glob + Read technology-stack.md (NEVER hardcode tech list)<br>• **Technology Stack Selection**: Match requirements to discovered technology capabilities<br>• **Technology Stack Management**: Update technology-stack.md when new tech added<br>• **Implementation Status Check**: Grep/Glob to verify feature not already implemented (prevent duplicates)<br>• **Plan Reviewer**: Validate Main Thread's plans, suggest improvements<br>• **Documentation Manager**: Create PRDs, update vision/ideas/tech-stack docs<br>• **Institutional Memory**: Recall previous decisions, record new ones<br>• **Insight Provider**: Explain vision conflicts, suggest alternatives<br>• **Dynamic Discovery**: Glob all docs dynamically (vision, tech stack, codebase structure)<br>• **Code Location**: Specify exact package/directory (eg-desk_taehwa/ vs packages/)<br>• **Preserve Main Thread's context**: Read vision/tech docs, synthesize strategic direction | • Write application code (only writes documentation: PRDs, vision docs, tech-stack.md)<br>• Execute implementation commands (Bash for discovery only)<br>• Commit changes<br>• Invoke other agents<br>• Provide technical patterns (framework agents do this)<br>• **Hardcode technology stack** (always discover from technology-stack.md) | Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch (Bash for discovery only, Write/Edit for documentation) |
 | **coding-agent** | • **Execute code writing/editing** based on Main Thread instructions<br>• Create new files following provided patterns<br>• Edit existing files precisely<br>• Follow framework patterns from analyzer guidance<br>• Handle multi-file implementations<br>• **Discover EG-DESK codebase dynamically** (Glob eg-desk*/**/*.ts)<br>• **Check for naming conflicts** before implementing EG-DESK features (CODEBASE_STRUCTURE.md)<br>• **STOP immediately** when conflict detected (report to Main Thread, user decides)<br>• **Update structure document** after successful implementation<br>• **Prevent duplicate implementations** (conflict prevention system)<br>• Return implementation status reports | • Make architectural decisions<br>• Choose implementation approaches<br>• **Auto-resolve conflicts** (must report, user decides)<br>• **Hardcode paths** (always discover dynamically)<br>• Execute bash commands<br>• Run builds/tests<br>• Commit changes<br>• Invoke other agents<br>• Analyze frameworks<br>• Validate vision | Write, Edit, Read, Glob, Grep (NO Bash) |
@@ -1078,11 +1239,11 @@ An effective agent swarm flow has:
 
 ### Code Ownership Hierarchy
 
-**Main Thread controls all code writing** - either directly or by delegating to coding-agent.
+**Main Thread NEVER writes code** - ALWAYS delegates ALL file changes to coding-agent.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│   Main Thread (Orchestrator & Decision Maker)            │
+│   Main Thread (Orchestrator ONLY)                        │
 │                                                           │
 │   Exclusive capabilities:                                │
 │   • Bash tool (execute commands, git, npm, build, test)  │
@@ -1096,30 +1257,33 @@ An effective agent swarm flow has:
 │   • Plans execution phases                               │
 │   • Preserves context (delegates heavy reading)          │
 │                                                           │
-│   Can write code:                                        │
-│   ├─ Directly (for small changes)                        │
-│   └─ OR delegate to coding-agent (for large impl)        │
+│   Code delegation (ALWAYS):                              │
+│   └─ ALL file changes → coding-agent                     │
+│                                                           │
+│   NEVER:                                                 │
+│   • Write/Edit application files directly                │
 │                                                           │
 │   Receives guidance from:                                │
 │   ├─ Framework analyzers (patterns)                      │
 │   └─ egdesk-pm-agent (vision alignment)                 │
 └───────────┬───────────────────────┬──────────────────────┘
             │                       │
-    (guidance only)          (implementation only)
+    (guidance only)          (implementation ONLY)
             │                       │
 ┌───────────▼─────────┐    ┌────────▼───────────────┐
 │ Framework Analyzers │    │ coding-agent           │
-│ (Explain patterns)  │    │ (Executes code)        │
-│ Returns guidance    │    │                        │
-│ with file refs      │    │ Receives:              │
-└─────────────────────┘    │ • Detailed impl plan   │
-                           │ • Agent guidance       │
-┌─────────────────────┐    │ • Patterns to follow   │
-│ PM Agent            │    │                        │
-│ (Validates vision)  │    │ Executes:              │
-│ Returns             │    │ • Write new files      │
-│ APPROVE/REJECT      │    │ • Edit existing files  │
-└─────────────────────┘    │ • Follow patterns      │
+│ (Explain patterns)  │    │ (ONLY entity that      │
+│ Returns guidance    │    │  writes code)          │
+│ with file refs      │    │                        │
+└─────────────────────┘    │ Receives:              │
+                           │ • Detailed impl plan   │
+┌─────────────────────┐    │ • Agent guidance       │
+│ PM Agent            │    │ • Patterns to follow   │
+│ (Validates vision)  │    │                        │
+│ Returns             │    │ Executes:              │
+│ APPROVE/REJECT      │    │ • Write new files      │
+└─────────────────────┘    │ • Edit existing files  │
+                           │ • Follow patterns      │
                            │                        │
                            │ Returns:               │
                            │ • Status report        │
@@ -1127,10 +1291,11 @@ An effective agent swarm flow has:
 ```
 
 **Key Points:**
-1. **Main Thread**: Can code directly OR delegate to coding-agent
-2. **coding-agent**: Only codes when instructed by Main Thread
+1. **Main Thread**: NEVER writes code, ALWAYS delegates to coding-agent
+2. **coding-agent**: ONLY entity that writes application code
 3. **Analyzer agents**: Never touch code
 4. **Only Main Thread**: Has Bash (build, test, commit)
+5. **Clear separation**: Main Thread orchestrates, coding-agent executes
 
 ### Orchestration Hierarchy
 
@@ -1138,7 +1303,8 @@ An effective agent swarm flow has:
 - Creates mission prompts
 - Invokes agents
 - Synthesizes results
-- Implements solutions
+- Delegates implementation to coding-agent
+- Builds, tests, commits
 
 ```
 User: "Implement feature X"
@@ -1157,6 +1323,7 @@ Main Thread:
          ├─ Plans phases:
          │  - Phase 1 (Parallel): PM + Framework analyzers
          │  - Phase 2 (Sequential): Integration analysis
+         │  - Phase 3: Implementation via coding-agent
          │
          ├─ Executes Phase 1 (single message, multiple Tasks):
          │  ├─ Task(agent: "egdesk-pm-agent", prompt: "[exact mission]")
@@ -1169,17 +1336,24 @@ Main Thread:
          │  └─ Task(agent: "theia-analyzer-agent",
          │          prompt: "[mission with Phase 1 context]")
          │
-         └─ Synthesizes all guidance and IMPLEMENTS:
-            ├─ Write(files)
-            ├─ Edit(files)
+         ├─ Synthesizes all guidance (PM guide + framework patterns)
+         │
+         ├─ Executes Phase 3: Delegates to coding-agent
+         │  └─ Task(agent: "coding-agent",
+         │          prompt: "Direction: [what to implement]
+         │                   Files: [CREATE/MODIFY/DELETE/REFERENCE]
+         │                   [You will read files for details]")
+         │
+         └─ After coding-agent completes:
             ├─ Bash(build, test, commit)
             └─ Reports to user
 ```
 
 **Critical Points:**
-1. **Main Thread**: Orchestrates, creates prompts, invokes agents, implements
+1. **Main Thread**: Orchestrates, creates prompts, invokes agents, NEVER writes code
 2. **Agents**: Analyze and return guidance only
-3. **User**: Makes decisions at decision points (분기점)
+3. **coding-agent**: ONLY entity that writes code
+4. **User**: Makes decisions at decision points (분기점)
 
 ---
 
@@ -1196,10 +1370,10 @@ This agent swarm system provides a scalable, efficient framework for developing 
   - Presents PM's insights/alternatives to user
 - **Creates execution plans** based on PM's strategic guidance
 - **Synthesizes** PM guide + framework patterns into coding instructions
-- **Controls all code writing**:
-  - Via coding-agent delegation (direction + file list)
-  - Directly for trivial changes only
-- **Executes implementation**: Builds, tests, commits (exclusive Bash for implementation)
+- **Controls all implementation**:
+  - Delegates ALL file changes to coding-agent (direction + file list)
+  - NEVER writes application code directly
+  - Retains control of build/test/commit (exclusive Bash for implementation)
 
 **egdesk-pm-agent (Strategic PM & Administrative Orchestrator):**
 - **Discovers technology stack dynamically**: Reads technology-stack.md (NEVER hardcodes tech list)

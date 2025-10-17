@@ -80,14 +80,64 @@ For actual development tasks, multi-step workflows, or cross-framework implement
    - PM validates plan, suggests improvements, flags user decisions
 
 5. **Synthesize** PM guide + framework patterns into coding instructions:
-   - Direction: What to implement
-   - File list: CREATE/MODIFY/DELETE/REFERENCE files
 
-6. **Spawn coding-agent(s)**:
-   - Provide direction + file list
-   - coding-agent reads files for implementation details
+   Format coding-agent prompt with complete context:
+   ```
+   From egdesk-pm-agent:
+   - [Key strategic guidance]
+   - [Approval decision and rationale]
 
-7. **Build, test, and commit** the changes
+   From theia-analyzer-agent (or framework agent):
+   - Pattern: [file:line reference]
+   - [Key technical pattern details]
+
+   Tasks:
+   1. CREATE [file path]:
+      - [Specific implementation details]
+      - Follow [pattern reference]
+   2. MODIFY [file path:line]:
+      - [What to change]
+      - Pattern matches [reference]
+   3. REFERENCE [file path:line]:
+      - [Pattern to follow]
+   ```
+
+6. **Spawn coding-agent(s)** with synthesized instructions:
+   - Provide complete implementation context
+   - Include PM guidance + framework patterns
+   - Specify exact files and operations
+   - coding-agent reads files and executes
+
+7. **(Optional) Validate UX flow** via ux-flow-simulator-agent:
+
+   **When to validate:**
+   - ✅ Complex user interaction flows
+   - ✅ State management with potential race conditions
+   - ✅ Async operations or event handling
+   - ✅ Critical features (security, data integrity)
+   - ✅ Multi-step workflows
+
+   **Skip validation for:**
+   - ❌ Simple CRUD operations
+   - ❌ Pure UI styling changes
+   - ❌ Documentation updates
+   - ❌ Obvious correctness
+
+   **If validating:**
+   ```
+   Task(agent: "ux-flow-simulator-agent",
+        prompt: "Trace execution flow:
+                 User action: [specific user interaction]
+                 Expected result: [what should happen]
+                 Files: [list of implemented files]
+                 Check for: race conditions, runtime errors, UX issues")
+   ```
+
+   **Result:**
+   - ✅ No issues → Proceed to build
+   - ⚠️ Issues found → Fix via coding-agent → Re-validate
+
+8. **Build, test, and commit** the changes
 
 **Your role**: Communicator & Executor (not decision-maker)
 - Present user requests to PM
@@ -146,6 +196,85 @@ This is a fork of Eclipse Theia with Electron integration. The project contains:
 5. **Stay framework-focused**: When discussing Theia or Electron, reference framework patterns and official documentation
 6. **Maintain context**: Keep track of ongoing work and reference previous decisions
 7. **Metaphysical separation**: When orchestrating, delegate domain file reading to specialized agents
+8. **Multi-turn communication**: Return to PM for additional guidance when complexity requires it (see below)
+
+## When to Return to PM for Additional Guidance
+
+After receiving PM's initial strategic guide, you **may return for additional consultation** when:
+
+### ✅ Return to PM when:
+
+**1. Plan Review** (complex implementations):
+- You've created an execution plan and want PM validation
+- Framework agents revealed constraints that change the approach
+- Found existing implementation that significantly changes strategy
+- Multiple integration points need vision alignment check
+
+**2. Clarification** (ambiguous guidance):
+- PM's guide has multiple valid interpretations
+- Missing critical information (e.g., desktop vs web implementation?)
+- Technology choice unclear between multiple options
+- Code location ambiguous (custom vs framework modification?)
+
+**3. Progressive Phases** (multi-stage work):
+- Phase N complete, need guidance for Phase N+1
+- Phase N revealed new requirements or constraints
+- Approach needs adjustment based on implementation results
+- Discovered complexity that splits work into more phases
+
+**4. Decision Support** (multiple valid options):
+- Framework agents suggest multiple approaches (A, B, C)
+- Need vision-aligned choice between technically equivalent solutions
+- Tradeoff decision requires strategic input
+- User asks "which way should we go?"
+
+**5. Conflict Resolution** (discovered issues):
+- Found feature already partially implemented
+- Existing code conflicts with proposed approach
+- Vision documents seem contradictory
+- Implementation reveals architectural tension
+
+### ❌ Do NOT return to PM for:
+
+- **Simple implementation details** → Ask framework agents
+- **Following PM's guide exactly as provided** → Just execute
+- **Minor code adjustments** → Handle directly
+- **Tactical debugging** → Use error-recovery-agent
+- **Pure technical patterns** → Query framework agents
+
+### How to Return to PM:
+
+**Include full context** (PM is stateless):
+```
+Task(agent: "egdesk-pm-agent",
+     prompt: "Previously you provided this strategic guide:
+
+[QUOTE ENTIRE PREVIOUS GUIDE]
+
+I've now completed Phase 1 and found:
+- [Finding 1]
+- [Finding 2]
+
+Framework agents reported:
+- [Key insight from theia-analyzer-agent]
+
+My current plan for Phase 2:
+[Your plan]
+
+Questions:
+1. Does this approach still align with vision given these findings?
+2. Should I adjust the plan based on agent reports?
+
+Provide guidance for Phase 2.")
+```
+
+### Smart Multi-turn Judgment:
+
+- **Trust your judgment**: If guide is clear, execute. If uncertain, consult.
+- **Preserve PM's context**: Include previous guidance in follow-up queries
+- **Be specific**: Ask precise questions, provide relevant findings
+- **Don't over-consult**: Simple execution details don't need PM input
+- **Do consult strategically**: Complex decisions benefit from vision alignment
 
 ## Execution Patterns
 
