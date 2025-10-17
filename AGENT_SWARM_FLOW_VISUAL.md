@@ -314,196 +314,58 @@ flowchart TD
 **User:** "Add a custom terminal theme that changes based on time of day"
 
 ```mermaid
-flowchart TD
-    User(["User Request:
-    'Add time-based terminal theme'"])
+flowchart LR
+    subgraph Phase0["PHASE 0: PM Guide"]
+        User(["User: Add time-based<br/>terminal theme"])
+        PM["PM: Approve<br/>Framework: Theia<br/>Location: packages/terminal/<br/>Creates PRD"]
+        User --> PM
+    end
 
-    --> MT1["Main Thread
-    Action: Analyze request
-    Decision: Development task
-    Route: PM for strategic guide"]
+    subgraph Phase1_2["PHASE 1-2: Investigation"]
+        FW["theia-analyzer<br/>Theme patterns<br/>DI binding<br/>CREATE+MODIFY list"]
+    end
 
-    --> PM1["PHASE 0: PM Strategic Guide
+    Phase0 --> Phase1_2
 
-    Tools:
-    - Glob: ideas&external_references/eg-desk ideas/**/*.md
-    - Glob: packages/*/package.json
-    - Read: EG-DESK_Whitepaper.md
-    - Read: packages/terminal/package.json
-    - Read: packages/terminal/src/browser/terminal-theme-service.ts
-    - Grep: 'theme', 'terminal'
+    subgraph Phase3_4["PHASE 3-4: Implementation"]
+        Coding["coding-agent<br/>Read patterns<br/>Write+Edit files<br/>1 CREATE, 2 MODIFY"]
+    end
 
-    Analysis:
-    ✅ Vision aligned (ambient AI principles)
-    ✅ Framework: Theia (terminal = Theia domain)
-    ✅ No duplicates found
-    ✅ Existing: terminal-theme-service.ts
+    Phase1_2 --> Phase3_4
 
-    Actions:
-    - Creates PRD
+    subgraph Decision["PHASE 4.5: UX Validation?"]
+        Decide{"Validate?<br/>Complex/Critical?"}
+    end
 
-    Returns:
-    Decision: APPROVE
-    Framework: Theia
-    Location: packages/terminal/src/browser/
-    Phasing: Phase 1 - analyze, Phase 2 - design, Phase 3 - implement
-    Considerations: Manual override, preference persistence
-    PRD: time-based-terminal-theme-prd.md"]
+    Phase3_4 --> Decision
 
-    --> MT2["PHASE 1: Main Thread
-    Investigation Planning
+    subgraph Validation["Optional UX Flow"]
+        direction TB
+        UXSim["ux-flow-simulator<br/>Trace flow<br/>Predict issues"]
+        Check{Issues?}
+        Fix["coding-agent<br/>Fix"]
+        UXSim --> Check
+        Check -->|Yes| Fix
+        Fix --> UXSim
+    end
 
-    Action: Plan framework investigation
-    Based on: PM's Phase 1 guidance
+    Decide -->|Yes| Validation
+    Decide -->|No| Build
 
-    Plan:
-    - Query theia-analyzer for theme patterns
-    - Query theia-analyzer for DI registration"]
+    Check -->|No| Build["PHASE 5: Build+Commit<br/>npm run build<br/>git commit"]
 
-    --> FW1["PHASE 2: theia-analyzer-agent
-    Framework Investigation
-
-    Tools:
-    - Read: packages/terminal/src/browser/terminal-theme-service.ts
-    - Read: packages/terminal/src/browser/terminal-frontend-module.ts
-    - Grep: @injectable
-
-    Analysis:
-    - Theme registration pattern found
-    - DI binding pattern identified
-
-    Returns:
-    Files Analyzed:
-    - terminal-theme-service.ts:45
-    - terminal-frontend-module.ts:32
-    Pattern: ThemeService.register() with DI
-    File List:
-    - CREATE: time-based-theme-switcher.ts
-    - MODIFY: terminal-frontend-module.ts:36
-    - REFERENCE: workspace-service.ts:89
-      (for @injectable pattern)"]
-
-    --> MT3["PHASE 3: Main Thread
-    Implementation Planning
-
-    Action: Synthesize PM guide + framework patterns
-
-    Implementation Plan:
-    Direction: Create TimeBasedThemeSwitcher
-    following Theia DI pattern
-
-    File List:
-    - CREATE: time-based-theme-switcher.ts
-    - MODIFY: terminal-frontend-module.ts:36
-    - MODIFY: terminal-contribution.ts:89
-    - REFERENCE: workspace-service.ts:89
-      (for @injectable pattern)"]
-
-    --> MT4["Main Thread
-    Action: Delegate to coding-agent
-
-    Tool: Task
-    Prompt includes:
-    - Direction (what to implement)
-    - File list (CREATE/MODIFY/REF)
-    - Pattern references
-    - 'You will read files for details'"]
-
-    --> Coding1["PHASE 4: coding-agent
-    Implementation Execution
-
-    Tools:
-    - Read: workspace-service.ts:89 (pattern)
-    - Write: time-based-theme-switcher.ts
-      (with @injectable, DI pattern)
-    - Read: terminal-frontend-module.ts
-    - Edit: Add DI binding
-      (bind(TimeBasedThemeSwitcher)...)
-    - Read: terminal-contribution.ts
-    - Edit: Inject service
-      (@inject(TimeBasedThemeSwitcher))
-
-    Returns:
-    Implementation complete: 1 CREATE, 2 MODIFY
-    Following workspace-service.ts pattern"]
-
-    --> MTDecide{"PHASE 4.5: Main Thread Decision
-
-    Validate UX flow?
-
-    Consider:
-    ✅ Complex user flows?
-    ✅ Race conditions?
-    ✅ State management?
-    ✅ Critical feature?
-
-    ❌ Simple CRUD?
-    ❌ Pure styling?"}
-
-    MTDecide -->|"Validate<br/>(Complex)"| UXSim["ux-flow-simulator-agent
-
-    Tools:
-    - Read: time-based-theme-switcher.ts
-    - Read: terminal-contribution.ts
-    - Read: terminal-frontend-module.ts
-
-    Actions:
-    - Trace execution flow
-    - Check: User opens terminal → theme switches
-    - Predict: Race conditions, runtime errors
-
-    Returns:
-    ✅ No race conditions found
-    ✅ Expected behavior correct
-    OR
-    ⚠️ Issues: [list] → Fix needed"]
-
-    MTDecide -->|"Skip<br/>(Simple)"| MT5
-
-    UXSim --> UXCheck{"Issues found?"}
-
-    UXCheck -->|Yes| Fix["coding-agent
-    Action: Fix issues
-    Re-validate needed"]
-
-    Fix --> UXSim
-
-    UXCheck -->|No| MT5["PHASE 5: Main Thread
-    Build & Commit
-
-    Tools:
-    - Bash: npm run build
-    - Bash: git add .
-    - Bash: git commit -m 'feat(terminal): ...'
-
-    Output: Committed"]
-
-    --> End(["Complete
-    Feature implemented and committed
-
-    Total Agents: 3-4
-    - PM strategic guide
-    - theia-analyzer
-    - coding-agent
-    - (optional) ux-flow-simulator
-
-    Who Coded: coding-agent
-    Duration: Multi-phase"])
+    Build --> E(["Complete<br/>Agents: 3-4<br/>Duration: Multi-phase"])
 
     style User fill:#e1f5ff
-    style MTDecide fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style UXCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style PM1 fill:#fff4e1
-    style FW1 fill:#f0e1ff
+    style Decide fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Check fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style PM fill:#fff4e1
+    style FW fill:#f0e1ff
     style UXSim fill:#f0e1ff
-    style Coding1 fill:#ffe1f0
+    style Coding fill:#ffe1f0
     style Fix fill:#ffe1f0
-    style MT1 fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style MT3 fill:#e1ffe1
-    style MT4 fill:#e1ffe1
-    style MT5 fill:#e1ffe1
-    style End fill:#e1ffe1
+    style Build fill:#e1ffe1
+    style E fill:#e1ffe1
 ```
 
 ---
@@ -759,311 +621,93 @@ flowchart LR
 **User:** "캔버스에 3D visualization을 추가하고 싶어. 어떤 framework가 좋을까?"
 
 ```mermaid
-flowchart TD
-    User(["User Request:
-    'Add 3D visualization
-    Which framework?'"])
-
-    --> MT1["Main Thread
-    Action: Analyze request
-    Decision: New capability, may need new tech
-    Route: PM for gap assessment"]
-
-    --> PM1["PHASE 0: PM Diagnosis
-
-    Tools:
-    - Glob: ideas*/**/eg-desk*ideas*/*tech*.md
-    - Read: technology-stack.md
-    - Glob: ideas*/**/eg-desk*ideas*/**/*.md
-    - Read: EG-DESK_Whitepaper.md
-
-    Analysis:
-    Current Stack:
-    - Konva.js = 2D canvas library
-    - Infinite Canvas = viewport transforms
-
-    User Needs: True 3D rendering
-    (lighting, shadows, depth)
-
-    GAP FOUND:
-    Konva.js limited to 2D shapes
-    Pseudo-3D insufficient for complex 3D
-
-    Vision Check: ✅ 3D viz aligns with
-    spatial canvas principles
-
-    Research Plan Created:
-    Options: Three.js, Babylon.js, Custom WebGL
-    Criteria:
-    - Bundle size < 500KB
-    - Integration complexity (w/ Infinite Canvas)
-    - Performance: 1000 obj @ 60fps
-    - Compatibility w/ existing stack
-
-    Parallel Design:
-    All 3 independent → run simultaneously
-
-    Returns:
-    Decision: RESEARCH_NEEDED
-    Limitation: Konva.js is 2D-only
-    Why: User needs true 3D w/ lighting
-    Investigation Scope: 3 parallel
-    Expected: MT returns with findings"]
-
-    --> MT2["Main Thread
-    Action: Present research plan to user"]
-
-    --> UserDec1{"USER DECISION 1:
-    Proceed with research?
-
-    PM diagnosed:
-    - Konva.js cannot do true 3D
-    - Recommends investigating:
-      Three.js, Babylon.js, Custom WebGL
-    - Criteria: bundle, integration, perf
-
-    Options:
-    A) Approve → Proceed
-    B) Modify → Adjust criteria/options
-    C) Reject → Use current stack"}
-
-    UserDec1 -->|A: Approve| MT3["Main Thread
-    Action: Execute parallel research"]
-
-    UserDec1 -->|B: Modify| PM2["PM: Adjust Plan
-    (See Scenario 7c)"]
-
-    UserDec1 -->|C: Reject| End1(["Stop
-    Use current stack workaround"])
-
-    PM2 --> UserConfirm{User: OK?}
-    UserConfirm -->|Yes| MT3
-    UserConfirm -->|No| End1
-
-    MT3 --> Parallel["PHASE 2: Parallel Research
-
-    Main Thread executes:
-    Single message, 3 Tasks
-
-    Task 1: general-purpose
-    'Research Three.js: bundle, 3D caps,
-    IC integration, performance'
-
-    Task 2: general-purpose
-    'Research Babylon.js: bundle, 3D caps,
-    IC integration, performance'
-
-    Task 3: general-purpose
-    'Research Custom WebGL: feasibility,
-    dev time, maintenance'
-
-    → All 3 run SIMULTANEOUSLY"]
-
-    --> Research["3 general-purpose agents
-
-    Agent 1 - Three.js:
-    - WebSearch: 'Three.js bundle size'
-    - WebSearch: 'Three.js IC integration'
-    - WebFetch: threejs.org/docs
-    Returns: ~600KB, mature, good docs
-
-    Agent 2 - Babylon.js:
-    - WebSearch: 'Babylon.js bundle'
-    - WebFetch: babylonjs.com/docs
-    Returns: ~1.2MB, game-focused, complex
-
-    Agent 3 - Custom WebGL:
-    - WebSearch: 'WebGL integration'
-    Returns: Feasible, 2-3 months dev time"]
-
-    --> MT4["PHASE 3: Main Thread
-    Research Organization
-
-    Tools:
-    - Write: ideas&external_references/
-             threejs-research.md
-             (Three.js findings)
-    - Write: babylonjs-research.md
-             (Babylon.js findings)
-    - Write: custom-webgl-research.md
-             (Custom WebGL findings)
-
-    Output: 3 research docs created
-    Institutional memory preserved"]
-
-    --> MT5["Main Thread
-    Action: Query analyzer for
-    technical integration assessment"]
-
-    --> Analyzer["PHASE 4: infinite-canvas-analyzer
-
-    Tools:
-    - Read: threejs-research.md
-    - Read: babylonjs-research.md
-    - Read: infinite-canvas/[integration code]
-
-    Analysis:
-    - Three.js: Camera sync with IC viewport
-      Complexity: MEDIUM
-    - Babylon.js: Scene graph conflicts
-      Complexity: HIGH
-
-    Returns:
-    Three.js: Medium integration complexity
-    Babylon.js: High complexity"]
-
-    --> MT6["Main Thread
-    Action: Return to PM with research results
-
-    Provides:
-    - Research docs: threejs, babylonjs, webgl
-    - Analyzer findings: integration complexity"]
-
-    --> PM3["PHASE 5: PM Evaluation
-
-    Tools:
-    - Read: threejs-research.md
-    - Read: babylonjs-research.md
-    - Read: custom-webgl-research.md
-
-    Evaluation Against Criteria:
-
-    Three.js:
-    - Bundle: 600KB (vs 500KB target = minor over)
-    - Integration: Medium
-    - Performance: Excellent
-    - Score: 4.2/5
-
-    Babylon.js:
-    - Bundle: 1.2MB (2x over target)
-    - Integration: High complexity
-    - Score: 3.1/5
-
-    Custom WebGL:
-    - Dev time: 2-3 months
-    - Maintenance: High burden
-    - Score: 2.5/5
-
-    Vision Alignment:
-    Three.js: Best fit (lightweight, proven)
-
-    Returns (WITHOUT updating stack yet):
-    Recommended: Three.js
-    Rationale: Best balance
-    Scoring: [detailed breakdown]
-    Why not Babylon: Bundle too large
-    Why not Custom: Too much dev time
-    Integration Strategy: 3 phases"]
-
-    --> MT7["Main Thread
-    Action: Present PM recommendation"]
-
-    --> UserDec2{"USER DECISION 2:
-    Accept Three.js?
-
-    PM evaluated 3 options:
-    - Three.js: 4.2/5 (recommended)
-    - Babylon.js: 3.1/5 (bundle large)
-    - Custom: 2.5/5 (dev time)
-
-    Options:
-    A) Approve Three.js
-    B) Choose Babylon.js
-    C) More research
-    D) Reject all"}
-
-    UserDec2 -->|A: Approve| PM4["PM: Finalize Adoption
-
-    Tools:
-    - Edit: technology-stack.md
-      (Add Three.js to 3D Rendering category
-       Status: Approved for Integration
-       Bundle: ~600KB
-       Integration: Layers with IC)
-    - Write: 3d-visualization-with-threejs-prd.md
-      (Research summary + decision rationale
-       + integration phases)
-
-    Returns:
-    Technology Stack Updated: Three.js added
-    PRD Created: Integration plan
-    Next Steps: Query framework agents"]
-
-    UserDec2 -->|B: Choose Other| PM4b["PM: Re-evaluate
-    (See Scenario 7b)"]
-
-    UserDec2 -->|C: More| MT3
-
-    UserDec2 -->|D: Reject| End2(["Stop
-    No new tech added"])
-
-    PM4 --> MT8["Main Thread
-    Action: Proceed to implementation
-
-    Next: Query theia-analyzer + electron-analyzer
-    for integration patterns"]
-
-    PM4b --> MT8
-
-    --> FW["Framework Agents (Parallel)
-
-    theia-analyzer:
-    - Analyze webview integration
-      for Three.js canvas
-
-    electron-analyzer:
-    - Electron security for Three.js
-      in renderer process
-
-    Both run simultaneously"]
-
-    --> MT9["Main Thread
-    Action: Synthesize + spawn coding-agent"]
-
-    --> Coding["coding-agent
-    Action: Implement Three.js integration
-    Direction: From PM guide
-    Files: From analyzer agents"]
-
-    --> End3(["Complete
-    3D visualization integrated
-
-    Total Agents: 8
-    - PM planning
-    - 3 research (parallel)
-    - 1 analyzer
-    - PM evaluation
-    - PM finalization
-    - 2 framework (parallel)
-    - coding-agent
-
-    Duration: Multi-phase
-    User Decisions: 2"])
+flowchart LR
+    subgraph Phase0["PHASE 0: PM Diagnosis"]
+        User(["User: Add 3D viz<br/>Which framework?"])
+        PM1["PM: Gap Analysis<br/>Glob+Read tech stack<br/>GAP: Konva.js=2D only<br/>Need: True 3D<br/>Plan: 3 parallel"]
+        User --> PM1
+    end
+
+    subgraph Dec1["USER DECISION 1"]
+        UD1{"Proceed?<br/>A) Yes<br/>B) Modify<br/>C) No"}
+    end
+
+    Phase0 --> Dec1
+
+    subgraph Phase2["PHASE 2: Parallel Research"]
+        direction TB
+        R1["Agent1: Three.js<br/>WebSearch+Fetch<br/>600KB, mature"]
+        R2["Agent2: Babylon.js<br/>WebSearch+Fetch<br/>1.2MB, complex"]
+        R3["Agent3: WebGL<br/>WebSearch<br/>2-3 months"]
+    end
+
+    Dec1 -->|A| Phase2
+    Dec1 -->|B| PM2["PM Adjust<br/>(7c)"]
+    Dec1 -->|C| E1([Stop])
+    PM2 --> Dec1
+
+    subgraph Phase3["PHASE 3: Organize"]
+        Org["MT: Write 3 docs<br/>ideas&external_references/"]
+    end
+
+    Phase2 --> Phase3
+
+    subgraph Phase4["PHASE 4: Analysis"]
+        Analyzer["IC-analyzer<br/>Read docs<br/>Three.js: Medium<br/>Babylon: High"]
+    end
+
+    Phase3 --> Phase4
+
+    subgraph Phase5["PHASE 5: PM Eval"]
+        PM3["PM: Score<br/>Three.js: 4.2/5<br/>Babylon: 3.1/5<br/>WebGL: 2.5/5<br/>Recommend: Three.js"]
+    end
+
+    Phase4 --> Phase5
+
+    subgraph Dec2["USER DECISION 2"]
+        UD2{"Accept?<br/>A) Three.js<br/>B) Babylon<br/>C) More<br/>D) No"}
+    end
+
+    Phase5 --> Dec2
+
+    subgraph Phase7["PHASE 7: Finalize"]
+        PM4["PM: Update stack<br/>Edit: tech-stack.md<br/>Write: PRD"]
+    end
+
+    Dec2 -->|A or B| Phase7
+    Dec2 -->|C| Phase2
+    Dec2 -->|D| E2([Stop])
+
+    subgraph Phase8["PHASE 8: Implementation"]
+        direction TB
+        FW1["theia-analyzer<br/>Webview integration"]
+        FW2["electron-analyzer<br/>Security patterns"]
+        Coding["coding-agent<br/>Implement"]
+        FW1 --> Coding
+        FW2 --> Coding
+    end
+
+    Phase7 --> Phase8
+    Phase8 --> E3(["Complete<br/>Agents: 8<br/>Decisions: 2"])
 
     style User fill:#e1f5ff
-    style UserDec1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style UserDec2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style UserConfirm fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UD1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UD2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
     style PM1 fill:#fff4e1
     style PM2 fill:#fff4e1
     style PM3 fill:#fff4e1
     style PM4 fill:#fff4e1
-    style PM4b fill:#fff4e1
-    style MT3 fill:#e1ffe1
-    style MT4 fill:#e1ffe1
-    style MT5 fill:#e1ffe1
-    style MT6 fill:#e1ffe1
-    style MT7 fill:#e1ffe1
-    style MT8 fill:#e1ffe1
-    style MT9 fill:#e1ffe1
-    style Parallel fill:#f0e1ff
-    style Research fill:#f0e1ff
+    style R1 fill:#f0e1ff
+    style R2 fill:#f0e1ff
+    style R3 fill:#f0e1ff
+    style Org fill:#e1ffe1
     style Analyzer fill:#f0e1ff
-    style FW fill:#f0e1ff
+    style FW1 fill:#f0e1ff
+    style FW2 fill:#f0e1ff
     style Coding fill:#ffe1f0
-    style End1 fill:#f0f0f0
-    style End2 fill:#f0f0f0
-    style End3 fill:#e1ffe1
+    style E1 fill:#f0f0f0
+    style E2 fill:#f0f0f0
+    style E3 fill:#e1ffe1
 ```
 
 **Highlights:**
