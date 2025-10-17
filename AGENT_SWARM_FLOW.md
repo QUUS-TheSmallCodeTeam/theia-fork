@@ -141,12 +141,14 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 
 ---
 
-### Scenario 3: Strategic Decision with Insight Provision (Vision Conflict)
+### Scenario 3a: Strategic Decision with Vision Conflict (User Accepts Alternative)
 
 **User Request:**
 ```
 "Should we add a floating AI assistant that follows the mouse cursor?"
 ```
+
+**Why this scenario:** User proposes feature that conflicts with vision - PM provides insight + alternative, user accepts alternative
 
 **Step-by-Step Flow:**
 
@@ -157,23 +159,177 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 | 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants floating AI assistant that follows mouse cursor. Provide strategic guide.")` | PM agent starts |
 | 4 | egdesk-pm-agent | Discovers vision docs | `Glob("ideas&external_references/eg-desk ideas/**/*.md")` | Finds UX and whitepaper docs |
 | 5 | egdesk-pm-agent | Analyzes vision docs | `Read("EG-DESK_Whitepaper.md")`<br>`Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")`<br>`Grep("spatial", "proximity", "floating")` | Finds: Previous decision against floating UI |
-| 6 | egdesk-pm-agent | Evaluates alignment | None (analysis) | Decision: REJECT - conflicts with spatial canvas principles |
-| 7 | egdesk-pm-agent | **Provides insight to user** (not just reject) | None | Explains conflict, suggests alternative |
-| 8 | egdesk-pm-agent | Returns strategic guide | None | **Summary**: Floating cursor-following AI conflicts with spatial canvas principles.<br>**Decision**: REJECT<br>**Insight**: "In EG-DESK_Spatial_Canvas_UX_Solutions.md, we decided against floating/following UI because it breaks spatial affordances. Users lose sense of place when elements follow cursor."<br>**Alternative**: Proximity-based AI activation - AI appears NEAR relevant canvas objects, not following cursor<br>**Why alternative is better**: Maintains spatial relationships while providing contextual AI |
-| 9 | Main Thread | Presents insight to user | None | User understands WHY it conflicts and sees vision-aligned alternative |
+| 6 | egdesk-pm-agent | Evaluates alignment | None (analysis) | Decision: REJECT original, SUGGEST alternative |
+| 7 | egdesk-pm-agent | Returns strategic guide with insight | None | **Summary**: Floating cursor-following AI conflicts with spatial canvas principles.<br>**Decision**: REJECT original idea<br>**Insight**: "In EG-DESK_Spatial_Canvas_UX_Solutions.md, we decided against floating/following UI because it breaks spatial affordances. Users lose sense of place when elements follow cursor."<br>**Alternative**: Proximity-based AI activation - AI appears NEAR relevant canvas objects, not following cursor<br>**Why alternative is better**: Maintains spatial relationships while providing contextual AI<br>**Vision-Aligned**: ✅ Proximity-based aligns with spatial canvas principles |
+| **PHASE 1: USER DECISION** |
+| 8 | Main Thread | **Presents rejection + alternative to user** | None | "PM rejected floating AI (conflicts with spatial canvas). Suggests proximity-based AI instead.<br>**Options:**<br>A) Accept alternative (proximity-based AI)<br>B) Insist on floating AI (requires vision change)<br>C) Cancel feature" |
+| 9 | User | **Accepts alternative** | None (human decision) | "Makes sense. Let's do proximity-based AI instead." |
+| **PHASE 2: PROCEED WITH ALTERNATIVE** |
+| 10 | Main Thread | Invokes PM for alternative feature guide | `Task(agent: "egdesk-pm-agent", prompt: "User accepted proximity-based AI alternative. Provide implementation guide for proximity-based AI activation.")` | PM agent starts |
+| 11 | egdesk-pm-agent | Creates PRD for alternative | `Write("ideas&external_references/eg-desk ideas/features/proximity-based-ai-prd.md", "[PRD content]")` | PRD created for vision-aligned feature |
+| 12 | egdesk-pm-agent | Returns implementation guide | None | **Decision**: APPROVE<br>**Feature**: Proximity-based AI activation<br>**Framework**: Theia + Infinite Canvas<br>**Location**: eg-desk_taehwa/ai/<br>**Next Steps**: Follow Pattern 2 for implementation |
+| 13 | Main Thread | Proceeds to implementation | (Follow Pattern 2: PM-Driven Development) | Implementation begins |
 
-**Total Agents Invoked:** 1 (egdesk-pm-agent)
+**Total Agents Invoked:** 2 (PM rejection + PM guide for alternative)
 
-**Who Wrote Code:** Nobody (strategic decision only)
+**Who Wrote Code:** coding-agent (via Pattern 2)
 
-**Duration:** Single agent invocation
+**Duration:** Two PM turns + implementation
 
-**Key Points:**
-- **PM provides insight, not just rejection**: Explains why conflict exists
+**Critical Observations:**
+- **PM provides insight, not just rejection**: Explains why conflict exists with evidence from vision docs
 - **Institutional memory**: "We previously decided X in document Y because Z"
 - **Alternative suggestion**: Vision-aligned approach that solves same user need
+- **USER DECISION POINT** (Step 8-9): User chooses between alternative, insisting on original, or canceling
 - **User understands vision**: Not just "no", but "no because... and here's better way"
+- **Smooth transition**: User accepts alternative → PM provides implementation guide → Proceeds normally
 - **Context Preservation**: Main Thread didn't read vision docs - PM synthesized everything
+
+**Key Point:** PM rejection includes **constructive alternative** - not blocking user, redirecting to vision-aligned solution.
+
+---
+
+### Scenario 3b: User Insists on Original Despite Vision Conflict
+
+**User Request:**
+```
+(Continuation from Scenario 3a, Step 8)
+Main Thread: "PM rejected floating AI (conflicts with spatial canvas). Suggests proximity-based AI instead. Options?"
+User: "I understand the vision, but I still want floating AI. I think the vision should evolve - floating UI is more intuitive."
+```
+
+**Why this scenario:** User challenges vision with strong rationale - shows vision evolution process
+
+**Step-by-Step Flow:**
+
+| Step | Entity | Action | Tools Used | Output |
+|------|--------|--------|------------|--------|
+| **PHASE 0: SAME AS SCENARIO 3a (Steps 1-7)** |
+| 1-7 | Various | User proposes → PM analyzes → PM rejects with alternative | (See Scenario 3a) | PM rejected floating AI, suggested proximity-based |
+| **PHASE 1: USER INSISTS ON ORIGINAL** |
+| 8 | Main Thread | Presents rejection + alternative to user | None | "PM rejected floating AI. Suggests proximity-based. **Options?**" |
+| 9 | User | **Insists on original with rationale** | None (human decision) | "I understand vision, but floating AI is more intuitive. Vision should evolve. Here's why: [user rationale]" |
+| **PHASE 2: PM RE-EVALUATES WITH USER RATIONALE** |
+| 10 | Main Thread | Returns to PM with user's argument | `Task(agent: "egdesk-pm-agent", prompt: "User reviewed vision conflict. Insists on floating AI despite spatial canvas principles. User rationale: 'Floating UI more intuitive for contextual AI'.<br><br>Reassess: Should vision evolve? Or does alternative better serve user's goal?")` | PM agent starts (re-evaluation) |
+| 11 | egdesk-pm-agent | Re-reads vision docs | `Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")` | Spatial affordance principles |
+| 12 | egdesk-pm-agent | Analyzes user's rationale | None (analysis) | User prioritizes "intuitiveness" over "spatial affordances". Valid but different priority. |
+| 13 | egdesk-pm-agent | **Makes final assessment** | None (strategic decision) | **Options**:<br>A) Maintain vision (spatial > intuitiveness) - Suggest proximity-based remains better<br>B) Evolve vision (if user's rationale strong) - Flag vision change for user to document<br>C) Hybrid approach (floating in certain contexts, spatial in others) |
+| 14 | egdesk-pm-agent | Returns re-evaluation | None | **Assessment**: User's rationale valid but vision prioritizes spatial affordances for different reason (long-term workspace coherence vs short-term intuitiveness)<br>**PM Stance**: Recommend maintaining current vision (spatial affordances > floating UX)<br>**User Decision Required**: This is strategic vision choice, not technical. User must decide:<br>  - Maintain vision (use proximity-based)<br>  - OR evolve vision (document rationale, update EG-DESK_Spatial_Canvas_UX_Solutions.md, proceed with floating AI) |
+| **PHASE 3: USER MAKES STRATEGIC DECISION** |
+| 15 | Main Thread | Presents vision choice to user | None | "PM reassessed. User's rationale valid, but vision prioritizes spatial affordances. **Your decision:**<br>A) Maintain vision - use proximity-based AI<br>B) Evolve vision - proceed with floating AI (requires vision doc update)" |
+| 16 | User | **Makes strategic decision** | None (human authority) | OPTIONS:<br>A) "OK, let's stick with vision - proximity-based is fine"<br>B) "I want to evolve vision - floating AI is worth it" |
+
+**Branch A: User maintains vision** → Proceed with proximity-based AI (follow Scenario 3a from Step 10)
+
+**Branch B: User evolves vision:**
+
+| Step | Entity | Action | Tools Used | Output |
+|------|--------|--------|------------|--------|
+| 17 | Main Thread | Invokes PM to update vision | `Task(agent: "egdesk-pm-agent", prompt: "User decided to evolve vision. Proceed with floating AI. Update EG-DESK_Spatial_Canvas_UX_Solutions.md to document this decision and rationale.")` | PM agent starts (vision update) |
+| 18 | egdesk-pm-agent | **Updates vision document** | `Edit("EG-DESK_Spatial_Canvas_UX_Solutions.md", add: "### Vision Evolution: Floating AI (2025-10-17)\nUser decision: Floating AI prioritized over strict spatial affordances for contextual assistance. Rationale: [user's argument]. Tradeoff accepted: Some spatial disorientation acceptable for improved intuitiveness.")` | Vision doc updated |
+| 19 | egdesk-pm-agent | Creates PRD for floating AI | `Write("ideas&external_references/eg-desk ideas/features/floating-ai-assistant-prd.md", "[PRD]")` | PRD created |
+| 20 | egdesk-pm-agent | Returns implementation guide | None | **Decision**: APPROVE (vision evolved per user decision)<br>**Vision Updated**: EG-DESK_Spatial_Canvas_UX_Solutions.md documents evolution<br>**Framework**: Theia + Infinite Canvas<br>**Location**: eg-desk_taehwa/ai/<br>**Next Steps**: Follow Pattern 2 for implementation |
+| 21 | Main Thread | Proceeds to implementation | (Follow Pattern 2) | Implementation of floating AI |
+
+**Total Agents Invoked:** 3 (PM rejection → PM re-evaluation → PM vision update + guide)
+
+**Who Wrote Code:** coding-agent (via Pattern 2, Branch B only)
+
+**Duration:** Three PM turns + implementation (if vision evolved)
+
+**Critical Observations:**
+- **User can challenge vision** with strong rationale
+- **PM doesn't dictate** - PM provides assessment, user decides
+- **Vision can evolve** - user has authority to change strategic direction
+- **PM documents evolution** - updates vision docs with user's rationale
+- **Tradeoffs documented** - "Why we evolved vision, what we're accepting"
+- **Institutional memory preserved** - future developers know why vision changed
+- **USER DECISION POINT** (Step 15-16): User chooses between maintaining vision or evolving it
+
+**When user might insist:**
+- Strong user rationale based on UX research
+- Market feedback contradicts vision
+- Strategic pivot needed
+- User expertise in domain
+
+**Key Point:** Vision is **not immutable** - PM enforces it, but user can evolve it with documented rationale.
+
+---
+
+### Scenario 3 Flow Diagram (Mermaid)
+
+```mermaid
+flowchart TD
+    Start([User: Add floating AI assistant?])
+
+    Start --> MT1[Main Thread: Route to PM]
+    MT1 --> PM1[PM: Analyze Vision Alignment]
+
+    PM1 --> PMDiscover["PM: Glob vision docs<br/>Read Whitepaper + UX docs<br/>Grep 'floating', 'spatial'"]
+    PMDiscover --> PMFind["PM Found:<br/>Previous decision AGAINST floating UI<br/>Reason: Breaks spatial affordances"]
+
+    PMFind --> PMAlt["PM: Generate Alternative<br/>Proximity-based AI<br/>(vision-aligned solution)"]
+
+    PMAlt --> PM1Return["PM Returns: REJECT original<br/>+ Insight (why conflict)<br/>+ Alternative (proximity-based)<br/>+ Rationale (maintains spatial)"]
+
+    PM1Return --> MT2[Main Thread: Present to User]
+    MT2 --> UserDec1{User Decision:<br/>Accept alternative?}
+
+    UserDec1 -->|A: Accept Alt| PM2Guide[PM: Guide for Alternative]
+    UserDec1 -->|B: Insist Original| PM2Reeval[PM: Re-evaluate with User Rationale]
+    UserDec1 -->|C: Cancel| End1([Stop: Feature canceled])
+
+    PM2Guide --> PM2PRD["PM: Create PRD<br/>proximity-based-ai-prd.md"]
+    PM2PRD --> PM2Return[PM: Implementation Guide]
+    PM2Return --> MT3A[Main Thread: Proceed to Implementation]
+    MT3A --> End2([Follow Pattern 2: Implementation])
+
+    PM2Reeval --> PM2Assess["PM: Assess User Rationale<br/>Valid priority shift?<br/>Vision evolution justified?"]
+
+    PM2Assess --> PM2Options["PM Returns:<br/>User rationale valid but...<br/>Options:<br/>A) Maintain vision<br/>B) Evolve vision (user decides)"]
+
+    PM2Options --> MT3B[Main Thread: Present Choice]
+    MT3B --> UserDec2{User Strategic Decision:<br/>Maintain or Evolve vision?}
+
+    UserDec2 -->|A: Maintain| PM2Guide
+    UserDec2 -->|B: Evolve| PM3Update[PM: Update Vision Docs]
+
+    PM3Update --> PM3Edit["PM: Edit UX Solutions doc<br/>Document vision evolution<br/>User rationale + tradeoffs"]
+    PM3Edit --> PM3PRD["PM: Create PRD<br/>floating-ai-assistant-prd.md"]
+    PM3PRD --> PM3Return[PM: Implementation Guide<br/>for floating AI]
+    PM3Return --> MT4[Main Thread: Proceed to Implementation]
+    MT4 --> End3([Follow Pattern 2: Implementation])
+
+    style Start fill:#e1f5ff
+    style UserDec1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserDec2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style PM1 fill:#fff4e1
+    style PM2Guide fill:#fff4e1
+    style PM2Reeval fill:#fff4e1
+    style PM3Update fill:#fff4e1
+    style MT2 fill:#e1ffe1
+    style MT3A fill:#e1ffe1
+    style MT3B fill:#e1ffe1
+    style MT4 fill:#e1ffe1
+    style End1 fill:#f0f0f0
+    style End2 fill:#e1ffe1
+    style End3 fill:#e1ffe1
+```
+
+**Flow Paths:**
+- **Path A (Accept Alternative)**: User accepts PM's vision-aligned alternative → Implementation
+- **Path B (Insist Original)**: User insists → PM re-evaluates → User chooses maintain/evolve
+  - **Path B1 (Maintain Vision)**: Same as Path A
+  - **Path B2 (Evolve Vision)**: PM updates vision docs → Implementation of original idea
+
+**Decision Gates:**
+1. **User Decision 1**: Accept alternative? Insist on original? Cancel?
+2. **User Decision 2** (if insisted): Maintain vision? Or evolve vision?
+
+**Key Insight:**
+- Vision conflicts don't block users
+- PM provides constructive alternative
+- User has authority to evolve vision (with documented rationale)
 
 ---
 
@@ -196,40 +352,41 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 | 5 | egdesk-pm-agent | Analyzes vision + structure | `Read("EG-DESK_Whitepaper.md")`<br>`Read("packages/terminal/package.json")`<br>`Read("packages/terminal/src/browser/terminal-theme-service.ts")` | Extracts principles + discovers structure |
 | 6 | egdesk-pm-agent | Creates PRD | `Write("ideas&external_references/eg-desk ideas/features/time-based-terminal-theme-prd.md", "[PRD content]")` | PRD file created |
 | 7 | egdesk-pm-agent | Returns strategic guide | None | **Decision**: APPROVE<br>**Framework**: Theia (terminal theming is Theia domain)<br>**Location**: `packages/terminal/src/browser/`<br>**Approach**: Phase 1 - analyze theme system, Phase 2 - design service, Phase 3 - implement<br>**Considerations**: Manual override needed, preference persistence<br>**PRD Created**: time-based-terminal-theme-prd.md |
-| **PHASE 1: MAIN THREAD CREATES PLAN** |
-| 8 | Main Thread | Creates execution plan based on PM guide | None (planning) | Plan: Query theia-analyzer for theme patterns, design TimeBasedSwitcher, implement |
-| **PHASE 2: FRAMEWORK INVESTIGATION** |
+| **PHASE 1: FRAMEWORK INVESTIGATION PLANNING** |
+| 8 | Main Thread | Plans framework investigation based on PM guide | None (planning) | Investigation plan: Query theia-analyzer for theme patterns, DI registration patterns |
+| **PHASE 2: FRAMEWORK INVESTIGATION (EXECUTION)** |
 | 9 | Main Thread | Queries framework agent (per PM's guide) | `Task(agent: "theia-analyzer-agent", prompt: "Analyze terminal theme system at packages/terminal/src/browser/terminal-theme-service.ts for registration and DI patterns")` | Agent starts |
 | 10 | theia-analyzer-agent | Analyzes theme system | `Read("packages/terminal/src/browser/terminal-theme-service.ts")`<br>`Read("packages/terminal/src/browser/terminal-frontend-module.ts")`<br>`Grep("@injectable")` | Finds patterns |
 | 11 | theia-analyzer-agent | Returns analysis | None | **Files Analyzed**: terminal-theme-service.ts:45, terminal-frontend-module.ts:32<br>**Pattern**: ThemeService.register() with DI binding<br>**File List**: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, REFERENCE workspace-service.ts:89 for @injectable() |
-| **PHASE 3: IMPLEMENTATION (via coding-agent)** |
-| 12 | Main Thread | Synthesizes guidance into instructions | None (internal) | Direction: Create TimeBasedThemeSwitcher<br>File List: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, terminal-contribution.ts:89, REFERENCE workspace-service.ts:89 |
+| **PHASE 3: IMPLEMENTATION PLANNING** |
+| 12 | Main Thread | Creates implementation plan (synthesizes PM guide + framework patterns) | None (internal) | Implementation plan:<br>**Direction**: Create TimeBasedThemeSwitcher following Theia DI pattern<br>**File List**: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, terminal-contribution.ts:89, REFERENCE workspace-service.ts:89 for @injectable() pattern |
+| **PHASE 4: IMPLEMENTATION EXECUTION (via coding-agent)** |
 | 13 | Main Thread | Delegates to coding-agent | `Task(agent: "coding-agent", prompt: "Implement time-based terminal theme switcher. Direction: [what to implement]. Files: [file list]. [You will read files for details]")` | Coding agent starts |
 | 14 | coding-agent | Reads files and implements | `Read(...)` + `Write(...)` + `Edit(...)` | Implementation complete |
 | 15 | coding-agent | Returns report | None | "Implementation complete: 1 CREATE, 2 MODIFY" |
-| **PHASE 3.5: UX FLOW VALIDATION (Optional)** |
+| **PHASE 4.5: UX FLOW VALIDATION (Optional)** |
 | 16a | Main Thread | (Optional) Decides to validate UX flow | None | Complex feature, worth validating |
 | 16b | Main Thread | Invokes ux-flow-simulator | `Task(agent: "ux-flow-simulator-agent", prompt: "Trace execution flow: User opens terminal → theme should switch based on time. Files: [list]. Predict runtime behavior.")` | Agent starts |
 | 16c | ux-flow-simulator-agent | Traces code execution paths | `Read(files)` + traces logic | Finds: No race conditions, expected behavior correct |
 | 16d | ux-flow-simulator-agent | Returns validation report | None | "✅ Flow validated: No issues predicted" |
-| **PHASE 4: BUILD & COMMIT** |
+| **PHASE 5: BUILD & COMMIT** |
 | 17 | Main Thread | Builds, tests, commits | `Bash("npm run build && git add . && git commit")` | Committed |
 
 **Total Agents Invoked:** 3-4 (PM strategic guide → framework analyzer → coding-agent → optional: ux-flow-simulator)
 
 **Who Wrote Code:** coding-agent (step 14)
 
-**Duration:** Multi-phase (PM guide → plan → framework investigation → implementation)
+**Duration:** Multi-phase (PM guide → investigation planning → framework investigation → implementation planning → implementation execution)
 
 **Critical Observations:**
-- **PM provides complete strategic direction**: Framework, location, approach, considerations
+- **PM provides complete strategic direction** (Phase 0): Framework, location, approach, considerations
 - **PM creates PRD**: Documents approved feature
-- **Main Thread creates plan** based on PM's guide
-- **Framework agent** provides technical patterns (not strategic direction)
-- **Main Thread synthesizes** PM guide + framework patterns into coding instructions
-- **coding-agent implements** following synthesized instructions
-- **(Optional) ux-flow-simulator validates logic** before build (Main Thread's discretion)
-- **Main Thread** retains control of build/test/commit
+- **Main Thread plans investigation** (Phase 1): Identifies what framework patterns to research
+- **Framework agent investigates** (Phase 2): Provides technical patterns (not strategic direction)
+- **Main Thread creates implementation plan** (Phase 3): Synthesizes PM guide + framework patterns
+- **coding-agent executes implementation** (Phase 4): Follows synthesized plan
+- **(Optional) ux-flow-simulator validates logic** (Phase 4.5): Before build (Main Thread's discretion)
+- **Main Thread builds/tests/commits** (Phase 5): Retains control of deployment
 
 **Note**: ALL file changes go through coding-agent for consistency and context preservation.
 
@@ -242,6 +399,81 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 - ❌ Simple CRUD operations
 - ❌ Pure UI styling changes
 - ❌ Documentation updates
+
+---
+
+### Scenario 4 Flow Diagram (Mermaid)
+
+```mermaid
+flowchart TD
+    Start([User: Add time-based terminal theme])
+
+    Start --> MT1[Main Thread: Route to PM]
+    MT1 --> PM1[PM: Strategic Guide]
+
+    PM1 --> PMDiscover["PM: Dynamic Discovery<br/>Glob vision docs + tech stack<br/>Grep existing features"]
+    PMDiscover --> PMAnalyze["PM Analysis:<br/>✅ Vision aligned<br/>✅ Theia framework<br/>✅ No duplicates"]
+
+    PMAnalyze --> PMPRD["PM: Create PRD<br/>time-based-terminal-theme-prd.md"]
+    PMPRD --> PM1Return["PM Returns: APPROVE<br/>+ Framework: Theia<br/>+ Location: packages/terminal/<br/>+ Phasing: 3 phases<br/>+ Considerations"]
+
+    PM1Return --> MT2["Main Thread: Plan Investigation<br/>Query theia-analyzer for patterns"]
+
+    MT2 --> FW1[theia-analyzer:<br/>Analyze theme system]
+    FW1 --> FW1Read["Read terminal-theme-service.ts<br/>Grep DI patterns"]
+    FW1Read --> FW1Return["Return: Patterns found<br/>+ File list (CREATE/MODIFY/REF)"]
+
+    FW1Return --> MT3["Main Thread: Create Implementation Plan<br/>Synthesize PM guide + patterns"]
+
+    MT3 --> MT4["Main Thread: Spawn coding-agent<br/>Direction + File list"]
+
+    MT4 --> Coding1[coding-agent: Read files]
+    Coding1 --> Coding2[coding-agent: Implement<br/>CREATE time-based-switcher.ts<br/>MODIFY frontend-module.ts<br/>MODIFY contribution.ts]
+
+    Coding2 --> Coding3[coding-agent: Return Report]
+
+    Coding3 --> MTDecideUX{Main Thread:<br/>Validate UX flow?}
+
+    MTDecideUX -->|Complex flow| UXSim[ux-flow-simulator:<br/>Trace execution]
+    MTDecideUX -->|Simple| MT5
+
+    UXSim --> UXCheck{Issues found?}
+    UXCheck -->|Yes| CodingFix[coding-agent: Fix issues]
+    CodingFix --> UXSim
+    UXCheck -->|No| MT5
+
+    MT5[Main Thread: Build & Test]
+    MT5 --> MT6[Main Thread: Commit]
+
+    MT6 --> End([Complete: Feature committed])
+
+    style Start fill:#e1f5ff
+    style MTDecideUX fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style UXCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style PM1 fill:#fff4e1
+    style FW1 fill:#f0e1ff
+    style UXSim fill:#f0e1ff
+    style Coding1 fill:#ffe1f0
+    style Coding2 fill:#ffe1f0
+    style CodingFix fill:#ffe1f0
+    style MT3 fill:#e1ffe1
+    style MT5 fill:#e1ffe1
+    style End fill:#e1ffe1
+```
+
+**Phases:**
+- **Phase 0** (Yellow): PM Strategic Guide
+- **Phase 1** (Green): Main Thread plans investigation
+- **Phase 2** (Purple): Framework agent investigates
+- **Phase 3** (Green): Main Thread creates implementation plan
+- **Phase 4** (Pink): coding-agent executes
+- **Phase 4.5** (Optional, Purple): UX flow validation
+- **Phase 5** (Green): Build & commit
+
+**Optional Validation Loop:**
+- Main Thread decides: Complex flow? → Validate
+- If issues found → coding-agent fixes → Re-validate
+- If no issues → Proceed to build
 
 ---
 
@@ -430,67 +662,345 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 
 ---
 
-### Scenario 7: Adding New Technology to Stack (Ideation/Research Phase)
+### Scenario 7a: New Technology Research & Evaluation (Happy Path)
 
 **User Request:**
 ```
-"캔버스에 3D visualization을 추가하고 싶어. Three.js를 쓰면 어떨까?"
+"캔버스에 3D visualization을 추가하고 싶어. 어떤 framework가 좋을까?"
 ```
 
-**Why this scenario:** User proposes new technology not currently in stack - requires PM evaluation and stack update
+**Why this scenario:** User needs capability not in current stack - requires PM to diagnose limitations, plan research, Main Thread to investigate options, PM to evaluate and recommend. Shows complete flow WITH user decision points.
 
 **Step-by-Step Flow:**
 
 | Step | Entity | Action | Tools Used | Output |
 |------|--------|--------|------------|--------|
-| **PHASE 0: TECHNOLOGY EVALUATION** |
-| 1 | User | Proposes new technology | None | "Use Three.js for 3D viz" |
-| 2 | Main Thread | Analyzes: New technology proposal, needs PM evaluation | None | Routes to PM for strategic guide |
-| 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants 3D visualization using Three.js. Evaluate this technology addition.")` | PM agent starts |
-| 4 | egdesk-pm-agent | **Discovers tech stack doc** | `Glob("ideas*/**/eg-desk*ideas*/*tech*.md")` | Finds: technology-stack.md |
-| 5 | egdesk-pm-agent | Reads current stack | `Read("ideas&external_references/eg-desk ideas/technology-stack.md")` | Current: Theia, Electron, Infinite Canvas, Konva, Claude API |
-| 6 | egdesk-pm-agent | Checks if Three.js in stack | Grep "Three.js" in tech stack doc | **NOT FOUND**: Three.js not in current stack |
-| 7 | egdesk-pm-agent | Discovers vision docs | `Glob("ideas*/**/eg-desk*ideas*/**/*.md")` | Finds whitepaper, UX docs |
-| 8 | egdesk-pm-agent | Evaluates vision alignment | `Read("EG-DESK_Whitepaper.md")`<br>`Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")` | Analysis: 3D viz aligns with spatial canvas principles |
-| 9 | egdesk-pm-agent | Evaluates necessity | None (analysis) | Question: Can Infinite Canvas + Konva.js achieve 3D-like effect? Or is true 3D needed? |
-| 10 | egdesk-pm-agent | Returns strategic guide | None | **Decision**: MODIFY (needs user clarification)<br>**Technology Evaluation**: Three.js not in current stack<br>**Vision Alignment**: ✅ Spatial canvas + 3D = aligned<br>**Options**:<br>A) Add Three.js (requires research phase, larger bundle)<br>B) Use Infinite Canvas + Konva.js with perspective tricks (no new dependency)<br>**User decision required**: Which approach? |
-| **PHASE 1: USER DECISION** |
-| 11 | Main Thread | Presents options to user | None | "Three.js not in stack. Add it (research needed) or use existing tech?" |
-| 12 | User | Decides to add Three.js | None (human input) | "Add Three.js - true 3D is worth it" |
-| **PHASE 2: TECHNOLOGY STACK UPDATE** |
-| 13 | Main Thread | Re-invokes PM to update stack | `Task(agent: "egdesk-pm-agent", prompt: "User approved adding Three.js. Update technology-stack.md and create research PRD.")` | PM agent starts |
-| 14 | egdesk-pm-agent | Reads tech stack doc | `Read("ideas&external_references/eg-desk ideas/technology-stack.md")` | Current structure |
-| 15 | egdesk-pm-agent | **Updates tech stack doc** | `Edit("technology-stack.md", add: "### Three.js\n- Category: 3D Rendering\n- Status: Research\n- Purpose: 3D visualization...")` | Three.js entry added |
-| 16 | egdesk-pm-agent | Creates research PRD | `Write("ideas&external_references/eg-desk ideas/features/threejs-integration-research-prd.md", "[PRD content]")` | Research PRD created |
-| 17 | egdesk-pm-agent | Returns update report | None | **✅ Technology Stack Updated**<br>**Added**: Three.js (3D Rendering, Research phase)<br>**PRD Created**: threejs-integration-research-prd.md<br>**Next Steps**: Research phase - evaluate integration approach, bundle size, performance |
-| **PHASE 3: NEXT STEPS** |
-| 18 | Main Thread | Reports to user | None | "Three.js added to technology stack. Research PRD created. Ready to begin research phase." |
+| **PHASE 0: LIMITATION DIAGNOSIS & RESEARCH PLANNING** |
+| 1 | User | Requests new capability | None | "Add 3D visualization to canvas" |
+| 2 | Main Thread | Analyzes: New capability request, may need new tech | None | Routes to PM for gap assessment |
+| 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants 3D visualization on canvas. Assess if current stack supports this or if new technology research needed.")` | PM agent starts |
+| 4 | egdesk-pm-agent | **Discovers tech stack** | `Glob("ideas*/**/eg-desk*ideas*/*tech*.md")`<br>`Read("technology-stack.md")` | Current stack: Theia, Electron, Infinite Canvas (research), Konva.js (research), Claude API |
+| 5 | egdesk-pm-agent | **Analyzes current capabilities** | None (analysis of tech stack doc) | Konva.js = 2D canvas library, Infinite Canvas = viewport transform system |
+| 6 | egdesk-pm-agent | **Diagnoses limitation** | None (analysis) | **Gap Found**: User needs true 3D rendering (lighting, shadows, depth). Konva.js limited to 2D shapes. Pseudo-3D (perspective tricks) insufficient for complex 3D scenes. |
+| 7 | egdesk-pm-agent | Discovers vision docs | `Glob("ideas*/**/eg-desk*ideas*/**/*.md")`<br>`Read("EG-DESK_Whitepaper.md")` | Vision: Spatial canvas principles support 3D visualization |
+| 8 | egdesk-pm-agent | **Creates research plan** | None (planning) | **Research Plan**: Investigate 3 options: Three.js, Babylon.js, Custom WebGL. Criteria: bundle size (<500KB), integration complexity, performance (1000+ objects @60fps), Infinite Canvas compatibility |
+| 9 | egdesk-pm-agent | Returns research planning report | None | **Decision**: RESEARCH_NEEDED<br>**Current Stack Limitation**: Konva.js is 2D-only, cannot render true 3D with lighting/shadows<br>**Why Research Needed**: User needs 3D object manipulation with realistic rendering<br>**Evaluation Criteria**: Bundle size, integration complexity, performance, compatibility<br>**Investigation Scope**: 3 parallel investigations (Three.js, Babylon.js, Custom WebGL)<br>**Expected Outcome**: Main Thread will return with research findings for PM evaluation |
+| **PHASE 1: USER DECISION (PROCEED WITH RESEARCH?)** |
+| 10 | Main Thread | **Presents research plan to user** | None | "PM diagnosed: Konva.js cannot do true 3D. Recommends investigating Three.js, Babylon.js, Custom WebGL.<br>Criteria: bundle <500KB, integration complexity, performance.<br>**Proceed with research?**" |
+| 11 | User | **Approves research** | None (human decision) | "Yes, proceed with investigation" |
+| **PHASE 2: PARALLEL RESEARCH EXECUTION** |
+| 12 | Main Thread | Plans parallel investigations | None (planning) | 3 investigations, all independent, run simultaneously |
+| 13 | Main Thread | Executes 3 parallel investigations | **Single message with 3 Tasks**:<br>`Task(agent: "general-purpose", prompt: "Research Three.js: bundle size, 3D capabilities, Infinite Canvas integration approach, performance. Organize findings.")`<br>`Task(agent: "general-purpose", prompt: "Research Babylon.js: bundle size, 3D capabilities, Infinite Canvas integration approach, performance. Organize findings.")`<br>`Task(agent: "general-purpose", prompt: "Research Custom WebGL: feasibility, dev time, maintenance burden. Organize findings.")` | 3 agents start simultaneously |
+| 14a | general-purpose (1) | Researches Three.js | `WebSearch("Three.js bundle size")`<br>`WebSearch("Three.js Infinite Canvas integration")`<br>`WebFetch(threejs.org docs)` | Three.js findings |
+| 14b | general-purpose (2) | Researches Babylon.js | `WebSearch("Babylon.js bundle size")`<br>`WebSearch("Babylon.js canvas integration")`<br>`WebFetch(babylonjs.com docs)` | Babylon.js findings |
+| 14c | general-purpose (3) | Researches Custom WebGL | `WebSearch("WebGL canvas integration")`<br>`WebSearch("WebGL performance benchmarks")` | Custom WebGL feasibility |
+| 15a | general-purpose (1) | Returns findings | None | Three.js: ~600KB bundle, mature ecosystem, good docs |
+| 15b | general-purpose (2) | Returns findings | None | Babylon.js: ~1.2MB bundle, game-focused, complex API |
+| 15c | general-purpose (3) | Returns findings | None | Custom WebGL: Feasible but 2-3 months dev time + maintenance |
+| **PHASE 3: RESEARCH ORGANIZATION** |
+| 16 | Main Thread | Organizes findings into documents | `Write("ideas&external_references/threejs-research.md", "[Three.js findings]")`<br>`Write("ideas&external_references/babylonjs-research.md", "[Babylon.js findings]")`<br>`Write("ideas&external_references/custom-webgl-research.md", "[Custom WebGL findings]")` | 3 research docs created |
+| **PHASE 4: TECHNICAL ANALYSIS** |
+| 17 | Main Thread | Queries analyzer for integration assessment | `Task(agent: "infinite-canvas-analyzer-agent", prompt: "Read threejs-research.md and babylonjs-research.md. Assess integration complexity with Infinite Canvas viewport transforms.")` | Agent starts |
+| 18 | infinite-canvas-analyzer-agent | Analyzes integration | `Read("ideas&external_references/threejs-research.md")`<br>`Read("ideas&external_references/babylonjs-research.md")`<br>`Read("ideas&external_references/infinite-canvas/[integration code]")` | Integration analysis |
+| 19 | infinite-canvas-analyzer-agent | Returns technical assessment | None | **Three.js**: Medium complexity - camera sync with IC viewport<br>**Babylon.js**: High complexity - scene graph conflicts with IC transform system |
+| **PHASE 5: PM EVALUATION** |
+| 20 | Main Thread | Returns to PM with research | `Task(agent: "egdesk-pm-agent", prompt: "Previously you requested research on 3D rendering with criteria [bundle, integration, performance].<br><br>I've organized findings in ideas&external_references/:<br>- threejs-research.md: 600KB, mature<br>- babylonjs-research.md: 1.2MB, complex<br>- custom-webgl-research.md: feasible but 3 months<br><br>Analyzer reported:<br>- Three.js: medium integration complexity<br>- Babylon.js: high complexity<br><br>Evaluate and recommend.")` | PM agent starts (evaluation turn) |
+| 21 | egdesk-pm-agent | Reads research documents | `Read("ideas&external_references/threejs-research.md")`<br>`Read("ideas&external_references/babylonjs-research.md")`<br>`Read("ideas&external_references/custom-webgl-research.md")` | All findings collected |
+| 22 | egdesk-pm-agent | **Evaluates against criteria** | None (analysis) | **Three.js**: Bundle size acceptable (600KB vs 500KB target = minor overage), integration medium, best balance<br>**Babylon.js**: Bundle too large (1.2MB), integration complex<br>**Custom WebGL**: Too much dev time |
+| 23 | egdesk-pm-agent | **Assesses vision alignment** | None (analysis) | Three.js best fits: lightweight enough, proven for spatial UIs, good TypeScript support |
+| 24 | egdesk-pm-agent | Returns evaluation report (WITHOUT updating stack yet) | None | **Recommended**: Three.js<br>**Rationale**: Best balance of bundle size, integration complexity, and capability. 600KB acceptable for 3D rendering value.<br>**Scoring**: Three.js (4.2/5), Babylon.js (3.1/5), Custom (2.5/5)<br>**Why not Babylon.js**: Bundle 2x too large<br>**Why not Custom**: 3 months dev time not justified<br>**Vision Alignment**: Supports spatial canvas with 3D depth<br>**Integration Strategy**: Phase 1 - POC, Phase 2 - IC integration, Phase 3 - production |
+| **PHASE 6: USER DECISION (ACCEPT RECOMMENDATION?)** |
+| 25 | Main Thread | **Presents PM recommendation to user** | None | "Research complete. PM evaluated 3 options:<br>- Three.js: 4.2/5 (recommended)<br>- Babylon.js: 3.1/5 (bundle too large)<br>- Custom WebGL: 2.5/5 (too much dev time)<br><br>PM recommends Three.js. **Proceed with Three.js?**" |
+| 26 | User | **Approves recommendation** | None (human decision) | "Yes, proceed with Three.js" |
+| **PHASE 7: TECHNOLOGY ADOPTION** |
+| 27 | Main Thread | Requests PM to finalize adoption | `Task(agent: "egdesk-pm-agent", prompt: "User approved Three.js. Update technology-stack.md and create integration PRD.")` | PM agent starts (finalization) |
+| 28 | egdesk-pm-agent | **Updates technology-stack.md** | `Edit("ideas&external_references/eg-desk ideas/technology-stack.md", add: "### Three.js\n- Category: 3D Rendering\n- Status: Approved for Integration\n- Capabilities: 3D object rendering, lighting, shadows\n- Bundle: ~600KB\n- Integration: Layers with Infinite Canvas")` | Stack updated |
+| 29 | egdesk-pm-agent | **Creates integration PRD** | `Write("ideas&external_references/eg-desk ideas/features/3d-visualization-with-threejs-prd.md", "[PRD with research summary + decision rationale + integration phases]")` | PRD created |
+| 30 | egdesk-pm-agent | Returns finalization report | None | **Technology Stack Updated**: Three.js added (Approved for Integration)<br>**PRD Created**: 3d-visualization-with-threejs-prd.md<br>**Next Steps**: Query framework agents for integration patterns |
+| **PHASE 8: IMPLEMENTATION PLANNING** |
+| 31 | Main Thread | Reports to user | None | "Three.js added to stack. Ready to begin integration planning." |
+| 32 | Main Thread | Queries framework agents for integration | `Task(agent: "theia-analyzer-agent", prompt: "Analyze webview integration for Three.js canvas in Theia")`<br>`Task(agent: "electron-analyzer-agent", prompt: "Electron security for Three.js in renderer process")` | 2 agents start (parallel) |
+| 33 | Framework agents | Analyze integration patterns | `Read(...)` + `Grep(...)` | Integration guidance |
+| 34 | Main Thread | Synthesizes + spawns coding-agent | `Task(agent: "coding-agent", prompt: "Implement Three.js integration. Direction: [PM guide]. Files: [from analyzer agents]")` | Implementation begins |
 
-**Total Agents Invoked:** 2 (PM evaluation → PM update)
+**Total Agents Invoked:** 8 (PM planning → 3 research agents parallel → 1 analyzer → PM evaluation → PM finalization → 2 framework agents parallel → coding-agent)
 
-**Who Wrote Code:** Nobody (documentation only)
+**Who Wrote Code:** coding-agent (step 34)
 
-**Duration:** Two-phase (evaluation → user decision → stack update)
+**Duration:** Multi-phase with 2 user decision points (diagnosis → **user approves research** → parallel research → organization → analysis → evaluation → **user approves recommendation** → adoption → implementation)
 
 **Critical Observations:**
-- **PM discovered current stack dynamically** (not hardcoded framework list)
-- **PM evaluated new technology against vision**
-- **PM provided options** (add new tech vs use existing)
-- **User made strategic decision** (add Three.js)
-- **PM updated technology-stack.md automatically** (Write/Edit tools)
-- **Research PRD created** for integration phase
-- **Stack always up-to-date** for future technology selections
+- **PM diagnosed current stack limitation** (Konva.js cannot do true 3D)
+- **PM articulated WHY research needed** (not just "we need X", but "current tech Y has limitation Z")
+- **PM created detailed research plan** with evaluation criteria (bundle size, integration, performance)
+- **PM designed for parallel execution** (3 independent investigations)
+- **USER DECISION POINT 1** (Step 10-11): User approves proceeding with research
+- **Main Thread executed 3 parallel investigations** (faster than sequential)
+- **Main Thread organized findings** in ideas&external_references/ (institutional memory)
+- **Main Thread returned to PM** with research results
+- **PM evaluated based on actual research** (not assumptions)
+- **PM recommended Three.js** with detailed rationale (scoring against criteria)
+- **USER DECISION POINT 2** (Step 25-26): User approves PM's recommendation
+- **PM updated technology-stack.md AFTER user approval** (stack evolution)
+- **Research documents preserved** (why Three.js chosen over alternatives documented)
 
 **When to use this pattern:**
-- User proposes new framework/library
-- During ideation/research phases
-- Technology evaluation needed
-- Stack evolution
+- User needs capability not in current stack
+- Current stack has limitations for requirement
+- Multiple technology options exist
+- Need comparative analysis before decision
+- Technology stack evolution
 
-**Key Point:**
-- Technology stack is **NOT fixed** - evolves with project needs
-- PM manages stack additions, not Main Thread
-- Always discover stack dynamically, never assume
+**Key Points:**
+1. **PM doesn't choose framework** - PM diagnoses gap + plans research
+2. **User approves research plan** before investigation starts
+3. **Main Thread does actual investigation** - WebSearch, organize findings (parallel)
+4. **PM evaluates results** - vision-aligned recommendation with scoring
+5. **User approves recommendation** before technology adoption
+6. **Institutional memory** - research docs preserved in ideas&external_references/
+7. **Technology stack evolves** - PM updates stack doc after user approval
+
+---
+
+### Scenario 7b: User Rejects PM Recommendation (Chooses Different Option)
+
+**User Request:**
+```
+(Continuation from Scenario 7a, Step 25)
+Main Thread: "PM recommends Three.js. Proceed with Three.js?"
+User: "No, I prefer Babylon.js - I need the advanced features even if bundle is larger"
+```
+
+**Why this scenario:** User overrides PM recommendation based on different priorities - shows iterative decision-making
+
+**Step-by-Step Flow:**
+
+| Step | Entity | Action | Tools Used | Output |
+|------|--------|--------|------------|--------|
+| **PHASE 0-5: SAME AS SCENARIO 7a (Steps 1-24)** |
+| 1-24 | Various | PM diagnoses → User approves research → Parallel investigation → PM evaluates | (See Scenario 7a) | PM recommended: Three.js (4.2/5) |
+| **PHASE 6: USER REJECTS RECOMMENDATION** |
+| 25 | Main Thread | Presents PM recommendation to user | None | "PM recommends Three.js. **Proceed with Three.js?**" |
+| 26 | User | **Rejects recommendation, chooses alternative** | None (human decision) | "No, use Babylon.js - advanced features worth the bundle size tradeoff" |
+| **PHASE 7: PM RE-EVALUATION WITH USER OVERRIDE** |
+| 27 | Main Thread | Returns to PM with user decision | `Task(agent: "egdesk-pm-agent", prompt: "User reviewed PM recommendation of Three.js but chooses Babylon.js instead. User rationale: 'Advanced features worth bundle size tradeoff'.<br><br>Reassess: Does Babylon.js align with vision given user's priority shift? Update integration strategy accordingly.")` | PM agent starts (re-evaluation) |
+| 28 | egdesk-pm-agent | Reads Babylon.js research | `Read("ideas&external_references/babylonjs-research.md")` | Babylon.js details |
+| 29 | egdesk-pm-agent | Re-evaluates with user priority | None (analysis) | User prioritizes features over bundle. Babylon.js has advanced lighting, physics, VR support. Vision alignment: ✅ if user accepts bundle impact |
+| 30 | egdesk-pm-agent | **Updates technology-stack.md with Babylon.js** | `Edit("ideas&external_references/eg-desk ideas/technology-stack.md", add: "### Babylon.js\n- Category: 3D Rendering\n- Status: Approved (user priority: features > bundle)\n- Capabilities: Advanced 3D, physics, VR\n- Bundle: ~1.2MB (accepted tradeoff)")` | Stack updated with Babylon.js |
+| 31 | egdesk-pm-agent | **Creates integration PRD** | `Write("ideas&external_references/eg-desk ideas/features/3d-visualization-with-babylonjs-prd.md", "[PRD: User chose Babylon.js, rationale documented, integration strategy adjusted for larger bundle]")` | PRD created |
+| 32 | egdesk-pm-agent | Returns updated guide | None | **Technology Adopted**: Babylon.js (per user decision)<br>**User Rationale Documented**: Advanced features prioritized over bundle size<br>**PM Assessment**: Vision-aligned given user's priority<br>**Adjusted Considerations**: Lazy-loading for bundle mitigation, bundle splitting strategy<br>**Integration Strategy**: Phase 1 - POC with bundle analysis, Phase 2 - bundle optimization, Phase 3 - IC integration |
+| **PHASE 8: IMPLEMENTATION PLANNING** |
+| 33 | Main Thread | Reports to user | None | "Babylon.js added to stack per your decision. Proceeding with integration planning." |
+| 34 | Main Thread | Queries framework agents for Babylon.js integration | `Task(agent: "theia-analyzer-agent", prompt: "Analyze webview integration for Babylon.js in Theia")`<br>`Task(agent: "electron-analyzer-agent", prompt: "Electron bundle optimization for Babylon.js (1.2MB)")` | 2 agents start |
+| 35 | Framework agents | Analyze integration + bundle optimization | `Read(...)` + `Grep(...)` | Integration guidance + bundle mitigation strategies |
+| 36 | Main Thread | Synthesizes + spawns coding-agent | `Task(agent: "coding-agent", prompt: "Implement Babylon.js integration with bundle optimization. Direction: [PM guide]. Files: [from analyzer agents]")` | Implementation begins |
+
+**Total Agents Invoked:** 8 (Same as 7a, but PM re-evaluates with user override)
+
+**Who Wrote Code:** coding-agent (step 36)
+
+**Duration:** Multi-phase with user override (same as 7a + re-evaluation turn)
+
+**Critical Observations:**
+- **User has final decision authority** - can override PM recommendation
+- **PM adapts to user priorities** - re-evaluates with different weighting
+- **User rationale documented** - "Why Babylon.js chosen despite PM recommending Three.js"
+- **Integration strategy adjusted** - PM accounts for bundle size mitigation needs
+- **Institutional memory preserved** - PRD documents user's decision rationale
+- **Vision alignment re-assessed** - PM confirms alignment given user's priority shift
+
+**When user might override PM:**
+- Different priorities (features > bundle size)
+- Team expertise (familiar with Babylon.js)
+- Strategic reasons (future VR support needed)
+- Risk tolerance (willing to accept tradeoffs)
+
+**Key Point:** PM guides, but **user decides**. PM adapts strategy to user's choice.
+
+---
+
+### Scenario 7c: User Modifies Research Criteria (Iterative Investigation)
+
+**User Request:**
+```
+(After Scenario 7a Step 10)
+Main Thread: "PM recommends investigating Three.js, Babylon.js, Custom WebGL. Criteria: bundle <500KB. Proceed?"
+User: "Add Pixi.js to investigation. And change bundle criterion - I don't care about bundle size, performance is critical."
+```
+
+**Why this scenario:** User modifies research scope before investigation starts - shows iterative planning
+
+**Step-by-Step Flow:**
+
+| Step | Entity | Action | Tools Used | Output |
+|------|--------|--------|------------|--------|
+| **PHASE 0: SAME AS SCENARIO 7a (Steps 1-9)** |
+| 1-9 | Various | PM diagnoses limitation and creates research plan | (See Scenario 7a) | PM returns: Investigate Three.js, Babylon.js, Custom WebGL with bundle <500KB criteria |
+| **PHASE 1: USER MODIFIES RESEARCH PLAN** |
+| 10 | Main Thread | Presents research plan to user | None | "PM recommends investigating 3 options with bundle <500KB criterion. **Proceed?**" |
+| 11 | User | **Requests modifications** | None (human input) | "Add Pixi.js to investigation. Change criterion: ignore bundle size, prioritize performance (render speed)" |
+| **PHASE 2: PM ADJUSTS RESEARCH PLAN** |
+| 12 | Main Thread | Returns to PM with user modifications | `Task(agent: "egdesk-pm-agent", prompt: "User reviewed research plan. Requests modifications:<br>1. Add Pixi.js as Option D<br>2. Change evaluation criteria: deprioritize bundle size, prioritize rendering performance<br><br>Adjust research plan accordingly.")` | PM agent starts (plan adjustment) |
+| 13 | egdesk-pm-agent | Analyzes Pixi.js relevance | `WebSearch("Pixi.js 3D capabilities")` | Pixi.js = primarily 2D WebGL renderer, limited 3D support |
+| 14 | egdesk-pm-agent | Adjusts research plan | None (planning) | **Research Plan Updated**: 4 options (added Pixi.js), **Criteria Adjusted**: Performance (1000 obj @60fps) = CRITICAL, Bundle size = DEPRIORITIZED, Integration complexity, Infinite Canvas compatibility |
+| 15 | egdesk-pm-agent | Returns adjusted research plan | None | **Investigation Updated**: Added Pixi.js (Option D)<br>**Evaluation Criteria Adjusted**: Performance now critical weight, bundle deprioritized<br>**New Investigation Questions**: Focus on render speed benchmarks, less on bundle size<br>**Parallel Execution**: 4 investigations (Three.js, Babylon.js, Custom WebGL, Pixi.js) |
+| **PHASE 3: USER CONFIRMS ADJUSTED PLAN** |
+| 16 | Main Thread | Presents adjusted plan | None | "PM adjusted plan: 4 options (added Pixi.js), performance prioritized. **Proceed?**" |
+| 17 | User | Approves adjusted plan | None (human decision) | "Yes, proceed" |
+| **PHASE 4: PARALLEL RESEARCH EXECUTION (4 OPTIONS)** |
+| 18 | Main Thread | Executes 4 parallel investigations | **Single message with 4 Tasks**:<br>`Task(agent: "general-purpose", "Research Three.js performance...")`<br>`Task(agent: "general-purpose", "Research Babylon.js performance...")`<br>`Task(agent: "general-purpose", "Research Custom WebGL performance...")`<br>`Task(agent: "general-purpose", "Research Pixi.js 3D capabilities...")` | 4 agents start simultaneously |
+| 19a-d | general-purpose (1-4) | Research 4 options | `WebSearch(...)` + `WebFetch(...)` | Findings for each option |
+| 20a-d | general-purpose (1-4) | Return findings | None | Research results with performance focus |
+| **PHASE 5-8: SAME AS SCENARIO 7a (Research organization → Analysis → PM evaluation → User approval → Adoption → Implementation)** |
+| 21-38 | Various | Organize → Analyze → PM evaluates (new criteria) → User approves → PM finalizes → Implementation | (See Scenario 7a with adjusted criteria) | Complete with user's modified criteria |
+
+**Total Agents Invoked:** 9 (PM planning → PM adjust plan → 4 research agents → 1 analyzer → PM evaluation → PM finalization → 2 framework agents → coding-agent)
+
+**Who Wrote Code:** coding-agent (final step)
+
+**Duration:** Multi-phase with iterative planning (user modifies criteria before research)
+
+**Critical Observations:**
+- **User can modify research plan** before investigation starts
+- **PM adapts to user priorities** - adjusts evaluation criteria, adds/removes options
+- **Pixi.js added to investigation** per user request
+- **Evaluation criteria re-weighted** - performance critical, bundle deprioritized
+- **4 parallel investigations** instead of 3 (user-requested scope expansion)
+- **PM re-evaluates with new criteria** - different scoring, potentially different recommendation
+- **Iterative planning** - PM → User feedback → PM adjusts → User approves → Execute
+
+**When user might modify plan:**
+- Add more options to investigate
+- Change evaluation criteria priorities
+- Remove options from investigation
+- Specify different technical constraints
+
+**Key Point:** Research plan is **collaborative** - PM proposes, user refines, PM adjusts, user approves.
+
+---
+
+### Scenario 7 Flow Diagram (Mermaid)
+
+```mermaid
+flowchart TD
+    Start([User: Add 3D visualization])
+
+    Start --> MT1[Main Thread: Route to PM]
+    MT1 --> PM1[PM: Diagnose Stack Limitation]
+
+    PM1 --> PMDiscover{{"PM: Glob tech stack<br/>Read technology-stack.md"}}
+    PMDiscover --> PMAnalyze["PM Analysis:<br/>Konva.js = 2D only<br/>User needs true 3D<br/>GAP FOUND"]
+
+    PMAnalyze --> PMPlan["PM: Create Research Plan<br/>- Options: Three.js, Babylon.js, WebGL<br/>- Criteria: bundle, perf, integration<br/>- Design: Parallel execution"]
+
+    PMPlan --> PM1Return["PM Returns: RESEARCH_NEEDED<br/>+ Limitation diagnosis<br/>+ Evaluation criteria<br/>+ Investigation scope"]
+
+    PM1Return --> MT2[Main Thread: Present to User]
+    MT2 --> UserDec1{User Decision 1:<br/>Proceed with research?}
+
+    UserDec1 -->|A: Approve| MT3[Main Thread: Execute Parallel Research]
+    UserDec1 -->|B: Modify| PM2Adjust[PM: Adjust Plan]
+    UserDec1 -->|C: Reject| End1([Stop: Use current stack])
+
+    PM2Adjust --> MT2b[Main Thread: Present Adjusted Plan]
+    MT2b --> UserDec1b{User: Approve<br/>adjusted plan?}
+    UserDec1b -->|Yes| MT3
+    UserDec1b -->|No| End1
+
+    MT3 --> Parallel["Single Message, 3 Tasks (Parallel)"]
+
+    Parallel --> Agent1["general-purpose #1:<br/>Research Three.js"]
+    Parallel --> Agent2["general-purpose #2:<br/>Research Babylon.js"]
+    Parallel --> Agent3["general-purpose #3:<br/>Research Custom WebGL"]
+
+    Agent1 --> Agent1Web["WebSearch + WebFetch<br/>Three.js docs"]
+    Agent2 --> Agent2Web["WebSearch + WebFetch<br/>Babylon.js docs"]
+    Agent3 --> Agent3Web["WebSearch + WebFetch<br/>WebGL resources"]
+
+    Agent1Web --> MT4[Main Thread: Collect Results]
+    Agent2Web --> MT4
+    Agent3Web --> MT4
+
+    MT4 --> MTOrg["Main Thread: Organize Findings<br/>Write to ideas&external_references/<br/>- threejs-research.md<br/>- babylonjs-research.md<br/>- custom-webgl-research.md"]
+
+    MTOrg --> MTAnalyzer[Main Thread: Query Analyzer]
+    MTAnalyzer --> Analyzer["infinite-canvas-analyzer:<br/>Assess integration complexity"]
+
+    Analyzer --> AnalyzerRead["Read research docs<br/>Analyze IC integration"]
+    AnalyzerRead --> AnalyzerReturn["Return: Three.js = Medium<br/>Babylon.js = High complexity"]
+
+    AnalyzerReturn --> MT5[Main Thread: Return to PM]
+    MT5 --> PM3["PM: Evaluate Research Results"]
+
+    PM3 --> PM3Read["PM: Read all research docs<br/>threejs-research.md<br/>babylonjs-research.md<br/>custom-webgl-research.md"]
+
+    PM3Read --> PM3Score["PM: Score Against Criteria<br/>Three.js: 4.2/5<br/>Babylon.js: 3.1/5<br/>Custom WebGL: 2.5/5"]
+
+    PM3Score --> PM3Return["PM Returns: Recommend Three.js<br/>(WITHOUT updating stack yet)<br/>+ Detailed rationale<br/>+ Scoring breakdown"]
+
+    PM3Return --> MT6[Main Thread: Present Recommendation]
+    MT6 --> UserDec2{User Decision 2:<br/>Accept Three.js?}
+
+    UserDec2 -->|A: Approve| PM4Final[PM: Finalize Adoption]
+    UserDec2 -->|B: Choose Babylon.js| PM4Alt[PM: Re-evaluate with Babylon.js]
+    UserDec2 -->|C: More Research| MT3
+    UserDec2 -->|D: Reject All| End2([Stop: No new tech])
+
+    PM4Alt --> PM4AltUpdate["PM: Update with Babylon.js<br/>Document user rationale<br/>Adjust integration strategy"]
+    PM4AltUpdate --> PM4Final
+
+    PM4Final --> PMUpdate["PM: Update technology-stack.md<br/>Create Integration PRD"]
+
+    PMUpdate --> MT7[Main Thread: Report to User]
+    MT7 --> MT8[Main Thread: Query Framework Agents]
+
+    MT8 --> FW1["theia-analyzer:<br/>Webview integration"]
+    MT8 --> FW2["electron-analyzer:<br/>Security patterns"]
+
+    FW1 --> MT9[Main Thread: Synthesize]
+    FW2 --> MT9
+
+    MT9 --> Coding["coding-agent:<br/>Implement Integration"]
+
+    Coding --> End3([Complete: 3D Viz Integrated])
+
+    style Start fill:#e1f5ff
+    style UserDec1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserDec2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style PM1 fill:#fff4e1
+    style PM2Adjust fill:#fff4e1
+    style PM3 fill:#fff4e1
+    style PM4Final fill:#fff4e1
+    style MT3 fill:#e1ffe1
+    style Parallel fill:#e1f0ff
+    style Agent1 fill:#f0e1ff
+    style Agent2 fill:#f0e1ff
+    style Agent3 fill:#f0e1ff
+    style Analyzer fill:#f0e1ff
+    style FW1 fill:#f0e1ff
+    style FW2 fill:#f0e1ff
+    style Coding fill:#ffe1f0
+    style End1 fill:#f0f0f0
+    style End2 fill:#f0f0f0
+    style End3 fill:#e1ffe1
+```
+
+**Legend:**
+- 🔵 Blue: User actions / Start
+- 🔴 Red border: **User Decision Points** (critical gates)
+- 🟡 Yellow: PM agent actions
+- 🟢 Green: Main Thread orchestration
+- 🟣 Purple: Research/Analyzer agents
+- 🔴 Pink: coding-agent (implementation)
+- ⚪ Gray: End states
+
+**Key Decision Gates:**
+1. **User Decision 1** (After PM diagnosis): Proceed with research? Modify? Stop?
+2. **User Decision 2** (After PM evaluation): Accept recommendation? Choose different? More research?
+
+**Parallel Execution Shown:**
+- Single message spawns 3 research agents simultaneously
+- Faster runtime (3x speedup vs sequential)
 
 ---
 
@@ -505,7 +1015,9 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 | **Theia Framework Implementation** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | ❌ No (Theia packages/) | "Modify Theia terminal service" |
 | **EG-DESK Custom Feature** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | ✅ Yes (CODEBASE_STRUCTURE.md) | "Add custom QuickSearch with Ctrl+K" |
 | **Large Multi-Feature** | Main Thread orchestrates → analyzers + coding-agent(s) | 3-4+ | coding-agent(s) | ✅ If EG-DESK custom | "Implement custom dashboard system" |
-| **New Technology Proposal** | Main Thread → PM agent (evaluate → update stack) | 1-2 | PM agent (docs) | N/A | "Add Three.js for 3D visualization" |
+| **New Technology Research** (happy path) | PM diagnoses → **User approves** → MT investigates (parallel) → PM evaluates → **User approves** → PM finalizes | 8+ | coding-agent (after approval) | N/A | "Add 3D visualization - which framework?" (Scenario 7a) |
+| **New Technology Research** (user override) | Same as above but **user rejects PM recommendation** → PM re-evaluates with user choice | 8+ | coding-agent (after user choice) | N/A | User: "No, use Babylon.js instead" (Scenario 7b) |
+| **New Technology Research** (iterative) | PM proposes plan → **User modifies criteria** → PM adjusts plan → **User approves** → MT investigates | 9+ | coding-agent (after approval) | N/A | User: "Add Pixi.js, change criteria" (Scenario 7c) |
 | **Agent Creation** | Main Thread → claude-agent | 1 | claude-agent (agent file) | N/A | "Create Konva analyzer agent" |
 
 ---
@@ -813,6 +1325,8 @@ Provide guidance for Phase 2.")
 3. **Progressive Phases**: Get next-phase guidance after completing previous phase
 4. **Decision Support**: Choose between multiple valid approaches
 5. **Conflict Resolution**: Resolve tension between found implementations and new requirements
+6. **Research Planning**: PM diagnoses stack limitation, provides research plan for Main Thread to execute
+7. **Research Results Evaluation**: Main Thread returns with findings, PM evaluates and recommends
 
 **Benefits**:
 - Complex implementations get vision alignment at multiple checkpoints
@@ -1085,6 +1599,91 @@ When to use: Complex flows, async operations, state management, critical feature
 When to skip: Simple changes, pure styling, documentation, obvious correctness
 ```
 
+### Pattern 8: New Technology Research & Evaluation (Multi-Option Investigation with User Decisions)
+```
+User → Main Thread orchestrates:
+         │
+         ├─ Step 1: PM diagnoses limitation
+         │   Main Thread → PM: "User wants [capability]. Current stack support?"
+         │   PM analyzes: Current tech X has limitation Y for requirement Z
+         │   PM returns: RESEARCH_NEEDED
+         │     - Limitation diagnosis (WHY research needed)
+         │     - Evaluation criteria (bundle, integration, performance)
+         │     - Investigation scope (Option A, B, C)
+         │     - Parallel execution design (all independent)
+         │
+         ├─ Step 2: USER DECISION POINT 1 (Proceed with research?)
+         │   Main Thread → User: "PM diagnosed limitation. Research plan: [...]"
+         │   User → OPTIONS:
+         │     A) Approve plan → Continue to Step 3
+         │     B) Modify plan → PM adjusts (add options, change criteria) → User approves → Step 3
+         │     C) Reject research → Stop (use current stack workaround)
+         │
+         ├─ Step 3: Main Thread investigates (PARALLEL - if user approved)
+         │   Single message, 3 Tasks:
+         │   ├─ Task(agent: "general-purpose", "Research Three.js...")
+         │   ├─ Task(agent: "general-purpose", "Research Babylon.js...")
+         │   └─ Task(agent: "general-purpose", "Research Custom WebGL...")
+         │   → All 3 run simultaneously (faster runtime)
+         │
+         ├─ Step 4: Main Thread organizes findings
+         │   ├─ Write("ideas&external_references/threejs-research.md")
+         │   ├─ Write("ideas&external_references/babylonjs-research.md")
+         │   └─ Write("ideas&external_references/custom-webgl-research.md")
+         │   → Institutional memory preserved
+         │
+         ├─ Step 5: Main Thread queries analyzers
+         │   Task(agent: "infinite-canvas-analyzer-agent",
+         │        "Read research docs, assess integration complexity")
+         │   → Technical analysis of integration
+         │
+         ├─ Step 6: PM evaluates results
+         │   Main Thread → PM: "Research complete. Files: [docs]. Analyzer: [findings]. Evaluate."
+         │   PM reads research docs
+         │   PM scores against criteria
+         │   PM recommends: Option X (with detailed rationale)
+         │   PM returns evaluation (WITHOUT updating stack yet - waits for user)
+         │   → Vision-aligned recommendation
+         │
+         ├─ Step 7: USER DECISION POINT 2 (Accept recommendation?)
+         │   Main Thread → User: "PM recommends [Option X]. Scoring: [X:4.2, Y:3.1, Z:2.5]"
+         │   User → OPTIONS:
+         │     A) Approve recommendation → PM finalizes (updates stack + PRD) → Implementation
+         │     B) Choose different option → PM re-evaluates with user choice → PM finalizes → Implementation
+         │     C) Request more research → Add options → Return to Step 3
+         │     D) Reject all → Stop
+         │
+         └─ Step 8: PM finalizes adoption (if user approved)
+             PM updates: technology-stack.md (with user-approved choice)
+             PM creates: Integration PRD (documents decision rationale)
+             → Ready for implementation (follow Pattern 2)
+
+Benefit:
+- Parallel research (3x faster than sequential)
+- Evidence-based decision (not assumptions)
+- **User control at 2 decision points** (research approval + recommendation approval)
+- **Iterative refinement** (user can modify criteria, add options, choose alternatives)
+- Institutional memory (research preserved with user decision rationale)
+- Technology stack evolution (documented with WHY user chose X over Y)
+
+When to use:
+- User needs capability not in current stack
+- Current stack has limitations
+- Multiple technology options exist
+- Need comparative analysis
+
+User Decision Points:
+1. **After PM diagnosis**: Proceed with research? Modify criteria? Stop?
+2. **After PM evaluation**: Accept recommendation? Choose different? More research?
+
+Variants:
+- **Scenario 7a**: User approves both decision points (happy path)
+- **Scenario 7b**: User rejects PM recommendation, chooses alternative
+- **Scenario 7c**: User modifies research plan before investigation
+
+Flow: PM diagnoses → **User approves** → MT investigates (parallel) → MT organizes → MT analyzes → PM evaluates → **User approves** → PM finalizes
+```
+
 ---
 
 ## Anti-Patterns to Avoid
@@ -1232,7 +1831,7 @@ An effective agent swarm flow has:
 |--------|--------|-----------|-----------------|
 | **Main Conversation Thread** | • Analyze and route requests<br>• **Orchestrate agents** (following `@.claude/prompts/agent-orchestration.md`):<br>  - Identify agents (from system prompt - Task tool lists all)<br>  - Create mission prompts<br>  - Plan execution phases<br>  - Identify decision points (분기점)<br>  - Design parallel/sequential workflows<br>• Invoke agents (Task tool)<br>• Synthesize agent outputs<br>• **NEVER Write/Edit application files** (always delegate to coding-agent)<br>• Execute bash commands (build/test/commit)<br>• Run git operations<br>• Commit code<br>• Create PRs<br>• Install packages<br>• Run builds and tests<br>• Make implementation decisions<br>• **Preserve own context** by delegating heavy reading to agents | • **Write/Edit application code** (ALWAYS delegate to coding-agent)<br>• **When orchestrating**: Read domain files (vision docs, codebase) - delegate to agents to preserve context<br>• Delegate simple tasks unnecessarily<br>• Guess framework patterns without agent consultation<br>• Implement EG-DESK features without vision validation | Bash, Task, Read, Glob, Grep (NO Write/Edit for application code) |
 | **Specialized Analyzer Agents**<br>(theia, electron, infinite-canvas, etc.) | • Analyze codebase/documentation<br>• Provide evidence-based guidance<br>• Explain framework patterns<br>• Troubleshoot issues<br>• Reference specific files/APIs<br>• Find proven patterns<br>• Return detailed reports<br>• **Use Bash for READ-ONLY analysis** (inspect outputs, run tests to understand behavior) | • Write ANY code<br>• **Use Bash for implementation** (commits, builds, installations) - contextually restricted<br>• Create files<br>• Edit files<br>• Commit changes<br>• Invoke other agents<br>• Implement features | Bash, Read, Glob, Grep, WebFetch, WebSearch (Bash for analysis only, contextually enforced) |
-| **egdesk-pm-agent** | • **Strategic PM**: Provide implementation guide (technology stack, location, phasing)<br>• **Technology Stack Discovery**: Glob + Read technology-stack.md (NEVER hardcode tech list)<br>• **Technology Stack Selection**: Match requirements to discovered technology capabilities<br>• **Technology Stack Management**: Update technology-stack.md when new tech added<br>• **Implementation Status Check**: Grep/Glob to verify feature not already implemented (prevent duplicates)<br>• **Plan Reviewer**: Validate Main Thread's plans, suggest improvements<br>• **Documentation Manager**: Create PRDs, update vision/ideas/tech-stack docs<br>• **Institutional Memory**: Recall previous decisions, record new ones<br>• **Insight Provider**: Explain vision conflicts, suggest alternatives<br>• **Dynamic Discovery**: Glob all docs dynamically (vision, tech stack, codebase structure)<br>• **Code Location**: Specify exact package/directory (eg-desk_taehwa/ vs packages/)<br>• **Preserve Main Thread's context**: Read vision/tech docs, synthesize strategic direction | • Write application code (only writes documentation: PRDs, vision docs, tech-stack.md)<br>• Execute implementation commands (Bash for discovery only)<br>• Commit changes<br>• Invoke other agents<br>• Provide technical patterns (framework agents do this)<br>• **Hardcode technology stack** (always discover from technology-stack.md) | Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch (Bash for discovery only, Write/Edit for documentation) |
+| **egdesk-pm-agent** | • **Strategic PM**: Provide implementation guide (technology stack, location, phasing)<br>• **Technology Stack Discovery**: Glob + Read technology-stack.md (NEVER hardcode tech list)<br>• **Technology Stack Selection**: Match requirements to discovered technology capabilities<br>• **Technology Gap Assessment**: Diagnose when current stack has limitations<br>• **Research Planning**: Create detailed, parallel investigation plans for new technologies<br>• **Evaluation Criteria Definition**: Specify criteria for Main Thread to evaluate tech options<br>• **Research Results Evaluation**: Assess Main Thread's findings, recommend vision-aligned choice<br>• **Technology Stack Management**: Update technology-stack.md when new tech added<br>• **Implementation Status Check**: Grep/Glob to verify feature not already implemented (prevent duplicates)<br>• **Plan Reviewer**: Validate Main Thread's plans, suggest improvements<br>• **Documentation Manager**: Create PRDs, update vision/ideas/tech-stack docs<br>• **Institutional Memory**: Recall previous decisions, record new ones<br>• **Insight Provider**: Explain vision conflicts, suggest alternatives<br>• **Dynamic Discovery**: Glob all docs dynamically (vision, tech stack, codebase structure)<br>• **Code Location**: Specify exact package/directory (eg-desk_taehwa/ vs packages/)<br>• **Preserve Main Thread's context**: Read vision/tech docs, synthesize strategic direction | • Write application code (only writes documentation: PRDs, vision docs, tech-stack.md, research docs in ideas&external_references/)<br>• Execute implementation commands (Bash for discovery only)<br>• Commit changes<br>• Invoke other agents<br>• Provide technical patterns (framework agents do this)<br>• **Hardcode technology stack** (always discover from technology-stack.md)<br>• **Do technology research directly** (PM plans research, Main Thread executes) | Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch (Bash for discovery only, Write/Edit for documentation) |
 | **coding-agent** | • **Execute code writing/editing** based on Main Thread instructions<br>• Create new files following provided patterns<br>• Edit existing files precisely<br>• Follow framework patterns from analyzer guidance<br>• Handle multi-file implementations<br>• **Discover EG-DESK codebase dynamically** (Glob eg-desk*/**/*.ts)<br>• **Check for naming conflicts** before implementing EG-DESK features (CODEBASE_STRUCTURE.md)<br>• **STOP immediately** when conflict detected (report to Main Thread, user decides)<br>• **Update structure document** after successful implementation<br>• **Prevent duplicate implementations** (conflict prevention system)<br>• Return implementation status reports | • Make architectural decisions<br>• Choose implementation approaches<br>• **Auto-resolve conflicts** (must report, user decides)<br>• **Hardcode paths** (always discover dynamically)<br>• Execute bash commands<br>• Run builds/tests<br>• Commit changes<br>• Invoke other agents<br>• Analyze frameworks<br>• Validate vision | Write, Edit, Read, Glob, Grep (NO Bash) |
 | **claude-agent-sdk-analyzer-agent** | • **Subagent Architect**: Design and create new specialized agents<br>• Read best practices from `subagent-best-practices.md`<br>• Examine existing agents to extract proven patterns<br>• Write agent definition files (`.claude/agents/*.md`)<br>• **SDK Integration Guidance**: Explain Claude Code SDK patterns<br>• Guide SDK feature implementation into forked apps<br>• Troubleshoot SDK usage issues | • Write application code (only writes agent files)<br>• Execute commands<br>• Commit changes<br>• Invoke other agents | Bash, Read, Write, Glob, Grep, WebFetch, WebSearch (Write for agent files only) |
 | **User** | • Make final decisions at decision points<br>• Provide preferences<br>• Validate experimental results<br>• Approve/reject architectural plans<br>• Request clarifications<br>• Override any recommendation | (User has full authority) | None (human input) |
@@ -1378,14 +1977,17 @@ This agent swarm system provides a scalable, efficient framework for developing 
 **egdesk-pm-agent (Strategic PM & Administrative Orchestrator):**
 - **Discovers technology stack dynamically**: Reads technology-stack.md (NEVER hardcodes tech list)
 - **Provides strategic guide**: Technology stack selection, code location, implementation phasing
+- **Diagnoses stack limitations**: Identifies when current stack cannot meet requirements
+- **Plans technology research**: Creates detailed, parallel investigation plans with evaluation criteria
+- **Evaluates research results**: Assesses Main Thread's findings, recommends vision-aligned choice
 - **Checks implementation status**: Prevents duplicate implementations (Grep EG-DESK + Theia code)
 - **Reviews execution plans**: Validates completeness, suggests improvements
-- **Manages documentation**: Creates PRDs, updates vision docs, updates technology-stack.md
+- **Manages documentation**: Creates PRDs, updates vision docs, updates technology-stack.md, preserves research docs
 - **Maintains institutional memory**: Recalls decisions, records new ones
 - **Provides insights**: Explains vision conflicts, suggests alternatives to user
 - **Dynamically discovers structure**: Globs vision docs + tech stack + codebase to understand project state
-- **Evaluates new technologies**: When user proposes new framework, evaluates and updates stack
 - **Never writes application code** (only documentation)
+- **Never does research directly** (plans research, Main Thread executes, PM evaluates)
 
 **Specialized Analyzer Agents (Technical Experts):**
 - Analyze codebases and documentation in their domains
@@ -1413,6 +2015,11 @@ This agent swarm system provides a scalable, efficient framework for developing 
 
 **Result:** PM-driven strategic flow with Main Thread as facilitator and built-in conflict prevention:
 - **PM discovers technology stack dynamically** (reads technology-stack.md, NEVER hardcoded)
+- **PM diagnoses stack limitations** (identifies when new technology research needed)
+- **PM plans technology research** (detailed criteria + parallel investigation design)
+- **Main Thread executes parallel research** (3+ agents simultaneously for faster runtime)
+- **Main Thread organizes findings** (preserves in ideas&external_references/ for institutional memory)
+- **PM evaluates research results** (vision-aligned recommendation with scoring)
 - **PM checks implementation status** (prevents duplicate implementations via Grep)
 - PM provides strategic direction (technology stack selection, location, approach)
 - PM updates technology-stack.md when new technologies added
@@ -1426,4 +2033,4 @@ This agent swarm system provides a scalable, efficient framework for developing 
 - Clear separation: strategy (PM) → planning (Main Thread) → patterns (analyzers) → conflict check (coding-agent) → execution (coding-agent) → structure update (coding-agent)
 - **Dynamic discovery**: All paths AND technology stack discovered via Glob, no hardcoding
 - **Conflict prevention**: CODEBASE_STRUCTURE.md prevents duplicate implementations, PM prevents duplicate tech stack
-- **Evolving tech stack**: Technology stack grows during ideation/research phases
+- **Evolving tech stack**: Technology stack grows through research workflow (PM plans → Main Thread investigates → PM evaluates)

@@ -67,19 +67,20 @@ For actual development tasks, multi-step workflows, or cross-framework implement
    - PM provides: Framework choice, code location, implementation phasing, considerations
    - PM creates PRD if feature approved
 
-2. **Create execution plan** based on PM's strategic guide:
+2. **Plan framework investigation** based on PM's strategic guide:
    - Follow PM's recommended phasing
    - Identify which framework agents to query (per PM's direction)
+   - Determine what technical patterns to research
 
-3. **Query framework agents** (as directed by PM):
+3. **Execute framework investigation** (query framework agents as directed by PM):
    - Invoke framework agents to get technical patterns
    - Framework agents return: Patterns, file lists (CREATE/MODIFY/DELETE/REFERENCE)
 
 4. **(Optional) Return to PM for plan review**:
-   - If complex: Present your plan + framework findings to PM
+   - If complex: Present your implementation plan + framework findings to PM
    - PM validates plan, suggests improvements, flags user decisions
 
-5. **Synthesize** PM guide + framework patterns into coding instructions:
+5. **Create implementation plan** (synthesize PM guide + framework patterns into coding instructions):
 
    Format coding-agent prompt with complete context:
    ```
@@ -145,6 +146,68 @@ For actual development tasks, multi-step workflows, or cross-framework implement
 - Query technical agents as PM directs
 - Execute implementation via coding-agent
 - Build, test, commit
+
+### Pattern 3: New Technology Research & Evaluation (capability not in current stack)
+```
+[Analyze: User needs capability that may require new technology]
+
+I'll consult PM to assess if current stack sufficient or if research needed.
+
+[Research Workflow:]
+1. Invoke egdesk-pm-agent: "User wants [capability]. Current stack support?"
+   → PM diagnoses: Current tech X has limitation Y for requirement Z
+   → PM returns: RESEARCH_NEEDED
+     - Limitation diagnosis (WHY research needed)
+     - Evaluation criteria (bundle size, integration, performance)
+     - Investigation scope (Option A, B, C to research)
+     - Parallel execution design
+
+2. Execute parallel research (faster runtime):
+   → Single message with 3 Tasks (all independent):
+     - Task(agent: "general-purpose", "Research Three.js...")
+     - Task(agent: "general-purpose", "Research Babylon.js...")
+     - Task(agent: "general-purpose", "Research Custom WebGL...")
+   → All 3 run simultaneously
+
+3. Organize findings in ideas&external_references/:
+   → Write("ideas&external_references/threejs-research.md", [findings])
+   → Write("ideas&external_references/babylonjs-research.md", [findings])
+   → Write("ideas&external_references/custom-webgl-research.md", [findings])
+   → Preserve institutional memory
+
+4. Query analyzer agents for technical assessment:
+   → Task(agent: "infinite-canvas-analyzer-agent",
+          "Read research docs, assess integration complexity")
+   → Technical analysis (not strategic)
+
+5. Return to PM with research results:
+   → Task(agent: "egdesk-pm-agent",
+          "Research complete. Findings in ideas&external_references/:
+           - threejs-research.md: [summary]
+           - babylonjs-research.md: [summary]
+           Analyzer reported: [integration findings]
+           Evaluate and recommend.")
+   → PM reads research docs
+   → PM scores against criteria
+   → PM recommends vision-aligned choice
+   → PM updates technology-stack.md
+   → PM creates research PRD
+
+6. Proceed to implementation (if approved):
+   → Follow Pattern 2 (PM-Driven Development) with new technology
+```
+
+**Key Points:**
+- PM diagnoses limitation (not chooses framework)
+- Main Thread does research (parallel for speed)
+- Main Thread organizes findings in ideas&external_references/
+- PM evaluates results (vision-aligned recommendation)
+- Research preserved (institutional memory)
+
+**Examples:**
+- "Add 3D visualization - which framework?" → Pattern 3
+- "Need real-time collaboration - WebRTC or CRDT?" → Pattern 3
+- "Want native notifications - which API?" → Pattern 3
 
 ### 4. Agent Creation
 
@@ -234,6 +297,12 @@ After receiving PM's initial strategic guide, you **may return for additional co
 - Vision documents seem contradictory
 - Implementation reveals architectural tension
 
+**6. Research Results Evaluation** (technology investigation complete):
+- Completed parallel technology research per PM's plan
+- Organized findings in ideas&external_references/
+- Analyzer agents provided technical assessment
+- Need PM to evaluate and recommend vision-aligned choice
+
 ### ❌ Do NOT return to PM for:
 
 - **Simple implementation details** → Ask framework agents
@@ -295,20 +364,21 @@ I'll consult PM for strategic guidance, then execute the implementation.
 1. Invoke egdesk-pm-agent: "User wants [feature]. Provide strategic guide."
    → PM returns: Framework, location, phasing, considerations, creates PRD
 
-2. Create execution plan based on PM's guide:
-   → Phase 1: Query [framework-agent] per PM's direction
-   → Phase 2: Implement based on findings
+2. Plan framework investigation based on PM's guide:
+   → Identify which framework agents to query per PM's direction
+   → Determine what technical patterns to research
 
-3. Query framework agents as PM directed:
+3. Execute framework investigation:
    → Invoke framework agents for technical patterns
    → Receive: Patterns, file lists (CREATE/MODIFY/DELETE/REFERENCE)
 
 4. (Optional) Return to PM for plan review if complex:
-   → "I created this plan: [...]. Agent reports: [...]. Review?"
+   → "I created this implementation plan: [...]. Agent reports: [...]. Review?"
    → PM validates or suggests improvements
 
-5. Synthesize into coding instructions:
-   → Direction + File list from PM guide + framework patterns
+5. Create implementation plan:
+   → Synthesize: PM guide + framework patterns → coding instructions
+   → Direction + File list with specific actions
 
 6. Spawn coding-agent(s) with synthesized instructions
 
