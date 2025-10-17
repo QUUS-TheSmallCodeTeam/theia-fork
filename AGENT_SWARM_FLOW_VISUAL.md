@@ -1092,6 +1092,45 @@ PM adjusts research plan per user modifications (add options, change criteria), 
 
 ## Common Patterns (Self-Documenting)
 
+### Pattern 1: Quick Framework Question
+
+```mermaid
+flowchart LR
+    User(["User: Framework question
+    Example: 'How does Theia handle menus?'"])
+
+    --> MT["Main Thread
+    Action: Analyze request
+    Decision: Single-framework question
+    Route: Direct to framework agent
+    No orchestration needed"]
+
+    --> Agent["theia-analyzer-agent
+    Tools:
+    - Read: packages/core/src/browser/menu/
+    - Grep: menu patterns
+    - Read: Examples
+
+    Returns:
+    - Detailed explanation
+    - Pattern examples
+    - File references"]
+
+    --> Answer(["Complete
+    User sees answer
+
+    Agents: 1
+    Duration: Single invocation
+    Efficiency: No orchestration overhead"])
+
+    style User fill:#e1f5ff
+    style MT fill:#e1ffe1
+    style Agent fill:#f0e1ff
+    style Answer fill:#e1ffe1
+```
+
+---
+
 ### Pattern 2: PM-Driven Development (Complete)
 
 ```mermaid
@@ -1147,6 +1186,343 @@ flowchart TD
     style MT1 fill:#e1ffe1
     style MT2 fill:#e1ffe1
     style MT3 fill:#e1ffe1
+    style End fill:#e1ffe1
+```
+
+---
+
+### Pattern 3: Full Development Cycle (Parallel Validation)
+
+```mermaid
+flowchart TD
+    User(["User: Complex feature request
+    Example: 'Add custom menu with OS integration'"])
+
+    --> MT["Main Thread
+    Action: Orchestrate multi-agent workflow
+    Identifies:
+    - PM (vision validation)
+    - theia-analyzer (menu patterns)
+    - electron-analyzer (OS integration)"]
+
+    --> Phase1["PHASE 1: Parallel Validation
+
+    Main Thread sends single message, 2 Tasks:
+
+    Task 1: egdesk-pm-agent
+    'Validate custom menu vs vision'
+
+    Task 2: theia-analyzer-agent
+    'Analyze Theia menu system'
+
+    Both run simultaneously"]
+
+    --> PM1["PM Agent
+    Tools: Glob + Read vision docs
+    Returns: APPROVE + considerations"]
+
+    --> FW1["theia-analyzer
+    Tools: Read menu code + Grep patterns
+    Returns: Menu registration patterns"]
+
+    Phase1 --> PM1
+    Phase1 --> FW1
+
+    PM1 --> MT2["Main Thread
+    Synthesizes: PM approval + patterns"]
+    FW1 --> MT2
+
+    --> Phase2["PHASE 2: Sequential Architecture
+
+    Main Thread (after Phase 1):
+    Task: electron-analyzer
+    'Given Theia menu pattern,
+    analyze OS integration'"]
+
+    --> FW2["electron-analyzer
+    Tools: Read Electron menu API
+    Returns: OS integration patterns"]
+
+    --> MT3["Main Thread
+    Synthesizes ALL guidance:
+    - PM: Vision-aligned
+    - Theia: Menu patterns
+    - Electron: OS integration"]
+
+    --> Coding["PHASE 3: coding-agent
+
+    Implements based on all guidance
+    Returns: Status report"]
+
+    --> MT4["Main Thread
+    Bash: build, test, commit"]
+
+    --> End(["Complete
+
+    Agents: 4 (PM + 2 FW parallel + 1 FW sequential + coding)
+    Duration: Multi-phase with parallelization"])
+
+    style User fill:#e1f5ff
+    style PM1 fill:#fff4e1
+    style FW1 fill:#f0e1ff
+    style FW2 fill:#f0e1ff
+    style Coding fill:#ffe1f0
+    style MT fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style MT3 fill:#e1ffe1
+    style MT4 fill:#e1ffe1
+    style End fill:#e1ffe1
+```
+
+---
+
+### Pattern 4: Agent Creation
+
+```mermaid
+flowchart LR
+    User(["User: Need new specialist
+    'Create Konva analyzer agent'"])
+
+    --> MT["Main Thread
+    Route: claude-agent-sdk-analyzer-agent"]
+
+    --> SDK["claude-agent-sdk-analyzer
+
+    Actions:
+    - Read: subagent-best-practices.md
+    - Glob + Read: Existing agents (extract patterns)
+    - Design: YAML frontmatter + instructions
+    - Write: .claude/agents/konva-analyzer-agent.md
+
+    Returns:
+    Agent file created
+    Session restart may be needed"]
+
+    --> End(["Complete
+    New agent ready
+
+    Agents: 1
+    Who codes: claude-agent (agent file only)"])
+
+    style User fill:#e1f5ff
+    style MT fill:#e1ffe1
+    style SDK fill:#f0e1ff
+    style End fill:#e1ffe1
+```
+
+---
+
+### Pattern 5: Large Implementation (Context Preservation)
+
+```mermaid
+flowchart TD
+    User(["User: Large multi-file feature
+    Example: 'Implement custom dashboard (10+ files)'"])
+
+    --> MT1["Main Thread
+    Decision: Large implementation
+    Strategy: Delegate to coding-agent
+    (preserve Main Thread context)"]
+
+    --> Phases["Phase 1-N: Gather Insights
+
+    Main Thread orchestrates:
+    - PM: Vision validation
+    - Framework agents: Patterns
+    - Architecture guidance
+
+    Main Thread's context stays clean
+    (agents do heavy reading)"]
+
+    --> MT2["Main Thread
+    Synthesizes insights:
+
+    What: Dashboard system
+    Files: 10+ CREATE/MODIFY operations
+    Patterns: From framework agents
+
+    Format for coding-agent:
+    - Direction (what to implement)
+    - File list (detailed CREATE/MODIFY/REF)
+    - Pattern references"]
+
+    --> Coding["coding-agent (Separate Context)
+
+    Actions:
+    - Reads files for implementation details
+    - Writes/Edits 10+ files
+    - Follows patterns precisely
+    - Returns: Status report
+
+    Benefit: Main Thread context preserved
+    Main Thread can continue orchestrating"]
+
+    --> MT3["Main Thread
+    After coding-agent returns:
+    - Bash: npm run build
+    - Bash: git commit
+
+    Context still clean for next feature"]
+
+    --> End(["Complete
+
+    Benefit: Main Thread available for
+    continued orchestration
+
+    When to use:
+    - 3+ files
+    - Large edits (500+ lines)
+    - Multiple features in session"])
+
+    style User fill:#e1f5ff
+    style MT1 fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style MT3 fill:#e1ffe1
+    style Coding fill:#ffe1f0
+    style End fill:#e1ffe1
+```
+
+---
+
+### Pattern 6: Conflict Detection & Resolution
+
+```mermaid
+flowchart TD
+    User(["User: EG-DESK custom feature
+    'Add keybinding Ctrl+K'"])
+
+    --> MT["Main Thread orchestrates:
+    - PM: Strategic guide (EG-DESK custom)
+    - Framework agents: Patterns"]
+
+    --> Coding1["coding-agent
+
+    BEFORE implementing:
+
+    Step 1: Discover EG-DESK codebase
+    - Glob: eg-desk*/**/*.ts
+
+    Step 2: Find structure doc
+    - Glob: eg-desk*/CODEBASE_STRUCTURE.md
+
+    Step 3: Read structure doc
+
+    Step 4: Check conflicts
+    - Grep: 'Ctrl+K' in structure"]
+
+    --> ConflictCheck{Conflict?}
+
+    ConflictCheck -->|Yes| Stop["coding-agent: STOP
+
+    DO NOT implement
+
+    Returns:
+    ❌ CONFLICT DETECTED
+    Alternatives: [list]
+    User decision required"]
+
+    ConflictCheck -->|No| Impl["coding-agent: Implement
+
+    Tools:
+    - Write: feature code
+    - Edit: CODEBASE_STRUCTURE.md
+      (Add keybinding + timeline)
+
+    Returns:
+    ✅ Complete + Structure updated"]
+
+    Stop --> UserDec{User chooses<br/>alternative}
+
+    UserDec --> Retry["coding-agent: Retry
+    with resolved keybinding"]
+
+    Retry --> Impl
+
+    Impl --> MT2["Main Thread
+    Bash: build, commit"]
+
+    --> End(["Complete
+
+    Benefit: Prevents duplicate implementations
+    When: EG-DESK custom features
+    Skip: Theia framework modifications"])
+
+    style User fill:#e1f5ff
+    style ConflictCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style UserDec fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style Coding1 fill:#ffe1f0
+    style Stop fill:#ffe1f0
+    style Impl fill:#ffe1f0
+    style Retry fill:#ffe1f0
+    style MT fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style End fill:#e1ffe1
+```
+
+---
+
+### Pattern 7: Optional UX Flow Validation (Pre-Build)
+
+```mermaid
+flowchart TD
+    Impl["coding-agent completed
+    implementation"]
+
+    --> MTDecide{"Main Thread Decision:
+
+    Validate UX flow?
+
+    Consider:
+    ✅ Complex user flows?
+    ✅ Race conditions possible?
+    ✅ State management?
+    ✅ Async operations?
+    ✅ Critical feature?
+
+    ❌ Simple CRUD?
+    ❌ Pure styling?
+    ❌ Obvious correctness?"}
+
+    MTDecide -->|Validate| UXSim["ux-flow-simulator-agent
+
+    Tools:
+    - Read: Implemented files
+    - Trace: Code execution paths
+
+    Actions:
+    - Simulate user flow
+    - Predict runtime behavior
+    - Check: Race conditions, null errors
+
+    Returns:
+    ✅ No issues predicted
+    OR
+    ⚠️ Issues found: [list]"]
+
+    MTDecide -->|Skip| Build
+
+    UXSim --> IssuesCheck{Issues?}
+
+    IssuesCheck -->|Yes| Fix["coding-agent
+    Fix issues based on
+    UX simulator findings"]
+
+    Fix --> UXSim
+
+    IssuesCheck -->|No| Build["Main Thread
+    Bash: npm run build"]
+
+    --> End(["Complete
+
+    Benefit: Catch runtime errors BEFORE build
+    When: Complex flows, critical features
+    Skip: Simple changes, styling"])
+
+    style MTDecide fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style IssuesCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style UXSim fill:#f0e1ff
+    style Fix fill:#ffe1f0
+    style Build fill:#e1ffe1
     style End fill:#e1ffe1
 ```
 
@@ -1841,6 +2217,865 @@ flowchart LR
     style P4 fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
     style P5 fill:#f0e1ff
     style P6 fill:#fff4e1
+```
+
+---
+
+## Key Execution Principles (Detailed)
+
+### Principle 1: Tool Ownership (Contextual Restriction)
+
+```mermaid
+flowchart TD
+    Principle["Tool Ownership Principle:
+
+    Tools restricted CONTEXTUALLY (via prompts)
+    NOT mechanically removed
+
+    Agents have tools, but role defines HOW to use"]
+
+    Principle --> Analyzers["Framework Analyzer Agents
+
+    Tool Access:
+    - Bash, Glob, Grep, Read
+    - WebFetch, WebSearch
+
+    Contextual Restriction (via prompt):
+    ✅ Bash for READ-ONLY analysis
+       (inspect outputs, run tests to understand)
+    ❌ NEVER for implementation
+       (commits, builds, installations)
+
+    Example:
+    ✅ Bash: npm test (see test behavior)
+    ❌ Bash: npm install (implementation)
+
+    Enforced: Agent prompt instructions"]
+
+    Principle --> Coding["coding-agent
+
+    Tool Access:
+    - Write, Edit, Read, Glob, Grep
+
+    Contextual Restriction:
+    ✅ Code execution ONLY
+    ❌ NO Bash (no builds/tests/commits)
+
+    Example:
+    ✅ Write: new-service.ts
+    ✅ Edit: existing-file.ts
+    ❌ Bash: npm run build
+
+    Enforced: Agent role description"]
+
+    Principle --> MT["Main Thread
+
+    Tool Access: ALL tools
+
+    Usage:
+    ✅ Bash: build, test, commit, git
+    ✅ Task: invoke agents
+    ✅ Read, Glob, Grep: orchestration
+    ❌ Write/Edit: application code
+       (always delegate to coding-agent)
+
+    Full access, contextually appropriate"]
+
+    style Principle fill:#e1ffe1
+    style Analyzers fill:#f0e1ff
+    style Coding fill:#ffe1f0
+    style MT fill:#e1ffe1
+```
+
+**Why Contextual Works:**
+- Agents understand their role from prompts
+- More flexible (agents can investigate runtime behavior)
+- No artificial tool removal
+- Trust agent instructions to enforce boundaries
+
+---
+
+### Principle 2: When to Spawn Subagent (Context Preservation)
+
+```mermaid
+flowchart TD
+    Task["Task arrives"]
+
+    --> Decision{"Requires heavy
+    domain-specific reading?"}
+
+    Decision -->|Yes| Spawn["✅ SPAWN SUBAGENT
+
+    Scenarios:
+    - Extensive domain reading
+      (vision docs, framework docs, large codebase)
+    - Synthesize knowledge from references
+    - Domain analysis needed
+    - 'Learn this domain, then apply'
+    - Would pollute Main Thread context
+
+    Example:
+    'Analyze Theia DI system across 50 files'
+    → theia-analyzer reads 50 files
+    → Returns 3-paragraph summary
+    → Main Thread context: Clean (only summary)
+
+    Benefit: Context preserved"]
+
+    Decision -->|No| Direct["✅ MAIN THREAD DIRECT
+
+    Scenarios:
+    - Simple questions (system knowledge)
+    - File operations (clear instructions)
+    - Orchestration tasks
+    - Already have guidance from agents
+
+    Example:
+    'List files in packages/core'
+    → Glob directly
+    → No agent needed
+
+    Benefit: Fast, efficient"]
+
+    Spawn --> Effect1["Effect: Main Thread Context
+
+    WITHOUT subagent:
+    MT reads 50 files → context polluted
+
+    WITH subagent:
+    Agent reads 50 files → returns summary
+    MT context: Clean (only summary)"]
+
+    Direct --> Effect2["Effect: Immediate
+
+    No agent overhead
+    Fast execution"]
+
+    style Task fill:#e1f5ff
+    style Decision fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Spawn fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
+    style Direct fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
+    style Effect1 fill:#f0e1ff
+    style Effect2 fill:#e1ffe1
+```
+
+---
+
+### Principle 3: Parallel vs Sequential Execution
+
+```mermaid
+flowchart TD
+    Tasks["Multiple analyses needed"]
+
+    --> Check{Independent<br/>analyses?}
+
+    Check -->|Yes| Parallel["✅ PARALLEL
+
+    Single message, multiple Tasks:
+
+    Main Thread sends ONE message:
+    - Task(agent: 'theia-analyzer', ...)
+    - Task(agent: 'electron-analyzer', ...)
+    - Task(agent: 'infinite-canvas-analyzer', ...)
+
+    All THREE execute simultaneously
+
+    Duration: max(T1, T2, T3)
+    Example: T1=10s, T2=8s, T3=12s
+    → Total: 12s (not 10+8+12=30s)
+
+    Benefit: 3x+ faster"]
+
+    Check -->|No| Sequential["✅ SEQUENTIAL
+
+    Separate messages (dependencies):
+
+    Message 1:
+    - Task(agent: 'electron-analyzer',
+           'Find security requirements')
+    (Wait for response)
+
+    Message 2:
+    - Task(agent: 'theia-analyzer',
+           'Given security reqs from previous,
+            analyze Theia implementation')
+
+    Duration: T1 + T2
+    (Later agent needs earlier findings)
+
+    Necessary: Dependent analyses"]
+
+    Parallel --> ParallelWhen["When to use PARALLEL:
+
+    ✅ Independent analyses
+    ✅ 'How does each framework handle X?'
+    ✅ Multiple research options
+    ✅ No dependencies between tasks"]
+
+    Sequential --> SeqWhen["When to use SEQUENTIAL:
+
+    ✅ Later agent needs earlier findings
+    ✅ 'Given security reqs, analyze implementation'
+    ✅ Dependent information
+    ✅ Phase N+1 needs Phase N results"]
+
+    style Tasks fill:#e1f5ff
+    style Check fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Parallel fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
+    style Sequential fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
+    style ParallelWhen fill:#e1f5ff
+    style SeqWhen fill:#e1f5ff
+```
+
+---
+
+### Principle 4: Conversational Re-query Pattern
+
+```mermaid
+flowchart TD
+    Agent1["Agent returns report
+
+    Report:
+    ✓ Summary: Present
+    ✓ Findings: Present
+    ✗ Files Analyzed: MISSING"]
+
+    --> MT1["Main Thread
+    Action: Detect incomplete report
+
+    Missing: Files Analyzed section
+    (REQUIRED for implementation)"]
+
+    --> Requery["Main Thread: Re-query Contextually
+
+    Tool: Task(agent: 'theia-analyzer-agent',
+          prompt: 'You previously provided this analysis:
+
+    [ENTIRE PREVIOUS REPORT QUOTED]
+
+    However, Files Analyzed section MISSING (REQUIRED).
+    Please provide complete file list with file:line refs.
+    No need to re-analyze - just add missing section.')
+
+    Key: Agent is stateless
+    BUT Main Thread provides full context"]
+
+    --> Agent2["Agent (stateless but with context)
+
+    Actions:
+    - Reads own previous report (from prompt)
+    - Extracts file list from analysis
+    - Completes missing section
+
+    Returns:
+    Files Analyzed:
+    - terminal-theme-service.ts:45
+    - terminal-frontend-module.ts:32
+    - workspace-service.ts:89"]
+
+    --> MT2["Main Thread
+    Now has complete report
+    Can proceed to next phase"]
+
+    --> End(["Continue
+
+    Benefit:
+    - Flexible (not strict validation)
+    - Natural conversation
+    - Agent can clarify/complete
+
+    When to use:
+    - Report missing sections
+    - Need clarification
+    - Want more detail
+    - File list breakdown needed"])
+
+    style Agent1 fill:#f0e1ff
+    style MT1 fill:#e1ffe1
+    style Requery fill:#e1ffe1
+    style Agent2 fill:#f0e1ff
+    style MT2 fill:#e1ffe1
+    style End fill:#e1ffe1
+```
+
+---
+
+### Principle 5: File List Format Enforcement
+
+```mermaid
+flowchart LR
+    Agent["Framework analyzer
+    returns file list"]
+
+    --> Format["Required Format:
+
+    1. CREATE:
+       - path/to/new-file.ts (purpose)
+
+    2. MODIFY:
+       - path/to/existing.ts:45 (what to change)
+
+    3. DELETE (if applicable):
+       - path/to/deprecated.ts (why removing)
+
+    4. REFERENCE (patterns, don't modify):
+       - path/to/pattern-file.ts:89
+         (Follow @injectable pattern)"]
+
+    --> Benefit["Main Thread Benefits:
+
+    - Extract exact action list
+    - Know CREATE vs MODIFY vs DELETE
+    - Identify pattern references separately
+    - Precise coding-agent instructions:
+      'CREATE 1, MODIFY 2, REF 1'"]
+
+    --> CodingPrompt["coding-agent Prompt:
+
+    From theia-analyzer:
+    - Pattern: workspace-service.ts:89
+
+    Tasks:
+    1. CREATE packages/terminal/src/browser/switcher.ts:
+       - Follow workspace-service.ts:89 @injectable pattern
+       - Implement time-based logic
+
+    2. MODIFY terminal-frontend-module.ts:36:
+       - Add DI binding: bind(Switcher).toSelf()
+
+    3. REFERENCE workspace-service.ts:89:
+       - Pattern to follow (don't modify this file)"]
+
+    style Agent fill:#f0e1ff
+    style Format fill:#e1f5ff
+    style Benefit fill:#e1ffe1
+    style CodingPrompt fill:#ffe1f0
+```
+
+---
+
+## Orchestration Guidelines Deep Dive
+
+### How Main Thread Orchestrates (10-Step Process)
+
+```mermaid
+flowchart TD
+    Start(["Complex Development Task"])
+
+    --> Step1["Step 1: Identify Agents
+
+    Source: System prompt knowledge
+    (Task tool description lists all agents)
+
+    Main Thread knows:
+    - egdesk-pm-agent
+    - theia-analyzer-agent
+    - electron-analyzer-agent
+    - infinite-canvas-analyzer-agent
+    - coding-agent
+    - ux-flow-simulator-agent
+    - etc."]
+
+    --> Step2["Step 2: Select Agents
+
+    Based on capabilities from descriptions
+
+    For 'Add custom menu with OS integration':
+    - PM (vision validation)
+    - theia-analyzer (menu patterns)
+    - electron-analyzer (OS integration)
+    - coding-agent (implementation)"]
+
+    --> Step3["Step 3: Analyze Task Requirements
+
+    From user request:
+    - What does user want?
+    - Which frameworks involved?
+    - Complexity level?
+    - Vision validation needed?"]
+
+    --> Step4["Step 4: (Optional) Read Agent Details
+
+    If needs specific implementation examples:
+    - Read: .claude/agents/[agent].md
+
+    Usually NOT needed:
+    - Agent descriptions in system prompt sufficient"]
+
+    --> Step5["Step 5: Create Mission Prompts
+
+    For each agent, create detailed prompt:
+
+    egdesk-pm-agent:
+    'Validate custom menu feature against
+    ambient AI workspace vision in whitepaper'
+
+    theia-analyzer-agent:
+    'Analyze Theia menu system at
+    packages/core/src/browser/menu/
+    to find registration patterns'"]
+
+    --> Step6["Step 6: Plan Execution Phases
+
+    Identify parallel vs sequential:
+
+    Phase 1 (Parallel):
+    - PM validation
+    - Theia menu analysis
+
+    Phase 2 (Sequential, after P1):
+    - Electron OS integration
+      (needs Theia patterns from P1)"]
+
+    --> Step7["Step 7: Identify Decision Points
+
+    Where user input needed:
+    - After PM evaluation?
+    - Conflict resolution?
+    - Multiple options to choose?
+
+    분기점 (Decision gates)"]
+
+    --> Step8["Step 8: Invoke Agents
+
+    Tool: Task
+
+    Phase 1 (single message, 2 Tasks):
+    - Task(agent: 'egdesk-pm-agent', ...)
+    - Task(agent: 'theia-analyzer-agent', ...)
+
+    Wait for both
+
+    Phase 2 (after P1):
+    - Task(agent: 'electron-analyzer-agent',
+           prompt includes P1 findings)"]
+
+    --> Step9["Step 9: Synthesize Agent Results
+
+    Collect:
+    - PM: APPROVE + considerations
+    - theia-analyzer: Menu patterns
+    - electron-analyzer: OS integration
+
+    Synthesize into:
+    - Implementation direction
+    - File list (CREATE/MODIFY/REF)
+    - Pattern references"]
+
+    --> Step10["Step 10: Delegate Implementation
+
+    Tool: Task(coding-agent,
+          prompt: synthesized guidance)
+
+    OR (if simple enough):
+    Main Thread handles directly
+
+    Then:
+    - Bash: npm run build
+    - Bash: git commit"]
+
+    --> End(["Complete
+    Orchestration Done"])
+
+    style Start fill:#e1f5ff
+    style Step1 fill:#e1ffe1
+    style Step2 fill:#e1ffe1
+    style Step3 fill:#e1ffe1
+    style Step4 fill:#e1ffe1
+    style Step5 fill:#e1ffe1
+    style Step6 fill:#e1ffe1
+    style Step7 fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Step8 fill:#e1ffe1
+    style Step9 fill:#e1ffe1
+    style Step10 fill:#e1ffe1
+    style End fill:#e1ffe1
+```
+
+---
+
+### File Reading Scope (Critical for Context Preservation)
+
+```mermaid
+flowchart TD
+    MT["Main Thread (When Orchestrating)"]
+
+    MT --> Can["✅ CAN Read:
+
+    Meta-level files:
+    - .claude/prompts/agent-orchestration.md
+      (orchestration guidelines)
+    - .claude/agents/*.md (OPTIONAL)
+      (only when needs specific examples
+       - agent discovery already in system prompt)
+
+    Purpose: Orchestration guidance only"]
+
+    MT --> Cannot["❌ CANNOT Read (When Orchestrating):
+
+    Domain files:
+    - ideas&external_references/eg-desk ideas/
+      (That's PM agent's domain)
+    - packages/
+      (That's framework analyzer agents' domain)
+    - Application/framework code
+      (Delegate to agents to preserve context)
+    - Vision/strategy documents
+      (PM agent reads these)
+
+    Why: Preserve Main Thread context
+    Agents synthesize → return summary"]
+
+    Cannot --> Effect["Effect of Context Preservation:
+
+    WITHOUT delegation:
+    MT reads 50 vision docs → context polluted
+
+    WITH delegation:
+    PM reads 50 docs → returns 3-paragraph summary
+    MT context: CLEAN (only summary)
+
+    Benefit:
+    - Main Thread available for continued orchestration
+    - Doesn't load unnecessary reference materials
+    - Gets synthesized conclusions only"]
+
+    Can --> Exception["Exception:
+
+    Main Thread CAN read domain files when:
+    ✅ Directly implementing
+       (after receiving agent guidance)
+    ✅ Handling simple tasks
+       (no orchestration needed)
+
+    Example:
+    'Fix typo' - may read README directly
+    before delegating to coding-agent"]
+
+    style MT fill:#e1ffe1
+    style Can fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
+    style Cannot fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Effect fill:#f0e1ff
+    style Exception fill:#fff4e1
+```
+
+---
+
+## Anti-Patterns to Avoid (BAD vs GOOD)
+
+### ❌ Anti-Pattern 1: Over-Orchestration
+
+```mermaid
+flowchart TD
+    Q["User: 'What files are in packages/core?'"]
+
+    Q --> Bad["❌ BAD: Over-Orchestration
+
+    Main Thread:
+    - Creates elaborate plan
+    - Invokes agents
+    - Orchestrates unnecessarily
+
+    Problem:
+    - Wastes time
+    - Unnecessary complexity
+    - Agent overhead for simple task"]
+
+    Q --> Good["✅ GOOD: Direct Execution
+
+    Main Thread:
+    - Tool: Glob packages/core/**/*
+    - Returns: File list immediately
+
+    Benefit:
+    - Fast
+    - Simple
+    - No agent overhead"]
+
+    Bad --> BadEnd([Slow, complex])
+    Good --> GoodEnd([Fast, simple])
+
+    style Q fill:#e1f5ff
+    style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Good fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
+    style BadEnd fill:#f0f0f0
+    style GoodEnd fill:#e1ffe1
+```
+
+---
+
+### ❌ Anti-Pattern 2: Sequential When Parallel Possible
+
+```mermaid
+flowchart TD
+    Task["Task: Analyze menus in
+    Theia AND Electron"]
+
+    Task --> Bad["❌ BAD: Sequential
+
+    Phase 1: theia-analyzer analyzes menus
+    (Wait for completion)
+
+    Phase 2: electron-analyzer analyzes menus
+    (Wait for completion)
+
+    Problem:
+    - These are INDEPENDENT analyses
+    - No dependency between them
+    - 2x slower (sequential execution)"]
+
+    Task --> Good["✅ GOOD: Parallel
+
+    Phase 1 (Single message, 2 Tasks):
+    - Task 1: theia-analyzer
+    - Task 2: electron-analyzer
+
+    Both run SIMULTANEOUSLY
+
+    Benefit:
+    - 2x faster runtime
+    - Efficient use of resources
+    - Independent analyses in parallel"]
+
+    Bad --> BadTime["Duration: T1 + T2
+    (Sequential = slower)"]
+
+    Good --> GoodTime["Duration: max(T1, T2)
+    (Parallel = faster)"]
+
+    style Task fill:#e1f5ff
+    style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Good fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
+    style BadTime fill:#f0f0f0
+    style GoodTime fill:#e1ffe1
+```
+
+---
+
+### ❌ Anti-Pattern 3: Agent Writing Code
+
+```mermaid
+flowchart LR
+    Task["Analyzer agent
+    analyzing codebase"]
+
+    Task --> Bad["❌ BAD: Agent Writes Code
+
+    Agent returns:
+    'Here's the code:
+    class Foo {
+      bar() { ... }
+    }'
+
+    Problem:
+    - Agents should analyze, not implement
+    - Violates role separation
+    - Main Thread can't review/adjust"]
+
+    Task --> Good["✅ GOOD: Agent Provides Patterns
+
+    Agent returns:
+    'Pattern at packages/core/foo.ts:45
+    shows @injectable decorator usage.
+    Follow this pattern for FooService.
+
+    File List:
+    - CREATE: foo-service.ts
+    - REFERENCE: foo.ts:45'
+
+    Benefit:
+    - Clear role: agent analyzes
+    - Main Thread decides implementation
+    - coding-agent implements"]
+
+    style Task fill:#f0e1ff
+    style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Good fill:#f0e1ff,stroke:#00ff00,stroke-width:2px
+```
+
+---
+
+### ❌ Anti-Pattern 4: Assumption-Based Guidance
+
+```mermaid
+flowchart LR
+    Agent["Analyzer agent"]
+
+    Agent --> Bad["❌ BAD: Assumptions
+
+    'Theia probably uses
+    dependency injection like Angular'
+
+    Problem:
+    - Not evidence-based
+    - May be wrong
+    - No file references
+    - Guessing framework patterns"]
+
+    Agent --> Good["✅ GOOD: Evidence-Based
+
+    Tools Used:
+    - Read: packages/core/src/common/di.ts
+
+    Analysis:
+    'Theia uses InversifyJS for DI.
+    Example at di.ts:89 shows
+    @injectable decorator usage.'
+
+    Benefit:
+    - Backed by actual file analysis
+    - File:line references
+    - Accurate guidance"]
+
+    style Agent fill:#f0e1ff
+    style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Good fill:#f0e1ff,stroke:#00ff00,stroke-width:2px
+```
+
+---
+
+### ❌ Anti-Pattern 5: Main Thread Writing Code Directly
+
+```mermaid
+flowchart TD
+    Task["User: 'Fix typo in README'"]
+
+    Task --> Bad["❌ BAD: Main Thread Direct Edit
+
+    Main Thread:
+    - Tool: Edit README.md directly
+      (old: 'intsall' → new: 'install')
+
+    Problem:
+    - Breaks separation of concerns
+    - Inconsistent (sometimes MT, sometimes coding-agent)
+    - Main Thread context polluted
+    - NOT orchestrator behavior"]
+
+    Task --> Good["✅ GOOD: Delegate to coding-agent
+
+    Main Thread:
+    - Tool: Task(coding-agent,
+             'Fix typo: intsall → install
+              File: MODIFY README.md')
+
+    coding-agent:
+    - Read: README.md
+    - Edit: old → new
+    - Return: Fixed
+
+    Main Thread:
+    - Bash: git commit
+
+    Benefit:
+    - Consistent delegation (ALWAYS)
+    - Main Thread stays clean
+    - Single responsibility principle
+    - Even 1-line fixes go through coding-agent"]
+
+    Bad --> BadEnd([Inconsistent,<br/>polluted context])
+    Good --> GoodEnd([Consistent,<br/>clean separation])
+
+    style Task fill:#e1f5ff
+    style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Good fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
+    style BadEnd fill:#f0f0f0
+    style GoodEnd fill:#e1ffe1
+```
+
+---
+
+### ❌ Anti-Pattern 6: Hardcoding Paths
+
+```mermaid
+flowchart LR
+    Agent["PM or coding-agent"]
+
+    Agent --> Bad["❌ BAD: Hardcoded Paths
+
+    PM: 'Implement in packages/terminal/src/browser/'
+    coding-agent: Read('packages/terminal/src/browser/file.ts')
+
+    Problem:
+    - Assumes fixed structure
+    - Breaks when directory renamed
+    - Not structure-agnostic
+    - Hard to refactor"]
+
+    Agent --> Good["✅ GOOD: Dynamic Discovery
+
+    PM:
+    - Glob: eg-desk*/**/*.ts
+    - Discovers: eg-desk_taehwa/
+    - Recommends: 'eg-desk_taehwa/terminal/'
+
+    coding-agent:
+    - Glob: eg-desk*/CODEBASE_STRUCTURE.md
+    - Discovers structure dynamically
+
+    Benefit:
+    - Structure-agnostic
+    - Flexible (handles renames)
+    - Always discovers current state"]
+
+    style Agent fill:#fff4e1
+    style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Good fill:#fff4e1,stroke:#00ff00,stroke-width:2px
+```
+
+---
+
+### ❌ Anti-Pattern 7: Not Checking Conflicts (EG-DESK Features)
+
+```mermaid
+flowchart TD
+    Task["User: 'Bind Ctrl+K to QuickSearch'"]
+
+    Task --> Bad["❌ BAD: No Conflict Check
+
+    coding-agent:
+    - Implements immediately
+    - Write: search-contribution.ts
+      (with Ctrl+K binding)
+    - NO conflict check
+
+    Result:
+    ❌ Ctrl+K already used elsewhere
+    → User confusion
+    → Discovered only after deployment
+    → Hard to debug 'which feature uses Ctrl+K?'"]
+
+    Task --> Good["✅ GOOD: Conflict Check FIRST
+
+    coding-agent:
+
+    Step 1: BEFORE implementing
+    - Read: CODEBASE_STRUCTURE.md
+    - Grep: 'Ctrl+K'
+
+    Step 2: If conflict
+    - STOP immediately
+    - Report to user with alternatives
+    - User chooses: Ctrl+Shift+K
+
+    Step 3: Implement with resolved key
+    - Write: search-contribution.ts (Ctrl+Shift+K)
+    - Edit: CODEBASE_STRUCTURE.md (update registry)
+
+    Benefit:
+    - Prevents duplicate keybindings
+    - User decides before implementation
+    - Registry always up-to-date
+    - No confusion"]
+
+    Bad --> BadEnd([Duplicate keybinding<br/>User confusion<br/>Wasted time])
+
+    Good --> GoodEnd([No conflicts<br/>Clean registry<br/>Prevented early])
+
+    style Task fill:#e1f5ff
+    style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Good fill:#ffe1f0,stroke:#00ff00,stroke-width:2px
+    style BadEnd fill:#f0f0f0
+    style GoodEnd fill:#e1ffe1
 ```
 
 ---
