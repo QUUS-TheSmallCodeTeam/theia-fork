@@ -58,7 +58,19 @@
       "WebFetch(domain:www.vibesparking.com)",
       "WebFetch(domain:cuong.io)",
       "Bash(find:*)",
-      "Read(//Users/fdesk/Downloads/----.v2i.coco/**)"
+      "Read(//Users/fdesk/Downloads/----.v2i.coco/**)",
+      "WebFetch(domain:chromedevtools.github.io)",
+      "Bash(git clone:*)",
+      "WebFetch(domain:playwright.dev)",
+      "Bash(git log:*)",
+      "Bash(node:*)",
+      "WebFetch(domain:rebrowser.net)",
+      "WebFetch(domain:substack.thewebscraping.club)",
+      "WebFetch(domain:devforth.io)",
+      "WebFetch(domain:apps.apple.com)",
+      "WebFetch(domain:www.cometapi.com)",
+      "WebFetch(domain:stevekinney.com)",
+      "WebFetch(domain:www.richsnapp.com)"
     ],
     "deny": [],
     "ask": []
