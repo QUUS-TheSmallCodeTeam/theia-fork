@@ -16,7 +16,11 @@ For the original table-based version, see [AGENT_SWARM_FLOW.md](./AGENT_SWARM_FL
 
 ---
 
-## Scenario 1: Simple Question (No Agents)
+## Pattern 1: Simple Direct Execution
+
+**When to use:** Simple questions, file listings, straightforward tasks that don't require framework analysis or strategic planning.
+
+### Scenario 1a: Simple File Listing
 
 **User:** "What files are in the packages/ai-chat directory?"
 
@@ -47,526 +51,7 @@ flowchart LR
     style End fill:#e1ffe1
 ```
 
----
-
-## Scenario 2: Framework Question (Direct Agent)
-
-**User:** "How does Theia's dependency injection work?"
-
-```mermaid
-flowchart TD
-    User(["User Request:
-    'How does Theia DI work?'"])
-
-    --> MT1["Main Thread
-    Action: Analyze request
-    Decision: Theia framework question
-    Route: theia-analyzer-agent"]
-
-    --> Invoke["Main Thread
-    Tool: Task
-    Agent: theia-analyzer-agent
-    Prompt: 'Analyze Theia DI system
-    in packages/core/'"]
-
-    --> Agent["theia-analyzer-agent
-    Tools Used:
-    - Read: packages/core/src/common/di.ts
-    - Grep: @injectable pattern
-    - Glob: **/*-frontend-module.ts
-    - Read: Example files
-
-    Actions:
-    - Analyzes DI implementation
-    - Examines usage examples
-    - Extracts patterns
-
-    Output:
-    - Detailed explanation
-    - File references with line numbers
-    - Pattern examples"]
-
-    --> MT2["Main Thread
-    Action: Receive report
-    Output: Present to user"]
-
-    --> End(["Complete
-    User sees explanation
-
-    Agents: 1 (theia-analyzer)
-    Duration: Single invocation"])
-
-    style User fill:#e1f5ff
-    style MT1 fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style Invoke fill:#e1ffe1
-    style Agent fill:#f0e1ff
-    style End fill:#e1ffe1
-```
-
----
-
-## Scenario 3a: Vision Conflict → User Accepts Alternative
-
-**User:** "Should we add a floating AI assistant that follows the mouse cursor?"
-
-```mermaid
-flowchart TD
-    User(["User Request:
-    'Add floating AI assistant
-    that follows cursor?'"])
-
-    --> MT1["Main Thread
-    Action: Analyze request
-    Decision: EG-DESK feature
-    Route: PM for strategic guide"]
-
-    --> PM1["PM Agent: Analyze Vision
-    Tools Used:
-    - Glob: ideas&external_references/eg-desk ideas/**/*.md
-    - Read: EG-DESK_Whitepaper.md
-    - Read: EG-DESK_Spatial_Canvas_UX_Solutions.md
-    - Grep: 'spatial', 'proximity', 'floating'
-
-    Findings:
-    - Previous decision AGAINST floating UI
-    - Reason: Breaks spatial affordances
-    - Users lose sense of place
-
-    Decision: REJECT original
-    Alternative: Proximity-based AI"]
-
-    --> PMReturn["PM Returns to Main Thread:
-    Summary: Floating conflicts with spatial canvas
-    Decision: REJECT
-    Insight: 'We decided against floating UI
-    in UX_Solutions.md because it breaks
-    spatial affordances'
-    Alternative: Proximity-based AI
-    (appears NEAR objects, not following cursor)
-    Rationale: Maintains spatial relationships
-    Vision-Aligned: ✅"]
-
-    --> MT2["Main Thread
-    Action: Present to user"]
-
-    --> UserDec{"User Decision:
-
-    Options:
-    A) Accept alternative
-       (proximity-based AI)
-    B) Insist on original
-       (requires vision change)
-    C) Cancel feature"}
-
-    UserDec -->|A: Accept| PM2["PM Agent: Guide for Alternative
-    Tools:
-    - Write: proximity-based-ai-prd.md
-
-    Actions:
-    - Creates PRD for alternative
-    - Provides implementation guide
-
-    Returns:
-    - Decision: APPROVE
-    - Feature: Proximity-based AI
-    - Framework: Theia + Infinite Canvas
-    - Location: eg-desk_taehwa/ai/
-    - Next: Follow Pattern 2"]
-
-    UserDec -->|B: Insist| Scenario3b["See Scenario 3b:
-    PM re-evaluates
-    → User decides maintain/evolve vision"]
-
-    UserDec -->|C: Cancel| End1(["Stop
-    Feature canceled
-
-    Agents: 1 (PM only)"])
-
-    PM2 --> MT3["Main Thread
-    Action: Proceed to implementation
-    Next: Follow Pattern 2 (PM-Driven Dev)"]
-
-    --> End2(["Complete
-    Proximity-based AI implemented
-
-    Agents: 2 (PM rejection + PM guide)
-    Duration: 2 PM turns + implementation"])
-
-    style User fill:#e1f5ff
-    style UserDec fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style PM1 fill:#fff4e1
-    style PM2 fill:#fff4e1
-    style PMReturn fill:#fff4e1
-    style MT1 fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style MT3 fill:#e1ffe1
-    style End1 fill:#f0f0f0
-    style End2 fill:#e1ffe1
-    style Scenario3b fill:#e1f0ff
-```
-
-**Key Insight:** PM rejection is constructive - provides alternative + rationale
-
----
-
-## Scenario 3b: User Insists on Original Despite Vision Conflict
-
-**User:** "I understand vision, but floating AI is more intuitive. Vision should evolve."
-
-```mermaid
-flowchart TD
-    Start(["From Scenario 3a:
-    User insists on floating AI
-    despite PM rejection"])
-
-    --> PM2["PM Agent: Re-evaluate
-    Tools:
-    - Read: EG-DESK_Spatial_Canvas_UX_Solutions.md
-
-    Analysis:
-    - User rationale: 'Floating more intuitive'
-    - Vision rationale: 'Spatial affordances for coherence'
-    - Valid priority shift (intuitiveness vs spatial)
-
-    Assessment:
-    - User rationale valid
-    - Vision prioritizes spatial (different reason)
-    - This is STRATEGIC decision (not technical)"]
-
-    --> PMReturn["PM Returns:
-    Assessment: User rationale valid BUT
-    vision prioritizes spatial affordances
-
-    User Decision Required:
-    A) Maintain vision (use proximity-based)
-    B) Evolve vision (document rationale,
-       update vision doc, proceed with floating)"]
-
-    --> MT1["Main Thread
-    Action: Present choice to user"]
-
-    --> UserDec{"User Strategic Decision:
-
-    A) Maintain vision
-       → Use proximity-based AI
-
-    B) Evolve vision
-       → Update vision docs
-       → Proceed with floating AI"}
-
-    UserDec -->|A: Maintain| PM3a["PM: Guide for Proximity-based
-    (Same as Scenario 3a)"]
-
-    UserDec -->|B: Evolve| PM3b["PM Agent: Update Vision
-    Tools:
-    - Edit: EG-DESK_Spatial_Canvas_UX_Solutions.md
-      (Add 'Vision Evolution: Floating AI'
-       section with date, user rationale,
-       tradeoffs accepted)
-    - Write: floating-ai-assistant-prd.md
-
-    Actions:
-    - Documents vision evolution
-    - Records user rationale
-    - Notes tradeoffs (spatial disorientation accepted)
-
-    Returns:
-    - Decision: APPROVE (vision evolved)
-    - Vision Updated: UX_Solutions.md
-    - Framework: Theia + Infinite Canvas
-    - Location: eg-desk_taehwa/ai/
-    - Next: Follow Pattern 2"]
-
-    PM3a --> End1(["Complete
-    Proximity-based AI
-
-    Agents: 2 (PM re-eval + PM guide)"])
-
-    PM3b --> MT2["Main Thread
-    Action: Proceed to implementation
-    Next: Follow Pattern 2"]
-
-    --> End2(["Complete
-    Floating AI implemented
-    Vision evolution documented
-
-    Agents: 3 (PM reject → re-eval → update)"])
-
-    style Start fill:#e1f5ff
-    style UserDec fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style PM2 fill:#fff4e1
-    style PM3a fill:#fff4e1
-    style PM3b fill:#fff4e1
-    style PMReturn fill:#fff4e1
-    style MT1 fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style End1 fill:#e1ffe1
-    style End2 fill:#e1ffe1
-```
-
-**Key:** Vision NOT immutable - user can evolve with documented rationale
-
----
-
-## Scenario 4: Development with PM Strategic Guide
-
-**User:** "Add a custom terminal theme that changes based on time of day"
-
-```mermaid
-flowchart LR
-    subgraph Phase0["PHASE 0: PM Guide"]
-        User(["User: Add time-based<br/>terminal theme"])
-        PM["PM: Approve<br/>Framework: Theia<br/>Location: packages/terminal/<br/>Creates PRD"]
-        User --> PM
-    end
-
-    subgraph Phase1_2["PHASE 1-2: Investigation"]
-        FW["theia-analyzer<br/>Theme patterns<br/>DI binding<br/>CREATE+MODIFY list"]
-    end
-
-    Phase0 --> Phase1_2
-
-    subgraph Phase3_4["PHASE 3-4: Implementation"]
-        Coding["coding-agent<br/>Read patterns<br/>Write+Edit files<br/>1 CREATE, 2 MODIFY"]
-    end
-
-    Phase1_2 --> Phase3_4
-
-    subgraph Decision["PHASE 4.5: UX Validation?"]
-        Decide{"Validate?<br/>Complex/Critical?"}
-    end
-
-    Phase3_4 --> Decision
-
-    subgraph Validation["Optional UX Flow"]
-        direction TB
-        UXSim["ux-flow-simulator<br/>Trace flow<br/>Predict issues"]
-        Check{Issues?}
-        Fix["coding-agent<br/>Fix"]
-        UXSim --> Check
-        Check -->|Yes| Fix
-        Fix --> UXSim
-    end
-
-    Decide -->|Yes| Validation
-    Decide -->|No| Build
-
-    Check -->|No| Build["PHASE 5: Build+Commit<br/>npm run build<br/>git commit"]
-
-    Build --> E(["Complete<br/>Agents: 3-4<br/>Duration: Multi-phase"])
-
-    style User fill:#e1f5ff
-    style Decide fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style Check fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style PM fill:#fff4e1
-    style FW fill:#f0e1ff
-    style UXSim fill:#f0e1ff
-    style Coding fill:#ffe1f0
-    style Fix fill:#ffe1f0
-    style Build fill:#e1ffe1
-    style E fill:#e1ffe1
-```
-
----
-
-## Scenario 4c: Conflict Detection (EG-DESK Custom Code)
-
-**User:** "Bind Ctrl+K to the new QuickSearch feature"
-
-```mermaid
-flowchart TD
-    User(["User Request:
-    'Bind Ctrl+K to QuickSearch'"])
-
-    --> Phases["PHASES 0-2: Same as Scenario 4
-    (PM guide → Investigation)
-
-    Result:
-    - PM approved
-    - Framework patterns collected"]
-
-    --> MT3["PHASE 3: Main Thread
-    Implementation Planning
-
-    Plan:
-    Direction: Bind Ctrl+K to QuickSearch
-    File List: CREATE search-contribution.ts
-    in eg-desk_taehwa/search/
-
-    ⚠️ INSTRUCTION: Check CODEBASE_STRUCTURE.md
-    for conflicts BEFORE implementing"]
-
-    --> Coding1["coding-agent: Conflict Check
-
-    Step 1 - Discover codebase:
-    - Tool: Glob eg-desk*/**/*.ts
-    - Found: eg-desk_taehwa/ (custom codebase root)
-
-    Step 2 - Find structure doc:
-    - Tool: Glob eg-desk*/CODEBASE_STRUCTURE.md
-    - Found: eg-desk_taehwa/CODEBASE_STRUCTURE.md
-
-    Step 3 - Read registry:
-    - Tool: Read CODEBASE_STRUCTURE.md
-
-    Step 4 - Check conflict:
-    - Tool: Grep 'Ctrl+K' in structure doc"]
-
-    --> ConflictCheck{"coding-agent Check Result:
-
-    Ctrl+K conflict?"}
-
-    ConflictCheck -->|"CONFLICT<br/>FOUND"| Stop["coding-agent: STOP
-
-    Action: DO NOT create any files
-
-    Returns:
-    ❌ CONFLICT DETECTED
-    Type: Keybinding conflict
-    Requested: Ctrl+K for QuickSearch
-    Existing: Ctrl+K for DifferentFeature
-    Location: search-old.ts:45
-    Severity: BLOCKER
-    Alternatives: Ctrl+Shift+K, Ctrl+Alt+K, Ctrl+J
-    User decision required"]
-
-    ConflictCheck -->|"NO<br/>CONFLICT"| Impl["coding-agent: Implement
-
-    Tools:
-    - Write: search-contribution.ts
-      (with Ctrl+K binding)
-    - Edit: CODEBASE_STRUCTURE.md
-      (Add 'Ctrl+K: QuickSearch')
-
-    Returns:
-    ✅ Implementation Complete
-    Conflict check: Passed
-    Structure updated"]
-
-    Stop --> MT4["Main Thread
-    Action: Present conflict to user"]
-
-    --> UserDec{"User Decision:
-
-    Choose alternative:
-    A) Ctrl+Shift+K
-    B) Ctrl+Alt+K
-    C) Ctrl+J
-    D) Override existing
-    E) Different key"}
-
-    UserDec --> MT5["Main Thread
-    Action: Retry with user's choice
-
-    Tool: Task(coding-agent,
-    'Bind [resolved-key] to QuickSearch')"]
-
-    --> Coding2["coding-agent: Retry
-
-    Step 1: Check new key conflict
-    Step 2: If OK → Implement
-    Step 3: Update structure doc"]
-
-    Coding2 --> Impl
-
-    Impl --> MT6["Main Thread
-    Tools:
-    - Bash: npm run build
-    - Bash: git add eg-desk_taehwa
-    - Bash: git commit"]
-
-    --> End(["Complete
-    QuickSearch bound to resolved key
-    Structure document updated
-
-    Agents: 3 (PM → analyzer → coding x2)
-    Duration: Multi-phase with user decision"])
-
-    style User fill:#e1f5ff
-    style ConflictCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style UserDec fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style Coding1 fill:#ffe1f0
-    style Coding2 fill:#ffe1f0
-    style Stop fill:#ffe1f0
-    style Impl fill:#ffe1f0
-    style MT3 fill:#e1ffe1
-    style MT4 fill:#e1ffe1
-    style MT5 fill:#e1ffe1
-    style MT6 fill:#e1ffe1
-    style End fill:#e1ffe1
-```
-
-**Key:** Conflict prevention - coding-agent checks BEFORE implementing
-
----
-
-## Scenario 5: Agent Creation
-
-**User:** "We need an agent that analyzes Konva.js integration patterns"
-
-```mermaid
-flowchart TD
-    User(["User Request:
-    'Create Konva.js analyzer agent'"])
-
-    --> MT1["Main Thread
-    Action: Analyze request
-    Decision: Agent creation task
-    Route: claude-agent-sdk-analyzer"]
-
-    --> Agent["claude-agent-sdk-analyzer-agent
-
-    Step 1 - Read best practices:
-    - Tool: Read subagent-best-practices.md
-    - Learn: Agent design patterns
-
-    Step 2 - Examine existing agents:
-    - Tool: Glob .claude/agents/*-analyzer-agent.md
-    - Read: theia-analyzer-agent.md
-    - Read: infinite-canvas-analyzer-agent.md
-    - Extract: Proven patterns
-
-    Step 3 - Design architecture:
-    - YAML frontmatter (name, tools, model)
-    - Instruction structure
-
-    Step 4 - Create agent file:
-    - Tool: Write .claude/agents/konva-analyzer-agent.md
-    - Content: Complete agent spec
-
-    Returns:
-    Summary: konva-analyzer-agent created
-    Specifications:
-    - Tools: Bash, Read, Glob, Grep, WebSearch
-    - Model: inherit
-    Best Practices Applied:
-    - Evidence-based analysis
-    - Contextual tool restriction
-    - Standard reporting format
-    File: .claude/agents/konva-analyzer-agent.md
-    Note: Session restart may be needed"]
-
-    --> MT2["Main Thread
-    Action: Present to user
-    Output: 'Agent created. Restart to use.'"]
-
-    --> End(["Complete
-    konva-analyzer-agent ready
-
-    Agents: 1 (claude-agent-sdk-analyzer)
-    Duration: Single invocation"])
-
-    style User fill:#e1f5ff
-    style MT1 fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style Agent fill:#f0e1ff
-    style End fill:#e1ffe1
-```
-
----
-
-## Scenario 6: Simple File Edit
+### Scenario 1b: Simple File Edit
 
 **User:** "Fix the typo in the README - change 'intsall' to 'install'"
 
@@ -616,79 +101,920 @@ flowchart LR
 
 ---
 
-## Scenario 7a: Technology Research (Happy Path with 2 User Decisions)
+## Pattern 2: Framework Question (Direct Agent)
+
+**When to use:** Questions specifically about Theia or Electron frameworks that don't require implementation.
+
+**User:** "How does Theia's dependency injection work?"
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    User(["User Request: How does Theia DI work?"]):::wideBox
+
+    --> MT1["Main Thread
+  • Analyze request
+  • Theia framework question → theia-analyzer-agent"]:::wideBox
+
+    --> Invoke["Main Thread
+  • Task: theia-analyzer-agent
+  • Prompt: Analyze Theia DI in packages/core/"]:::wideBox
+
+    --> Agent["theia-analyzer-agent
+  • Read di.ts, Grep @injectable, Glob frontend-modules
+  • Output: Explanation + file:line refs + pattern examples"]:::wideBox
+
+    --> MT2["Main Thread
+  • Receive report
+  • Present to user"]:::wideBox
+
+    --> End(["Complete
+  • User sees explanation
+  • Agents: 1 (theia-analyzer)
+  • Duration: Single invocation"]):::wideBox
+
+    style User fill:#e1f5ff
+    style MT1 fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style Invoke fill:#e1ffe1
+    style Agent fill:#f0e1ff
+    style End fill:#e1ffe1
+```
+
+---
+
+## Pattern 3: Vision Conflict Resolution
+
+**When to use:** User requests feature that may conflict with established vision. PM evaluates against vision documents.
+
+**Critical features:**
+- **Multiple conversation turns** between PM and user to refine idea
+- **2 decision points:** User Determination (implement later vs now) + User Approval (after impact report)
+- **Vision Impact Report** before final approval
+- **Document updates** only after user approval
+
+### Scenario 3a: User Accepts PM's Alternative
+
+**User:** "Should we add a floating AI assistant that follows the mouse cursor?"
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+    classDef invisible fill:none,stroke:none;
+    classDef branchLabel fill:#e8f4f8,stroke:#0288d1,stroke-width:2px,text-align:left,white-space:pre;
+
+    User(["User Request:
+  Add floating AI assistant that follows cursor?"]):::wideBox
+
+    --> MT1["Main Thread
+  • EG-DESK feature → PM for strategic guide"]:::wideBox
+
+    --> PM1["PM: Analyze Vision
+  • Glob ideas/, Read Whitepaper/UX Solutions, Grep 'spatial'
+  • REJECT: Floating UI breaks spatial affordances
+  • Alternative: Proximity-based AI"]:::wideBox
+
+    --> PMReturn["PM Returns:
+  • REJECT floating | Alternative: Proximity-based AI
+  • (appears near objects)
+  • Vision-Aligned ✅"]:::wideBox
+
+    --> MT2["Main Thread
+  • Present to user"]:::wideBox
+
+    --> ConvLoop["🔄 CONVERSATION TURNS
+  • PM and user exchange messages
+  • to refine approach (triggers, design, etc.)"]:::wideBox
+
+    --> UserDec1{"User Determination:
+  • 나중에 구현 (later)?
+  • OR 바로 구현 (now)?"}:::wideDecision
+
+    --> Label1["Branch: 나중에 (later)"]:::branchLabel
+
+    subgraph SG1 [" "]
+        direction LR
+        Entry1[" "]:::invisible --> PMIdea["PM Agent: Document Idea
+  • Write: ideas&external_references/
+    eg-desk ideas/proximity-ai-idea.md
+  • Saves concept, user rationale"]:::wideBox --> End1(["Stop
+  • Idea saved for later
+  • Agents: 1 (PM only)"]):::wideBox
+    end
+
+    Label1 --> Entry1
+
+    End1 --> Label2["Branch: 바로 (now)"]:::branchLabel
+
+    subgraph SG2 [" "]
+        direction LR
+        Entry2[" "]:::invisible --> PM2["PM: Create Impact Report
+  • Read PRDs/vision docs
+  • Affected: Spatial Canvas, AI Integration
+  • Maintains: Spatial affordances"]:::wideBox --> MT3["Main Thread
+  • Present Impact Report"]:::wideBox --> UserDec2{"User Approval?
+  • A/B/C"}:::wideDecision
+    end
+
+    Label2 --> Entry2
+
+    UserDec2 --> Label3["Sub-branch A: Approve"]:::branchLabel
+
+    subgraph SG3 [" "]
+        direction LR
+        Entry3[" "]:::invisible --> PM3["PM: Finalize
+  • Write proximity-based-ai-prd.md
+  • APPROVE Proximity-based AI
+  • Framework: Theia + Infinite Canvas"]:::wideBox --> MT4["Main Thread
+  • Proceed to implementation
+  • Next: Follow Pattern 4"]:::wideBox --> End3(["Complete
+  • Proximity-based AI implemented
+  • Agents: 2"]):::wideBox
+    end
+
+    Label3 --> Entry3
+
+    End3 --> Label4["Sub-branch B: Modify"]:::branchLabel
+
+    subgraph SG4 [" "]
+        direction LR
+        Entry4[" "]:::invisible --> BackToConv["Main Thread
+  • Return to conversation loop
+  • for refinement"]:::wideBox
+    end
+
+    Label4 --> Entry4
+
+    BackToConv -.->|"Returns to"| ConvLoop
+
+    BackToConv --> Label5["Sub-branch C: Cancel"]:::branchLabel
+
+    subgraph SG5 [" "]
+        direction LR
+        Entry5[" "]:::invisible --> End2(["Stop
+  • Feature canceled
+  • Agents: 1 (PM only)"]):::wideBox
+    end
+
+    Label5 --> Entry5
+
+    style User fill:#e1f5ff
+    style UserDec1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserDec2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style ConvLoop fill:#fff4e1,stroke:#ffa500,stroke-width:2px
+    style PM1 fill:#fff4e1
+    style PM2 fill:#fff4e1
+    style PM3 fill:#fff4e1
+    style PMReturn fill:#fff4e1
+    style PMIdea fill:#fff4e1
+    style MT1 fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style MT3 fill:#e1ffe1
+    style MT4 fill:#e1ffe1
+    style BackToConv fill:#e1ffe1
+    style End1 fill:#f0f0f0
+    style End2 fill:#f0f0f0
+    style End3 fill:#e1ffe1
+```
+
+**Key Insight:** PM rejection is constructive - provides alternative + rationale
+
+---
+
+### Scenario 3b: User Insists on Original (Vision Evolution)
+
+**User:** "I understand vision, but floating AI is more intuitive. Vision should evolve."
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+    classDef invisible fill:none,stroke:none;
+    classDef branchLabel fill:#e8f4f8,stroke:#0288d1,stroke-width:2px,text-align:left,white-space:pre;
+
+    Start(["From Scenario 3a:
+  User insists on floating AI despite PM rejection"]):::wideBox
+
+    --> PM2["PM: Re-evaluate
+  • Read UX_Solutions.md
+  • User: 'Floating more intuitive' vs Vision: 'Spatial affordances'
+  • Both valid - STRATEGIC decision required"]:::wideBox
+
+    --> PMReturn["PM Returns: Valid conflict - User must decide
+  • A) Maintain vision (proximity-based)
+  • OR B) Evolve vision (floating + update docs)"]:::wideBox
+
+    --> MT1["Main Thread
+  • Present choice to user"]:::wideBox
+
+    --> ConvLoop["🔄 CONVERSATION TURNS
+  • PM and user exchange messages to discuss vision evolution
+  • implications (affected features, philosophy, tradeoffs)"]:::wideBox
+
+    --> UserDec1{"User Determination:
+  • 나중에 구현 (later)?
+  • OR 바로 구현 (now)?"}:::wideDecision
+
+    --> Label1["Branch: 나중에 (later)"]:::branchLabel
+
+    subgraph SG1 [" "]
+        direction LR
+        Entry1[" "]:::invisible --> PMIdea["PM Agent: Document Evolution Idea
+  • Write: ideas&external_references/eg-desk ideas/
+    floating-ai-vision-evolution.md
+  • Saves vision evolution concept, user rationale, affected features
+  • Returns: Evolution idea documented"]:::wideBox --> End1(["Stop
+  • Evolution idea saved for later
+  • Agents: 1 (PM only)"]):::wideBox
+    end
+
+    Label1 --> Entry1
+
+    End1 --> Label2["Branch: 바로 (now)"]:::branchLabel
+
+    subgraph SG2 [" "]
+        direction LR
+        Entry2[" "]:::invisible --> UserChoice{"User Strategic Decision:
+  • A) Maintain vision → proximity-based AI
+  • B) Evolve vision → Update docs + floating AI"}:::wideDecision
+    end
+
+    Label2 --> Entry2
+
+    UserChoice --> Label3A["Sub-branch A: Maintain Vision"]:::branchLabel
+
+    subgraph SG3A [" "]
+        direction LR
+        Entry3A[" "]:::invisible --> PM3a["PM: Impact Report (Maintain)
+  • Affected: AI Integration (proximity-based)
+  • Maintains: Spatial Canvas (core vision preserved)
+  • Docs: Create proximity-ai-prd.md"]:::wideBox --> MT3["Main Thread
+  • Present Impact Report to user"]:::wideBox --> UserDec3{"User Approval?
+  • A/B/C"}:::wideDecision
+    end
+
+    Label3A --> Entry3A
+
+    UserDec3 --> Label4A["Sub-sub-branch A: Approve"]:::branchLabel
+
+    subgraph SG4A [" "]
+        direction LR
+        Entry4A[" "]:::invisible --> PM5["PM: Finalize (Maintain)
+  • Write proximity-based-ai-prd.md
+  • Returns: Implementation guide"]:::wideBox --> End4(["Complete
+  • Proximity-based AI
+  • Agents: 2"]):::wideBox
+    end
+
+    Label4A --> Entry4A
+
+    End4 --> Label5A["Sub-sub-branch B: Modify"]:::branchLabel
+
+    subgraph SG5A [" "]
+        direction LR
+        Entry5A[" "]:::invisible --> BackLoop1["Main Thread
+  • Return to conversation"]:::wideBox
+    end
+
+    Label5A --> Entry5A
+
+    BackLoop1 -.->|Returns to| ConvLoop
+
+    BackLoop1 --> Label6A["Sub-sub-branch C: Cancel"]:::branchLabel
+
+    subgraph SG6A [" "]
+        direction LR
+        Entry6A[" "]:::invisible --> End3(["Stop
+  • Feature canceled"]):::wideBox
+    end
+
+    Label6A --> Entry6A
+
+    End3 --> Label3B["Sub-branch B: Evolve Vision"]:::branchLabel
+
+    subgraph SG3B [" "]
+        direction LR
+        Entry3B[" "]:::invisible --> PM3b["PM: Impact Report (Evolution)
+  • Affected: Spatial Canvas (philosophy evolves), AI Integration (floating)
+  • Maintains: Ambient AI, Non-intrusive
+  • Docs: Update UX_Solutions.md, Create floating-ai-prd.md"]:::wideBox --> MT2["Main Thread
+  • Present Impact Report to user"]:::wideBox --> UserDec2{"User Approval?
+  • A/B/C"}:::wideDecision
+    end
+
+    Label3B --> Entry3B
+
+    UserDec2 --> Label4B["Sub-sub-branch A: Approve"]:::branchLabel
+
+    subgraph SG4B [" "]
+        direction LR
+        Entry4B[" "]:::invisible --> PM4["PM: Finalize Evolution
+  • Edit UX_Solutions.md (add Vision Evolution section)
+  • Write floating-ai-prd.md
+  • APPROVE (vision evolved)
+  • Location: eg-desk_taehwa/ai/
+  • Next: Pattern 4"]:::wideBox --> MT4["Main Thread
+  • Proceed to implementation
+  • Next: Follow Pattern 4"]:::wideBox --> End5(["Complete
+  • Floating AI implemented
+  • Vision evolution documented
+  • Agents: 3"]):::wideBox
+    end
+
+    Label4B --> Entry4B
+
+    End5 --> Label5B["Sub-sub-branch B: Modify"]:::branchLabel
+
+    subgraph SG5B [" "]
+        direction LR
+        Entry5B[" "]:::invisible --> BackLoop2["Main Thread
+  • Return to conversation"]:::wideBox
+    end
+
+    Label5B --> Entry5B
+
+    BackLoop2 -.->|Returns to| ConvLoop
+
+    BackLoop2 --> Label6B["Sub-sub-branch C: Cancel"]:::branchLabel
+
+    subgraph SG6B [" "]
+        direction LR
+        Entry6B[" "]:::invisible --> End2(["Stop
+  • Feature canceled
+  • Agents: 1 (PM only)"]):::wideBox
+    end
+
+    Label6B --> Entry6B
+
+    style Start fill:#e1f5ff
+    style UserDec1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserChoice fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserDec2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserDec3 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style ConvLoop fill:#fff4e1,stroke:#ffa500,stroke-width:2px
+    style PM2 fill:#fff4e1
+    style PM3a fill:#fff4e1
+    style PM3b fill:#fff4e1
+    style PM4 fill:#fff4e1
+    style PM5 fill:#fff4e1
+    style PMReturn fill:#fff4e1
+    style PMIdea fill:#fff4e1
+    style MT1 fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style MT3 fill:#e1ffe1
+    style MT4 fill:#e1ffe1
+    style BackLoop1 fill:#e1ffe1
+    style BackLoop2 fill:#e1ffe1
+    style End1 fill:#f0f0f0
+    style End2 fill:#f0f0f0
+    style End3 fill:#f0f0f0
+    style End4 fill:#e1ffe1
+    style End5 fill:#e1ffe1
+```
+
+**Key:** Vision NOT immutable - user can evolve with documented rationale
+
+---
+
+### Scenario 3c: User Cancels at Any Decision Point
+
+**Description:** User can cancel at any point during Pattern 3 workflows.
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+    classDef invisible fill:none,stroke:none;
+    classDef branchLabel fill:#e8f4f8,stroke:#0288d1,stroke-width:2px,text-align:left,white-space:pre;
+
+    Start(["User in Pattern 3 Workflow
+  • Multiple decision points available"]):::wideBox
+
+    --> Decision{"User Decision Point?"}:::wideDecision
+
+    --> Label1["Branch: Cancel After PM Rejection"]:::branchLabel
+
+    subgraph SG1 [" "]
+        direction LR
+        Entry1[" "]:::invisible --> PMReject["PM: Rejected feature
+  • Provided alternative"]:::wideBox --> UserDec1{"Accept alternative?"}:::wideDecision --> CancelA["User: Cancel"]:::wideBox --> ResultA(["Stop
+  • No documents created
+  • Agents: 1 (PM only)"]):::wideBox
+    end
+
+    Label1 --> Entry1
+
+    ResultA --> Label2["Branch: Cancel After Impact Report"]:::branchLabel
+
+    subgraph SG2 [" "]
+        direction LR
+        Entry2[" "]:::invisible --> PMReport["PM: Created Impact Report
+  • Presented to user"]:::wideBox --> UserDec2{"Approve impact?
+  • A/B/C"}:::wideDecision --> CancelB["User: Option C - Cancel"]:::wideBox --> ResultB(["Stop
+  • Impact Report discarded
+  • No implementation
+  • Agents: 1 (PM only)"]):::wideBox
+    end
+
+    Label2 --> Entry2
+
+    ResultB --> Label3["Branch: Cancel During Conversation Refinement"]:::branchLabel
+
+    subgraph SG3 [" "]
+        direction LR
+        Entry3[" "]:::invisible --> ConvLoop["🔄 Conversation Turns
+  • PM and user refining approach"]:::wideBox --> UserDec3{"Continue or cancel?"}:::wideDecision --> CancelC["User: Cancel conversation"]:::wideBox --> ResultC(["Stop
+  • Partial conversation only
+  • No documents
+  • Agents: 1 (PM only)"]):::wideBox
+    end
+
+    Label3 --> Entry3
+
+    ResultC --> Label4["Branch: 'Implement Later' (Exception)"]:::branchLabel
+
+    subgraph SG4 [" "]
+        direction LR
+        Entry4[" "]:::invisible --> Later{"User: 나중에 구현?"}:::wideDecision --> SaveIdea["PM: Document Idea
+  • Write: ideas&external_references/
+    eg-desk ideas/[feature]-idea.md
+  • Saves concept, rationale"]:::wideBox --> ResultD(["Stop
+  • Idea saved for later
+  • Agents: 1 (PM)
+  • Document: Feature idea preserved"]):::wideBox
+    end
+
+    Label4 --> Entry4
+
+    style Start fill:#e1f5ff
+    style Decision fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserDec1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserDec2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style UserDec3 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style Later fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style PMReject fill:#fff4e1
+    style PMReport fill:#fff4e1
+    style SaveIdea fill:#fff4e1
+    style ConvLoop fill:#fff4e1,stroke:#ffa500,stroke-width:2px
+    style CancelA fill:#e1f5ff
+    style CancelB fill:#e1f5ff
+    style CancelC fill:#e1f5ff
+    style ResultA fill:#f0f0f0
+    style ResultB fill:#f0f0f0
+    style ResultC fill:#f0f0f0
+    style ResultD fill:#f0f0f0
+```
+
+**Key Points:**
+- User can cancel at ANY decision point (full authority)
+- Result: Feature development stops, no documents created
+- Exception: "Implement later" option saves idea for future reference
+
+---
+
+## Pattern 4: PM-Driven Development
+
+**When to use:** Implementing new features for EG-DESK that require strategic planning, framework analysis, and code execution.
+
+**Pattern includes 3 scenario branches:**
+- **Scenario 4a:** Standard implementation (happy path)
+- **Scenario 4b:** With conflict detection (EG-DESK custom code)
+- **Scenario 4c:** With optional UX validation
+
+### Scenario 4a: Standard Implementation
+
+**User:** "Add a custom terminal theme that changes based on time of day"
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    User(["User Request: Add time-based terminal theme"]):::wideBox
+
+    --> MT0["PHASE 0: Main Thread
+  • Receive request
+  • Invoke egdesk-pm-agent"]:::wideBox
+
+    --> PM["PM Agent
+  • Approve: Time-based theme
+  • Framework: Theia
+  • Location: packages/terminal/
+  • Phasing: 1) Service 2) Binding 3) Integration
+  • Creates: time-based-theme-prd.md"]:::wideBox
+
+    --> MT1["PHASE 1: Main Thread
+  • Receive PM guide
+  • Plan investigation
+  • Invoke theia-analyzer-agent"]:::wideBox
+
+    --> FW["theia-analyzer-agent
+  • Read packages/core/, Glob theme*, Grep @injectable
+  • Patterns: DI binding, Lifecycle hooks, Theme service
+  • File list: CREATE time-based-theme.ts
+    MODIFY terminal-frontend-module.ts, terminal-contribution.ts"]:::wideBox
+
+    --> MT2["PHASE 2: Main Thread
+  • Receive analyzer patterns
+  • Synthesize: PM guide + analyzer patterns
+  • Create implementation instructions"]:::wideBox
+
+    --> MT3["PHASE 3: Main Thread
+  • Invoke coding-agent with synthesized instructions"]:::wideBox
+
+    --> Coding["coding-agent
+  • Read patterns from instructions
+  • Write time-based-theme.ts (new service)
+  • Edit terminal-frontend-module.ts (DI binding)
+  • Edit terminal-contribution.ts (lifecycle hook)"]:::wideBox
+
+    --> MT4["PHASE 4: Main Thread
+  • Receive implementation report
+  • Build + Test + Commit"]:::wideBox
+
+    --> Build["Main Thread
+  • Bash: npm run build
+  • Verify success
+  • Bash: git add, git commit"]:::wideBox
+
+    --> End(["Complete
+  • Time-based theme implemented
+  • Agents: 3 (PM + theia-analyzer + coding-agent)
+  • Duration: 4 phases"]):::wideBox
+
+    style User fill:#e1f5ff
+    style MT0 fill:#e1ffe1
+    style MT1 fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style MT3 fill:#e1ffe1
+    style MT4 fill:#e1ffe1
+    style PM fill:#fff4e1
+    style FW fill:#f0e1ff
+    style Coding fill:#ffe1f0
+    style Build fill:#e1ffe1
+    style End fill:#e1ffe1
+```
+
+---
+
+### Scenario 4b: With Conflict Detection (EG-DESK Custom Code)
+
+**User:** "Bind Ctrl+K to the new QuickSearch feature"
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+    classDef invisible fill:none,stroke:none;
+    classDef branchLabel fill:#e8f4f8,stroke:#0288d1,stroke-width:2px,text-align:left,white-space:pre;
+
+    User(["User Request: Bind Ctrl+K to QuickSearch"]):::wideBox
+
+    --> Phases["PHASES 0-2: Same as Scenario 4a (PM guide → Investigation)
+  • Result: PM approved, Framework patterns collected"]:::wideBox
+
+    --> MT3["PHASE 3: Main Thread Planning
+  • Direction: Bind Ctrl+K to QuickSearch
+  • CREATE search-contribution.ts in eg-desk_taehwa/search/
+  • ⚠️ INSTRUCTION: Check CODEBASE_STRUCTURE.md BEFORE implementing"]:::wideBox
+
+    --> Coding1["coding-agent: Conflict Check
+  1) Glob eg-desk*/**/*.ts → Find eg-desk_taehwa/
+  2) Glob CODEBASE_STRUCTURE.md → Find structure doc
+  3) Read structure doc
+  4) Grep 'Ctrl+K' in structure"]:::wideBox
+
+    --> ConflictCheck{"coding-agent Check Result:
+  • Ctrl+K conflict?"}:::wideDecision
+
+    --> Label1["Branch: CONFLICT FOUND"]:::branchLabel
+
+    subgraph SG1 [" "]
+        direction LR
+        Entry1[" "]:::invisible --> Stop["coding-agent: STOP - DO NOT create files
+  • ❌ CONFLICT: Ctrl+K exists (DifferentFeature at search-old.ts:45)
+  • Alternatives: Ctrl+Shift+K, Ctrl+Alt+K, Ctrl+J
+  • User decision required"]:::wideBox --> MT4["Main Thread
+  • Present conflict to user"]:::wideBox --> UserDec{"User Decision:
+  • Choose alternative:
+  • A/B/C/D/E"}:::wideDecision
+    end
+
+    Label1 --> Entry1
+
+    UserDec --> Label2["User Choice: A/B/C/D/E - Resolved Key"]:::branchLabel
+
+    subgraph SG2 [" "]
+        direction LR
+        Entry2[" "]:::invisible --> MT5["Main Thread: Retry
+  • Task(coding-agent, 'Bind [resolved-key] to QuickSearch')"]:::wideBox --> Coding2["coding-agent: Retry
+  • Check new key conflict → If OK, Implement → Update structure doc"]:::wideBox
+    end
+
+    Label2 --> Entry2
+
+    Coding2 --> Label3["Branch: NO CONFLICT (initial or retry)"]:::branchLabel
+
+    subgraph SG3 [" "]
+        direction LR
+        Entry3[" "]:::invisible --> Impl["coding-agent: Implement
+  • Write search-contribution.ts ([resolved-key] binding)
+  • Edit CODEBASE_STRUCTURE.md (Add [key]: QuickSearch)
+  • ✅ Complete: Conflict check passed, Structure updated"]:::wideBox --> MT6["Main Thread: Build + Commit
+  • Bash: npm run build
+  • Bash: git add eg-desk_taehwa
+  • Bash: git commit"]:::wideBox --> End(["Complete
+  • QuickSearch bound to resolved key
+  • Structure document updated
+  • Agents: 3 (PM → analyzer → coding x1-2)
+  • Duration: Multi-phase with user decision"]):::wideBox
+    end
+
+    Label3 --> Entry3
+
+    style User fill:#e1f5ff
+    style ConflictCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style UserDec fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style Phases fill:#e1ffe1
+    style MT3 fill:#e1ffe1
+    style MT4 fill:#e1ffe1
+    style MT5 fill:#e1ffe1
+    style MT6 fill:#e1ffe1
+    style Coding1 fill:#ffe1f0
+    style Coding2 fill:#ffe1f0
+    style Stop fill:#ffe1f0
+    style Impl fill:#ffe1f0
+    style End fill:#e1ffe1
+```
+
+**Key:** Conflict prevention - coding-agent checks BEFORE implementing
+
+---
+
+### Scenario 4c: With Optional UX Validation
+
+**User:** "Add complex state management feature with async operations"
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+    classDef invisible fill:none,stroke:none;
+    classDef branchLabel fill:#e8f4f8,stroke:#0288d1,stroke-width:2px,text-align:left,white-space:pre;
+
+    User(["User: Complex feature with state management"]):::wideBox
+
+    --> Phases["PHASES 0-3: Same as Scenario 4a (PM → Investigation → Implementation)
+  • Result: coding-agent completed implementation"]:::wideBox
+
+    --> Decision["PHASE 4.5: Main Thread Decision - Validate UX flow?
+  • Consider: ✅ Complex flows? Race conditions? State mgmt? Async? Critical?
+  • Skip: ❌ Simple CRUD? Pure styling? Obvious correctness?"]:::wideBox
+
+    --> Decide{"Validate?
+  • Complex/Critical?"}:::wideDecision
+
+    --> Label1["Branch: No Validation (Skip)"]:::branchLabel
+
+    subgraph SG1 [" "]
+        direction LR
+        Entry1[" "]:::invisible --> Build1["PHASE 5: Build+Commit
+  • Bash: npm run build
+  • Bash: git commit"]:::wideBox --> E1(["Complete
+  • Agents: 3
+  • Duration: Standard"]):::wideBox
+    end
+
+    Label1 --> Entry1
+
+    E1 --> Label2["Branch: Yes - Run UX Validation"]:::branchLabel
+
+    subgraph SG2 [" "]
+        direction LR
+        Entry2[" "]:::invisible --> Validation["Optional UX Flow Validation"]:::wideBox --> UXSim["ux-flow-simulator-agent
+  • Read implemented files, Trace execution paths
+  • Simulate user flow, predict runtime behavior
+  • Returns: Report with ✅ No issues OR ⚠️ Issues"]:::wideBox --> MT5["PHASE 4.6: Main Thread
+  • Receive UX simulator report
+  • Analyze issue type"]:::wideBox --> Check{"UX Report:
+  • Issues found?"}:::wideDecision
+    end
+
+    Label2 --> Entry2
+
+    Check --> Label3["Sub-branch: No Issues Found"]:::branchLabel
+
+    subgraph SG3 [" "]
+        direction LR
+        Entry3[" "]:::invisible --> Build2["PHASE 5: Build+Commit
+  • Bash: npm run build
+  • Bash: git commit"]:::wideBox --> E2(["Complete
+  • Agents: 4
+  • Validation passed"]):::wideBox
+    end
+
+    Label3 --> Entry3
+
+    E2 --> Label4["Sub-branch: Issues Found"]:::branchLabel
+
+    subgraph SG4 [" "]
+        direction LR
+        Entry4[" "]:::invisible --> MTAnalyze["Main Thread
+  • Categorize issues
+  • Decision: Simple bug fix? OR Vision/UX design conflict?"]:::wideBox --> IssueType{"Issue Type?"}:::wideDecision
+    end
+
+    Label4 --> Entry4
+
+    IssueType --> Label5A["Issue Type A: Simple Bug"]:::branchLabel
+
+    subgraph SG5A [" "]
+        direction LR
+        Entry5A[" "]:::invisible --> Fix1["Main Thread → coding-agent
+  • Fix technical issues
+  • coding-agent: Read report, Edit files, Re-test"]:::wideBox --> Revalidate1["Main Thread
+  • Re-invoke ux-flow-simulator-agent to verify fix"]:::wideBox
+    end
+
+    Label5A --> Entry5A
+
+    Revalidate1 -.->|Re-validate| UXSim
+
+    Revalidate1 --> Label5B["Issue Type B: Vision Conflict"]:::branchLabel
+
+    subgraph SG5B [" "]
+        direction LR
+        Entry5B[" "]:::invisible --> ConsultPM["Main Thread → PM
+  • 'UX simulator found design issue: [details]. Vision impact?'
+  • PM: Analyze vision alignment, recommend fix OR vision evolution"]:::wideBox --> UserDecPM{"User Decision:
+  • Accept PM guidance?"}:::wideDecision
+    end
+
+    Label5B --> Entry5B
+
+    UserDecPM --> Label6A["User: Yes - Accept PM Guidance"]:::branchLabel
+
+    subgraph SG6A [" "]
+        direction LR
+        Entry6A[" "]:::invisible --> Fix2["Main Thread → coding-agent
+  • Implement PM-recommended fix
+  • coding-agent: Read report, Edit files"]:::wideBox --> Revalidate2["Main Thread
+  • Re-invoke ux-flow-simulator-agent"]:::wideBox
+    end
+
+    Label6A --> Entry6A
+
+    Revalidate2 -.->|Re-validate| UXSim
+
+    Revalidate2 --> Label6B["User: No - Proceed Without Fix"]:::branchLabel
+
+    subgraph SG6B [" "]
+        direction LR
+        Entry6B[" "]:::invisible --> Build3["PHASE 5: Build+Commit
+  • Bash: npm run build
+  • Bash: git commit
+  • (User accepted risk)"]:::wideBox --> E3(["Complete
+  • Agents: 4-5
+  • User override"]):::wideBox
+    end
+
+    Label6B --> Entry6B
+
+    style User fill:#e1f5ff
+    style Decide fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Check fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style IssueType fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style UserDecPM fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style Phases fill:#e1ffe1
+    style Decision fill:#e1ffe1
+    style MT5 fill:#e1ffe1
+    style MTAnalyze fill:#e1ffe1
+    style Revalidate1 fill:#e1ffe1
+    style Revalidate2 fill:#e1ffe1
+    style Build1 fill:#e1ffe1
+    style Build2 fill:#e1ffe1
+    style Build3 fill:#e1ffe1
+    style UXSim fill:#f0e1ff
+    style ConsultPM fill:#fff4e1
+    style Fix1 fill:#ffe1f0
+    style Fix2 fill:#ffe1f0
+    style Validation fill:#e1ffe1
+    style E1 fill:#e1ffe1
+    style E2 fill:#e1ffe1
+    style E3 fill:#e1ffe1
+```
+
+**Key:** UX validation is optional - Main Thread decides based on complexity
+
+---
+
+## Pattern 5: Technology Research & Evaluation
+
+**When to use:** User needs capability that may require new technology not in current stack. PM diagnoses GAP, Main Thread orchestrates research, PM evaluates vision fit.
+
+**Critical features:**
+- **2 User Decision Points:** Approve research plan? / Accept recommendation?
+- **Parallel execution:** Multiple research agents run simultaneously
+- **Role separation:** PM diagnoses GAP (not technical scoring), Main Thread plans/executes research, PM evaluates vision alignment
+- **PM waits for user approval** before updating technology-stack.md
+- **Institutional memory:** Research docs preserved in ideas&external_references/
 
 **User:** "캔버스에 3D visualization을 추가하고 싶어. 어떤 framework가 좋을까?"
 
 ```mermaid
-flowchart LR
-    subgraph Phase0["PHASE 0: PM Diagnosis"]
-        User(["User: Add 3D viz<br/>Which framework?"])
-        PM1["PM: Gap Analysis<br/>Glob+Read tech stack<br/>GAP: Konva.js=2D only<br/>Need: True 3D<br/>Plan: 3 parallel"]
-        User --> PM1
-    end
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
 
-    subgraph Dec1["USER DECISION 1"]
-        UD1{"Proceed?<br/>A) Yes<br/>B) Modify<br/>C) No"}
-    end
+    User(["User: 캔버스에 3D visualization을 추가하고 싶어
+  어떤 framework가 좋을까?"]):::wideBox
 
-    Phase0 --> Dec1
+    --> PM1["PHASE 0: PM GAP Diagnosis
+  • Glob+Read tech-stack.md
+  • Current: Konva.js (2D only)
+  • Need: True 3D
+  • DIAGNOSIS: 3D capability needed"]:::wideBox
 
-    subgraph Phase2["PHASE 2: Parallel Research"]
-        direction TB
-        R1["Agent1: Three.js<br/>WebSearch+Fetch<br/>600KB, mature"]
-        R2["Agent2: Babylon.js<br/>WebSearch+Fetch<br/>1.2MB, complex"]
-        R3["Agent3: WebGL<br/>WebSearch<br/>2-3 months"]
-    end
+    --> MT1["PHASE 1: MT Research Planning
+  • Plan research scope
+  • Targets: Three.js, Babylon.js, WebGL"]:::wideBox
 
-    Dec1 -->|A| Phase2
-    Dec1 -->|B| PM2["PM Adjust<br/>(7c)"]
-    Dec1 -->|C| E1([Stop])
-    PM2 --> Dec1
+    --> UD1{"USER DECISION 1
+  Proceed with research?
+  • A) Yes
+  • B) Modify scope
+  • C) No"}:::wideDecision
 
-    subgraph Phase3["PHASE 3: Organize"]
-        Org["MT: Write 3 docs<br/>ideas&external_references/"]
-    end
+    UD1 -->|"C: No"| E1([Stop])
+    UD1 -->|"B: Modify"| PM2["PM: Adjust scope"]:::wideBox
+    PM2 --> MT1
 
-    Phase2 --> Phase3
+    UD1 -->|"A: Yes"| MT2["PHASE 2: MT Spawn Research
+  • Spawn 3 agents (parallel)"]:::wideBox
 
-    subgraph Phase4["PHASE 4: Analysis"]
-        Analyzer["IC-analyzer<br/>Read docs<br/>Three.js: Medium<br/>Babylon: High"]
-    end
+    --> R["PHASE 3: Parallel Research
+  • Agent1: Three.js (600KB, mature)
+  • Agent2: Babylon.js (1.2MB, full-featured)
+  • Agent3: WebGL (lightweight, 2-3mo dev)"]:::wideBox
 
-    Phase3 --> Phase4
+    --> Org["PHASE 4: MT Organize
+  • Write 3 docs: ideas&external_references/
+    - threejs-research.md
+    - babylonjs-research.md
+    - webgl-research.md"]:::wideBox
 
-    subgraph Phase5["PHASE 5: PM Eval"]
-        PM3["PM: Score<br/>Three.js: 4.2/5<br/>Babylon: 3.1/5<br/>WebGL: 2.5/5<br/>Recommend: Three.js"]
-    end
+    --> MT3["PHASE 5: MT Invoke Analyzer
+  • Invoke infinite-canvas-analyzer
+  • 'Assess integration complexity'"]:::wideBox
 
-    Phase4 --> Phase5
+    --> Analyzer["PHASE 6: Technical Analysis
+  • infinite-canvas-analyzer
+  • Read research docs
+  • Integration complexity:
+    - Three.js: Medium
+    - Babylon: High
+    - WebGL: Very High"]:::wideBox
 
-    subgraph Dec2["USER DECISION 2"]
-        UD2{"Accept?<br/>A) Three.js<br/>B) Babylon<br/>C) More<br/>D) No"}
-    end
+    --> MT4["PHASE 7: MT to PM
+  • Deliver to PM:
+    - Research docs
+    - Analyzer assessment"]:::wideBox
 
-    Phase5 --> Dec2
+    --> PM3["PHASE 8: PM Vision Evaluation
+  • Read research docs
+  • Evaluate philosophy fit:
+    - Three.js: Aligns (balance)
+    - Babylon: Over-engineered
+    - WebGL: Too custom
+  • RECOMMEND: Three.js"]:::wideBox
 
-    subgraph Phase7["PHASE 7: Finalize"]
-        PM4["PM: Update stack<br/>Edit: tech-stack.md<br/>Write: PRD"]
-    end
+    --> UD2{"USER DECISION 2
+  Accept PM recommendation?
+  • A) Three.js
+  • B) Babylon.js
+  • C) More research
+  • D) No"}:::wideDecision
 
-    Dec2 -->|A or B| Phase7
-    Dec2 -->|C| Phase2
-    Dec2 -->|D| E2([Stop])
+    UD2 -->|"D: No"| E2([Stop])
+    UD2 -->|"C: More"| MT2
 
-    subgraph Phase8["PHASE 8: Implementation"]
-        direction TB
-        FW1["theia-analyzer<br/>Webview integration"]
-        FW2["electron-analyzer<br/>Security patterns"]
-        Coding["coding-agent<br/>Implement"]
-        FW1 --> Coding
-        FW2 --> Coding
-    end
+    UD2 -->|"A or B"| PM4["PHASE 9: PM Finalize
+  • Edit: tech-stack.md
+  • Write: threejs-prd.md (or babylonjs-prd.md)"]:::wideBox
 
-    Phase7 --> Phase8
-    Phase8 --> E3(["Complete<br/>Agents: 8<br/>Decisions: 2"])
+    --> MT_Impl["PHASE 10: Implementation
+  • MT invokes theia-analyzer + electron-analyzer
+  • Analyzers return patterns
+  • MT synthesizes → coding-agent
+  • coding-agent implements"]:::wideBox
+
+    --> E3(["Complete
+  3D framework integrated
+  Agents: 8+
+  Decisions: 2"]):::wideBox
 
     style User fill:#e1f5ff
     style UD1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
@@ -697,18 +1023,20 @@ flowchart LR
     style PM2 fill:#fff4e1
     style PM3 fill:#fff4e1
     style PM4 fill:#fff4e1
-    style R1 fill:#f0e1ff
-    style R2 fill:#f0e1ff
-    style R3 fill:#f0e1ff
+    style MT1 fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style MT3 fill:#e1ffe1
+    style MT4 fill:#e1ffe1
+    style MT_Impl fill:#e1ffe1
     style Org fill:#e1ffe1
+    style R fill:#f0e1ff
     style Analyzer fill:#f0e1ff
-    style FW1 fill:#f0e1ff
-    style FW2 fill:#f0e1ff
-    style Coding fill:#ffe1f0
     style E1 fill:#f0f0f0
     style E2 fill:#f0f0f0
     style E3 fill:#e1ffe1
 ```
+
+**Key:** PM diagnoses GAP, Main Thread plans/executes research, PM evaluates vision fit (not technical scores)
 
 **Highlights:**
 - **2 User Decision Points**: Approve research? / Accept recommendation?
@@ -716,551 +1044,60 @@ flowchart LR
 - **PM waits for user approval** before updating technology-stack.md
 - **Institutional memory**: Research docs preserved
 
----
+### Scenario 5b: User Modifies Research Criteria
 
-## Scenario 7b: User Rejects PM Recommendation
+**Embedded in main diagram above - see UserDec1 → B: Modify option**
 
-(Embedded in Scenario 7a diagram - see UserDec2 → B: Choose Other option)
+**Flow:** PM adjusts research plan per user modifications (add options, change criteria), user confirms, then proceed.
 
-Flow continues with PM re-evaluating user's choice, documenting rationale, adjusting integration strategy.
+### Scenario 5c: User Rejects PM Recommendation
 
----
+**Embedded in main diagram above - see UserDec2 → B: Choose Other option**
 
-## Scenario 7c: User Modifies Research Criteria
-
-(Embedded in Scenario 7a diagram - see UserDec1 → B: Modify option)
-
-PM adjusts research plan per user modifications (add options, change criteria), user confirms, then proceed.
+**Flow:** User chooses different option than PM recommended. PM re-evaluates user's choice, documents rationale, adjusts integration strategy, proceeds with user's selection.
 
 ---
 
-## Common Patterns (Self-Documenting)
+## Pattern 6: Agent Creation
 
-### Pattern 1: Quick Framework Question
+**When to use:** Need a new specialized agent for recurring analysis tasks.
+
+**User:** "We need an agent that analyzes Konva.js integration patterns"
 
 ```mermaid
-flowchart LR
-    User(["User: Framework question
-    Example: 'How does Theia handle menus?'"])
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
 
-    --> MT["Main Thread
-    Action: Analyze request
-    Decision: Single-framework question
-    Route: Direct to framework agent
-    No orchestration needed"]
+    User(["User Request: Create Konva.js analyzer agent"]):::wideBox
 
-    --> Agent["theia-analyzer-agent
-    Tools:
-    - Read: packages/core/src/browser/menu/
-    - Grep: menu patterns
-    - Read: Examples
+    --> MT1["Main Thread
+  • Analyze request
+  • Agent creation task → claude-agent-sdk-analyzer"]:::wideBox
 
-    Returns:
-    - Detailed explanation
-    - Pattern examples
-    - File references"]
+    --> Agent["claude-agent-sdk-analyzer-agent
+  1) Read best practices
+  2) Glob+Read existing agents (extract patterns)
+  3) Design architecture (YAML, instructions)
+  4) Write .claude/agents/konva-analyzer-agent.md
+  • Returns: konva-analyzer-agent created
+  • Tools: Bash, Read, Glob, Grep, WebSearch
+  • Note: Session restart may be needed"]:::wideBox
 
-    --> Answer(["Complete
-    User sees answer
+    --> MT2["Main Thread
+  • Present to user
+  • Output: 'Agent created. Restart to use.'"]:::wideBox
 
-    Agents: 1
-    Duration: Single invocation
-    Efficiency: No orchestration overhead"])
+    --> End(["Complete
+  • konva-analyzer-agent ready
+  • Agents: 1 (claude-agent-sdk-analyzer)
+  • Duration: Single invocation"]):::wideBox
 
     style User fill:#e1f5ff
-    style MT fill:#e1ffe1
+    style MT1 fill:#e1ffe1
+    style MT2 fill:#e1ffe1
     style Agent fill:#f0e1ff
-    style Answer fill:#e1ffe1
-```
-
----
-
-### Pattern 2: PM-Driven Development (Complete)
-
-```mermaid
-flowchart TD
-    User(["User: Feature request"])
-
-    --> PM["PM Agent
-    - Discovers tech stack (Glob + Read)
-    - Analyzes vision alignment
-    - Checks implementation status
-    - Selects technology
-    - Specifies location
-    - Creates phasing strategy
-    - Writes PRD
-    Returns: Strategic guide"]
-
-    --> MT1["Main Thread
-    - Plans investigation
-    - Identifies framework agents needed
-    - Creates mission prompts"]
-
-    --> FW["Framework Agents
-    - Analyze codebase/docs
-    - Find patterns
-    - Provide file lists
-    Returns: Patterns + CREATE/MODIFY/REF"]
-
-    --> MT2["Main Thread
-    - Synthesizes PM guide + patterns
-    - Creates implementation plan
-    Format:
-      From PM: [strategic guidance]
-      From analyzers: [patterns]
-      Tasks: CREATE/MODIFY/REF"]
-
-    --> Coding["coding-agent
-    - Reads files for details
-    - Implements following patterns
-    - Creates/edits files
-    Returns: Status report"]
-
-    --> MT3["Main Thread
-    - Bash: npm run build
-    - Bash: git commit
-    Returns: Committed"]
-
-    --> End(["Complete"])
-
-    style User fill:#e1f5ff
-    style PM fill:#fff4e1
-    style FW fill:#f0e1ff
-    style Coding fill:#ffe1f0
-    style MT1 fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style MT3 fill:#e1ffe1
     style End fill:#e1ffe1
-```
-
----
-
-### Pattern 3: Full Development Cycle (Parallel Validation)
-
-```mermaid
-flowchart TD
-    User(["User: Complex feature request
-    Example: 'Add custom menu with OS integration'"])
-
-    --> MT["Main Thread
-    Action: Orchestrate multi-agent workflow
-    Identifies:
-    - PM (vision validation)
-    - theia-analyzer (menu patterns)
-    - electron-analyzer (OS integration)"]
-
-    --> Phase1["PHASE 1: Parallel Validation
-
-    Main Thread sends single message, 2 Tasks:
-
-    Task 1: egdesk-pm-agent
-    'Validate custom menu vs vision'
-
-    Task 2: theia-analyzer-agent
-    'Analyze Theia menu system'
-
-    Both run simultaneously"]
-
-    --> PM1["PM Agent
-    Tools: Glob + Read vision docs
-    Returns: APPROVE + considerations"]
-
-    --> FW1["theia-analyzer
-    Tools: Read menu code + Grep patterns
-    Returns: Menu registration patterns"]
-
-    Phase1 --> PM1
-    Phase1 --> FW1
-
-    PM1 --> MT2["Main Thread
-    Synthesizes: PM approval + patterns"]
-    FW1 --> MT2
-
-    --> Phase2["PHASE 2: Sequential Architecture
-
-    Main Thread (after Phase 1):
-    Task: electron-analyzer
-    'Given Theia menu pattern,
-    analyze OS integration'"]
-
-    --> FW2["electron-analyzer
-    Tools: Read Electron menu API
-    Returns: OS integration patterns"]
-
-    --> MT3["Main Thread
-    Synthesizes ALL guidance:
-    - PM: Vision-aligned
-    - Theia: Menu patterns
-    - Electron: OS integration"]
-
-    --> Coding["PHASE 3: coding-agent
-
-    Implements based on all guidance
-    Returns: Status report"]
-
-    --> MT4["Main Thread
-    Bash: build, test, commit"]
-
-    --> End(["Complete
-
-    Agents: 4 (PM + 2 FW parallel + 1 FW sequential + coding)
-    Duration: Multi-phase with parallelization"])
-
-    style User fill:#e1f5ff
-    style PM1 fill:#fff4e1
-    style FW1 fill:#f0e1ff
-    style FW2 fill:#f0e1ff
-    style Coding fill:#ffe1f0
-    style MT fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style MT3 fill:#e1ffe1
-    style MT4 fill:#e1ffe1
-    style End fill:#e1ffe1
-```
-
----
-
-### Pattern 4: Agent Creation
-
-```mermaid
-flowchart LR
-    User(["User: Need new specialist
-    'Create Konva analyzer agent'"])
-
-    --> MT["Main Thread
-    Route: claude-agent-sdk-analyzer-agent"]
-
-    --> SDK["claude-agent-sdk-analyzer
-
-    Actions:
-    - Read: subagent-best-practices.md
-    - Glob + Read: Existing agents (extract patterns)
-    - Design: YAML frontmatter + instructions
-    - Write: .claude/agents/konva-analyzer-agent.md
-
-    Returns:
-    Agent file created
-    Session restart may be needed"]
-
-    --> End(["Complete
-    New agent ready
-
-    Agents: 1
-    Who codes: claude-agent (agent file only)"])
-
-    style User fill:#e1f5ff
-    style MT fill:#e1ffe1
-    style SDK fill:#f0e1ff
-    style End fill:#e1ffe1
-```
-
----
-
-### Pattern 5: Large Implementation (Context Preservation)
-
-```mermaid
-flowchart TD
-    User(["User: Large multi-file feature
-    Example: 'Implement custom dashboard (10+ files)'"])
-
-    --> MT1["Main Thread
-    Decision: Large implementation
-    Strategy: Delegate to coding-agent
-    (preserve Main Thread context)"]
-
-    --> Phases["Phase 1-N: Gather Insights
-
-    Main Thread orchestrates:
-    - PM: Vision validation
-    - Framework agents: Patterns
-    - Architecture guidance
-
-    Main Thread's context stays clean
-    (agents do heavy reading)"]
-
-    --> MT2["Main Thread
-    Synthesizes insights:
-
-    What: Dashboard system
-    Files: 10+ CREATE/MODIFY operations
-    Patterns: From framework agents
-
-    Format for coding-agent:
-    - Direction (what to implement)
-    - File list (detailed CREATE/MODIFY/REF)
-    - Pattern references"]
-
-    --> Coding["coding-agent (Separate Context)
-
-    Actions:
-    - Reads files for implementation details
-    - Writes/Edits 10+ files
-    - Follows patterns precisely
-    - Returns: Status report
-
-    Benefit: Main Thread context preserved
-    Main Thread can continue orchestrating"]
-
-    --> MT3["Main Thread
-    After coding-agent returns:
-    - Bash: npm run build
-    - Bash: git commit
-
-    Context still clean for next feature"]
-
-    --> End(["Complete
-
-    Benefit: Main Thread available for
-    continued orchestration
-
-    When to use:
-    - 3+ files
-    - Large edits (500+ lines)
-    - Multiple features in session"])
-
-    style User fill:#e1f5ff
-    style MT1 fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style MT3 fill:#e1ffe1
-    style Coding fill:#ffe1f0
-    style End fill:#e1ffe1
-```
-
----
-
-### Pattern 6: Conflict Detection & Resolution
-
-```mermaid
-flowchart TD
-    User(["User: EG-DESK custom feature
-    'Add keybinding Ctrl+K'"])
-
-    --> MT["Main Thread orchestrates:
-    - PM: Strategic guide (EG-DESK custom)
-    - Framework agents: Patterns"]
-
-    --> Coding1["coding-agent
-
-    BEFORE implementing:
-
-    Step 1: Discover EG-DESK codebase
-    - Glob: eg-desk*/**/*.ts
-
-    Step 2: Find structure doc
-    - Glob: eg-desk*/CODEBASE_STRUCTURE.md
-
-    Step 3: Read structure doc
-
-    Step 4: Check conflicts
-    - Grep: 'Ctrl+K' in structure"]
-
-    --> ConflictCheck{Conflict?}
-
-    ConflictCheck -->|Yes| Stop["coding-agent: STOP
-
-    DO NOT implement
-
-    Returns:
-    ❌ CONFLICT DETECTED
-    Alternatives: [list]
-    User decision required"]
-
-    ConflictCheck -->|No| Impl["coding-agent: Implement
-
-    Tools:
-    - Write: feature code
-    - Edit: CODEBASE_STRUCTURE.md
-      (Add keybinding + timeline)
-
-    Returns:
-    ✅ Complete + Structure updated"]
-
-    Stop --> UserDec{User chooses<br/>alternative}
-
-    UserDec --> Retry["coding-agent: Retry
-    with resolved keybinding"]
-
-    Retry --> Impl
-
-    Impl --> MT2["Main Thread
-    Bash: build, commit"]
-
-    --> End(["Complete
-
-    Benefit: Prevents duplicate implementations
-    When: EG-DESK custom features
-    Skip: Theia framework modifications"])
-
-    style User fill:#e1f5ff
-    style ConflictCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style UserDec fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style Coding1 fill:#ffe1f0
-    style Stop fill:#ffe1f0
-    style Impl fill:#ffe1f0
-    style Retry fill:#ffe1f0
-    style MT fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style End fill:#e1ffe1
-```
-
----
-
-### Pattern 7: Optional UX Flow Validation (Pre-Build)
-
-```mermaid
-flowchart TD
-    Impl["coding-agent completed
-    implementation"]
-
-    --> MTDecide{"Main Thread Decision:
-
-    Validate UX flow?
-
-    Consider:
-    ✅ Complex user flows?
-    ✅ Race conditions possible?
-    ✅ State management?
-    ✅ Async operations?
-    ✅ Critical feature?
-
-    ❌ Simple CRUD?
-    ❌ Pure styling?
-    ❌ Obvious correctness?"}
-
-    MTDecide -->|Validate| UXSim["ux-flow-simulator-agent
-
-    Tools:
-    - Read: Implemented files
-    - Trace: Code execution paths
-
-    Actions:
-    - Simulate user flow
-    - Predict runtime behavior
-    - Check: Race conditions, null errors
-
-    Returns:
-    ✅ No issues predicted
-    OR
-    ⚠️ Issues found: [list]"]
-
-    MTDecide -->|Skip| Build
-
-    UXSim --> IssuesCheck{Issues?}
-
-    IssuesCheck -->|Yes| Fix["coding-agent
-    Fix issues based on
-    UX simulator findings"]
-
-    Fix --> UXSim
-
-    IssuesCheck -->|No| Build["Main Thread
-    Bash: npm run build"]
-
-    --> End(["Complete
-
-    Benefit: Catch runtime errors BEFORE build
-    When: Complex flows, critical features
-    Skip: Simple changes, styling"])
-
-    style MTDecide fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style IssuesCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style UXSim fill:#f0e1ff
-    style Fix fill:#ffe1f0
-    style Build fill:#e1ffe1
-    style End fill:#e1ffe1
-```
-
----
-
-### Pattern 8: Technology Research (With User Control)
-
-```mermaid
-flowchart TD
-    User(["User: Need new capability"])
-
-    --> PM1["PM: Diagnose limitation
-    - Read tech stack
-    - Analyze capabilities
-    - Identify gap
-    Returns: RESEARCH_NEEDED
-    + Criteria + Investigation scope"]
-
-    --> UD1{"USER DECISION 1:
-    Proceed with research?
-
-    A) Approve
-    B) Modify criteria
-    C) Reject"}
-
-    UD1 -->|A| MT1["Main Thread
-    Execute parallel research
-    (3+ agents simultaneously)"]
-
-    UD1 -->|B| PM1b["PM: Adjust plan
-    per user modifications"]
-
-    PM1b --> UD1
-
-    UD1 -->|C| End1([Stop])
-
-    MT1 --> Agents["Research Agents
-    - WebSearch + WebFetch
-    - Gather findings
-    Returns: Research results"]
-
-    --> MT2["Main Thread
-    - Write research docs
-      (ideas&external_references/)
-    - Query analyzer agents
-    Returns: Organized findings"]
-
-    --> PM2["PM: Evaluate Results
-    - Read research docs
-    - Score against criteria
-    - Assess vision alignment
-    Returns: Recommendation
-    (WITHOUT updating stack yet)"]
-
-    --> UD2{"USER DECISION 2:
-    Accept recommendation?
-
-    PM recommends: [Option X]
-    Scoring: [breakdown]
-
-    A) Approve
-    B) Choose different
-    C) More research
-    D) Reject all"}
-
-    UD2 -->|A or B| PM3["PM: Finalize
-    - Update tech stack
-    - Create PRD
-    - Document rationale
-    Returns: Adoption complete"]
-
-    UD2 -->|C| MT1
-    UD2 -->|D| End2([Stop])
-
-    PM3 --> MT3["Main Thread
-    Proceed to implementation
-    (Follow Pattern 2)"]
-
-    --> End3([Complete])
-
-    style User fill:#e1f5ff
-    style UD1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style UD2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style PM1 fill:#fff4e1
-    style PM1b fill:#fff4e1
-    style PM2 fill:#fff4e1
-    style PM3 fill:#fff4e1
-    style MT1 fill:#e1ffe1
-    style MT2 fill:#e1ffe1
-    style MT3 fill:#e1ffe1
-    style Agents fill:#f0e1ff
-    style End1 fill:#f0f0f0
-    style End2 fill:#f0f0f0
-    style End3 fill:#e1ffe1
 ```
 
 ---
@@ -1269,80 +1106,37 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    MT["Main Thread
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
 
-    Orchestrates by:
-    - Identifying agents (from system prompt)
-    - Creating mission prompts
-    - Planning execution phases
-    - Invoking agents (Task tool)
-    - Synthesizing results
+    MT["Main Thread: Orchestrates
+  • Identify agents, create mission prompts
+  • Plan phases, invoke agents, synthesize results
+  • Exclusive: ✅ Bash (build, test, commit), Task, PR creation
+  • Delegation: ALL file changes → coding-agent
+  • NEVER: ❌ Write/Edit app files"]:::wideBox
 
-    Exclusive capabilities:
-    ✅ Bash (build, test, commit, git)
-    ✅ Task (invoke agents)
-    ✅ Commit and PR creation
+    MT -->|"Guidance only
+(read-only)"| Analyzers["Framework Analyzers:
+  • Analyze codebase/docs, provide patterns, return file refs
+  • Tools: Bash (READ-ONLY), Read, Glob, Grep, WebFetch, WebSearch
+  • NEVER: ❌ Write code, Edit files, Commit"]:::wideBox
 
-    Code delegation (ALWAYS):
-    → ALL file changes → coding-agent
+    MT -->|"Strategic guide
+(vision + docs)"| PM["PM Agent:
+  • Discover tech stack (dynamic), analyze vision
+  • Strategic guide, review plans, manage docs
+  • Tools: Read, Glob, Grep, Write/Edit (docs ONLY)
+  • NEVER: ❌ Write app code, Implement features"]:::wideBox
 
-    NEVER:
-    ❌ Write/Edit application files directly"]
-
-    MT -->|"Guidance only<br/>(read-only)"| Analyzers["Framework Analyzers
-
-    - Analyze codebase/docs
-    - Provide patterns
-    - Return file references
-
-    Tools:
-    - Bash (READ-ONLY analysis)
-    - Read, Glob, Grep
-    - WebFetch, WebSearch
-
-    NEVER:
-    ❌ Write code
-    ❌ Edit files
-    ❌ Commit"]
-
-    MT -->|"Strategic guide<br/>(vision + docs)"| PM["PM Agent
-
-    - Discovers tech stack (dynamically)
-    - Analyzes vision alignment
-    - Provides strategic guide
-    - Reviews plans
-    - Manages documentation
-
-    Tools:
-    - Read, Glob, Grep (discovery)
-    - Write, Edit (documentation ONLY)
-      (PRDs, vision docs, tech stack)
-
-    NEVER:
-    ❌ Write application code
-    ❌ Implement features"]
-
-    MT -->|"Implementation<br/>(ONLY entity)"| Coding["coding-agent
-
-    ONLY entity that writes application code
-
-    Actions:
-    - Reads files for implementation details
-    - Creates new files (Write)
-    - Edits existing files (Edit)
-    - Follows patterns from analyzers
-    - Checks conflicts (EG-DESK features)
-    - Updates CODEBASE_STRUCTURE.md
-
-    Tools:
-    - Write, Edit (application code)
-    - Read, Glob, Grep (context)
-
-    NO:
-    ❌ Bash (no builds/tests/commits)
-    ❌ Architectural decisions
-
-    Returns: Status report"]
+    MT -->|"Implementation
+(ONLY entity)"| Coding["coding-agent: ONLY entity writing app code
+  • Read, Write new, Edit existing files
+  • Follow patterns, check conflicts (EG-DESK)
+  • Update CODEBASE_STRUCTURE.md
+  • Tools: Write, Edit (app), Read, Glob, Grep
+  • NO: ❌ Bash, Architectural decisions
+  • Returns: Status report"]:::wideBox
 
     style MT fill:#e1ffe1
     style Analyzers fill:#f0e1ff
@@ -1358,79 +1152,65 @@ flowchart TD
 
 ```mermaid
 flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
     Initial["PM: Initial Strategic Guide
+  • Framework choice, Code location
+  • Implementation phasing, Considerations
+  • Creates PRD"]:::wideBox
 
-    Provides:
-    - Framework choice
-    - Code location
-    - Implementation phasing
-    - Considerations
-    - Creates PRD"]
+    --> MT["Main Thread: Executes Plan"]:::wideBox
 
-    --> MT["Main Thread: Executes Plan"]
-
-    --> Need{"Main Thread:
-    Need PM consultation?
-
-    Situations:
-    - Plan needs validation?
-    - Guidance ambiguous?
-    - Phase N complete, need Phase N+1?
-    - Multiple approaches, which one?
-    - Found conflicts?
-    - Research needed?
-    - Research complete, evaluate?"}
+    --> Need{"MT: Need PM consultation?
+  • Plan validation?
+  • Guidance ambiguous?
+  • Phase N complete?
+  • Multiple approaches?
+  • Found conflicts?
+  • Research needed?
+  • Research complete?"}:::wideDecision
 
     Need -->|Plan Review| PM1["PM: Pattern A
-    - Validate plan vs vision
-    - Check completeness
-    - Review agent reports
-    - Suggest improvements
-    Returns: PROCEED/REVISE/CONSULT USER"]
+  • Validate plan vs vision
+  • Review agent reports
+  • Returns: PROCEED/REVISE/CONSULT"]:::wideBox
 
     Need -->|Clarification| PM2["PM: Pattern B
-    - Re-read context
-    - Provide clear direction
-    - Give concrete examples
-    Returns: Focused clarification"]
+  • Re-read context, clear direction
+  • Give examples
+  • Returns: Focused clarification"]:::wideBox
 
     Need -->|Progressive Phase| PM3["PM: Pattern C
-    - Acknowledge Phase N results
-    - Assess impact on strategy
-    - Adjust Phase N+1 direction
-    Returns: Updated guidance for next phase"]
+  • Acknowledge Phase N results
+  • Assess impact on strategy
+  • Returns: Updated guidance"]:::wideBox
 
     Need -->|Decision Support| PM4["PM: Pattern D
-    - Evaluate options vs vision
-    - Consider strategic fit
-    - Recommend with rationale
-    Returns: Clear choice + reasoning"]
+  • Evaluate options vs vision
+  • Strategic fit analysis
+  • Returns: Choice + reasoning"]:::wideBox
 
     Need -->|Conflict Resolution| PM5["PM: Pattern E
-    - Analyze existing implementation
-    - Check vision docs
-    - Resolve conflict
-    Returns: Enhance/Replace/Separate"]
+  • Analyze existing implementation
+  • Check vision docs
+  • Returns: Enhance/Replace/Separate"]:::wideBox
 
-    Need -->|Research Planning| PM6["PM: Pattern F (NEW)
-    - Diagnose current stack limitation
-    - Define evaluation criteria
-    - Structure investigation scope
-    - Design parallel execution
-    Returns: RESEARCH_NEEDED + plan"]
+    Need -->|Research Planning| PM6["PM: Pattern F
+  • Diagnose stack limitation
+  • Define eval criteria
+  • Returns: RESEARCH_NEEDED + plan"]:::wideBox
 
-    Need -->|Research Evaluation| PM7["PM: Pattern G (NEW)
-    - Read research docs
-    - Score against criteria
-    - Assess vision alignment
-    - Recommend option
-    Returns: Vision-aligned choice"]
+    Need -->|Research Evaluation| PM7["PM: Pattern G
+  • Read research docs
+  • Score against criteria
+  • Returns: Vision-aligned choice"]:::wideBox
 
     Need -->|Clear, Execute| Exec["Main Thread
-    Execute plan directly"]
+  • Execute plan directly"]:::wideBox
 
     PM1 --> Adjust["Main Thread
-    Adjust plan based on PM feedback"]
+  • Adjust plan based on PM feedback"]:::wideBox
     PM2 --> Adjust
     PM3 --> Adjust
     PM4 --> Adjust
@@ -1439,7 +1219,7 @@ flowchart TD
     PM7 --> Adjust
 
     Adjust --> Exec
-    Exec --> Continue([Continue])
+    Exec --> Continue([Continue]):::wideBox
 
     style Initial fill:#fff4e1
     style Need fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
@@ -1466,110 +1246,80 @@ flowchart TD
 
 ```mermaid
 flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+    classDef branchLabel fill:#e8f4f8,stroke:#0288d1,stroke-width:2px,text-align:left,white-space:pre;
+
     Request{"User Request
+  • Analyze type"}:::wideDecision
 
-    Analyze type:"}
+    --> Label1["Route 1: Simple Question"]:::branchLabel
 
-    Request -->|"Simple Question<br/>(file list, git status)"| Route1["Direct Execution
+    --> Route1["Direct Execution
+  • MT: Glob, Read, Bash
+  • Agents: 0 | Who codes: None
+  • Ex: 'List files in packages/core'"]:::wideBox
 
-    Main Thread handles directly:
-    - Glob, Read, Bash
+    --> Label2["Route 2: File Edit"]:::branchLabel
 
-    Agents: 0
-    Who codes: Nobody
-    Example: 'List files in packages/core'"]
+    --> Route2["coding-agent Only
+  • MT → coding-agent: Read + Edit
+  • Agents: 1 | Who codes: coding-agent
+  • Ex: 'Fix typo in README'"]:::wideBox
 
-    Request -->|"File Edit<br/>(typo, version)"| Route2["coding-agent Only
+    --> Label3["Route 3: Framework Question"]:::branchLabel
 
-    MT → coding-agent:
-    - coding-agent: Read + Edit
+    --> Route3["Direct to Framework Agent
+  • MT → analyzer: Read + Grep
+  • Agents: 1 | Who codes: None
+  • Ex: 'How does Theia DI work?'"]:::wideBox
 
-    Agents: 1
-    Who codes: coding-agent
-    Example: 'Fix typo in README'"]
+    --> Label4["Route 4: Strategic Vision"]:::branchLabel
 
-    Request -->|"Framework Question<br/>(How does X work?)"| Route3["Direct to Framework Agent
+    --> Route4["PM Agent Only
+  • MT → PM: Vision check
+  • Agents: 1 | Who codes: None
+  • Ex: 'Should we add floating AI?'"]:::wideBox
 
-    MT → theia/electron-analyzer:
-    - Agent: Read + Grep + Analyze
+    --> Label5["Route 5: Theia Implementation"]:::branchLabel
 
-    Agents: 1
-    Who codes: Nobody
-    Example: 'How does Theia DI work?'"]
+    --> Route5["PM → Analyzers → coding-agent
+  • PM guide, Analyzers patterns
+  • Agents: 2-3 | Who codes: coding-agent
+  • Conflict: ❌ No (Theia packages/)
+  • Ex: 'Modify Theia terminal'"]:::wideBox
 
-    Request -->|"Strategic Decision<br/>(Should we add X?)"| Route4["PM Agent Only
+    --> Label6["Route 6: EG-DESK Feature"]:::branchLabel
 
-    MT → PM:
-    - PM: Vision alignment check
+    --> Route6["PM → Analyzers → coding-agent
+  • + conflict check (CODEBASE_STRUCTURE.md)
+  • Agents: 2-3 | Who codes: coding-agent
+  • Conflict: ✅ Yes
+  • Ex: 'Add QuickSearch + Ctrl+K'"]:::wideBox
 
-    Agents: 1
-    Who codes: Nobody (decision only)
-    Example: 'Should we add floating AI?'"]
+    --> Label7["Route 7: New Technology"]:::branchLabel
 
-    Request -->|"Theia Implementation<br/>(Modify framework)"| Route5["PM → Analyzers → coding-agent
+    --> Route7["PM → MT Investigates → PM
+  • PM diagnose → USER DECISION
+  • MT parallel investigation (3+)
+  • PM evaluate → USER DECISION
+  • Agents: 8+ | Decisions: 2
+  • Ex: '3D viz - which framework?'"]:::wideBox
 
-    Flow:
-    - PM: Strategic guide
-    - Analyzers: Patterns
-    - coding-agent: Implements
+    --> Label8["Route 8: Multi-Feature"]:::branchLabel
 
-    Agents: 2-3
-    Who codes: coding-agent
-    Conflict check: ❌ No (Theia packages/)
-    Example: 'Modify Theia terminal service'"]
+    --> Route8["PM → Multiple Analyzers → coding
+  • Multiple agents (parallel)
+  • Agents: 3-4+ | Who codes: coding
+  • Conflict: ✅ If EG-DESK custom
+  • Ex: 'Implement dashboard'"]:::wideBox
 
-    Request -->|"EG-DESK Feature<br/>(Custom code)"| Route6["PM → Analyzers → coding-agent
+    --> Label9["Route 9: New Agent Creation"]:::branchLabel
 
-    Flow:
-    - PM: Strategic guide
-    - Analyzers: Patterns
-    - coding-agent: Implements
-      + Conflict check via CODEBASE_STRUCTURE.md
-
-    Agents: 2-3
-    Who codes: coding-agent
-    Conflict check: ✅ Yes
-    Example: 'Add custom QuickSearch + Ctrl+K'"]
-
-    Request -->|"New Technology<br/>(Which framework?)"| Route7["PM Diagnoses → MT Investigates → PM Evaluates
-
-    Flow:
-    - PM: Diagnose limitation + plan research
-    - USER DECISION: Approve research?
-    - MT: Parallel investigation (3+ agents)
-    - MT: Organize findings
-    - PM: Evaluate + recommend
-    - USER DECISION: Accept recommendation?
-    - PM: Finalize (update stack)
-
-    Agents: 8+
-    Who codes: coding-agent (after approval)
-    User Decisions: 2
-    Example: 'Add 3D viz - which framework?'"]
-
-    Request -->|"Large Multi-Feature<br/>(Complex system)"| Route8["PM → Multiple Analyzers → coding-agent(s)
-
-    Flow:
-    - PM: Strategic guide
-    - Multiple framework agents (parallel)
-    - Multiple coding-agents (if large)
-
-    Agents: 3-4+
-    Who codes: coding-agent(s)
-    Conflict check: ✅ If EG-DESK custom
-    Example: 'Implement dashboard system'"]
-
-    Request -->|"New Agent<br/>(Create specialist)"| Route9["claude-agent-sdk-analyzer
-
-    Flow:
-    - Reads best practices
-    - Examines existing agents
-    - Designs new agent
-    - Writes agent file
-
-    Agents: 1
-    Who codes: claude-agent (agent file only)
-    Example: 'Create Konva analyzer'"]
+    --> Route9["claude-agent-sdk-analyzer
+  • Read practices, Design agent
+  • Agents: 1 | Who codes: claude-agent
+  • Ex: 'Create Konva analyzer'"]:::wideBox
 
     style Request fill:#e1f5ff,stroke:#ff0000,stroke-width:2px
     style Route1 fill:#e1ffe1
@@ -1591,74 +1341,65 @@ flowchart TD
 
 ```mermaid
 flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
     Success["Effective Agent Swarm Flow
+  • Has ALL these characteristics:"]:::wideBox
 
-    Has ALL these characteristics:"]
+    --> M1["✅ Right Routing
+  • Simple → Direct
+  • Complex → Orchestrated
+  • No over-orchestration"]:::wideBox
 
-    Success --> M1["✅ Right Routing
+    --> M2["✅ Parallel Execution
+  • Independent analyses simultaneous
+  • Single message, multiple Tasks
+  • 3x+ faster"]:::wideBox
 
-    - Simple questions → Direct execution
-    - Complex tasks → Orchestrated
-    - No over-orchestration"]
+    --> M3["✅ Evidence-Based
+  • Recommendations backed by files
+  • No assumptions
+  • Read before recommend"]:::wideBox
 
-    Success --> M2["✅ Parallel Execution
+    --> M4["✅ Clear Boundaries
+  • Agents analyze (read-only)
+  • coding-agent writes code
+  • MT orchestrates + builds
+  • PM guides strategy"]:::wideBox
 
-    - Independent analyses run simultaneously
-    - Single message, multiple Tasks
-    - 3x+ faster runtime"]
+    --> M5["✅ Strategic Alignment
+  • Vision validated before implementation
+  • PM checks all EG-DESK features
+  • Institutional memory maintained"]:::wideBox
 
-    Success --> M3["✅ Evidence-Based
+    --> M6["✅ User Decision Points
+  • Research approval required
+  • Recommendation approval required
+  • Vision evolution needs user authority
+  • User can override PM"]:::wideBox
 
-    - All recommendations backed by file analysis
-    - No assumptions
-    - Read before recommend"]
+    --> M7["✅ No Redundancy
+  • Each agent unique value
+  • No duplicate work
+  • Clear role separation"]:::wideBox
 
-    Success --> M4["✅ Clear Boundaries
+    --> M8["✅ Conflict Prevention
+  • Check CODEBASE_STRUCTURE.md first
+  • Report conflicts, user decides
+  • Update structure after"]:::wideBox
 
-    - Agents analyze (read-only)
-    - coding-agent implements (writes code)
-    - Main Thread orchestrates + builds
-    - PM guides strategy"]
+    --> M9["✅ Dynamic Discovery
+  • No hardcoded paths
+  • Glob everything
+  • Tech stack discovered from doc
+  • Structure-agnostic"]:::wideBox
 
-    Success --> M5["✅ Strategic Alignment
-
-    - Vision validated before implementation
-    - PM checks all EG-DESK features
-    - Institutional memory maintained"]
-
-    Success --> M6["✅ User Decision Points
-
-    - Research approval required
-    - Recommendation approval required
-    - Vision evolution requires user authority
-    - User can override PM"]
-
-    Success --> M7["✅ No Redundancy
-
-    - Each agent contributes unique value
-    - No duplicate work
-    - Clear role separation"]
-
-    Success --> M8["✅ Conflict Prevention
-
-    - coding-agent checks CODEBASE_STRUCTURE.md
-    - BEFORE implementing EG-DESK features
-    - Reports conflicts, user decides
-    - Updates structure after implementation"]
-
-    Success --> M9["✅ Dynamic Discovery
-
-    - No hardcoded paths
-    - Glob everything
-    - Tech stack discovered from doc
-    - Structure-agnostic"]
-
-    Success --> M10["✅ Institutional Memory
-
-    - Research docs preserved
-    - Decision rationales documented
-    - CODEBASE_STRUCTURE.md maintained
-    - Technology stack tracked"]
+    --> M10["✅ Institutional Memory
+  • Research docs preserved
+  • Decision rationales documented
+  • CODEBASE_STRUCTURE.md maintained
+  • Tech stack tracked"]:::wideBox
 
     style Success fill:#e1ffe1
     style M1 fill:#e1f5ff
@@ -1679,103 +1420,70 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    User(["User
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+    classDef branchLabel fill:#e8f4f8,stroke:#0288d1,stroke-width:2px,text-align:left,white-space:pre;
 
-    - Makes final decisions
-    - Provides preferences
-    - Approves/rejects plans
-    - Can override any recommendation
-    - Full authority"])
+    User(["User:
+  • Final decisions, preferences
+  • Approve/reject plans
+  • Override any recommendation
+  • Full authority"]):::wideBox
 
     --> MT["Main Thread (Orchestrator ONLY)
+  • Analyze/route, identify agents
+  • Create mission prompts, plan phases
+  • Invoke agents (Task), synthesize outputs
+  • Execute bash (build/test/commit)
+  • Tools: Bash, Task, Read, Glob, Grep
+  • NO: Write/Edit app code
+  • Delegation: ALL file changes → coding-agent"]:::wideBox
 
-    Responsibilities:
-    - Analyze and route requests
-    - Identify agents (from system prompt)
-    - Create mission prompts
-    - Plan execution phases
-    - Invoke agents (Task tool)
-    - Synthesize agent outputs
-    - Execute bash (build/test/commit)
-    - Preserve context (delegate heavy reading)
+    --> Label1["Level 3A: Strategic Guidance"]:::branchLabel
 
-    Tools: Bash, Task, Read, Glob, Grep
-    NO: Write/Edit application code
+    --> PM["PM Agent
+  • Discover tech stack (Glob+Read)
+  • Diagnose limitations, plan research
+  • Evaluate results, check status
+  • Review plans, manage docs
+  • Maintain institutional memory
+  • Tools: Bash, Read, Glob, Grep, Write/Edit (docs), WebFetch/Search
+  • Writes: PRDs, vision, tech stack
+  • NEVER: App code"]:::wideBox
 
-    Delegation:
-    ALL file changes → coding-agent"]
+    --> Label2["Level 3B: Technical Patterns"]:::branchLabel
 
-    MT -->|"Strategic<br/>guidance"| PM["PM Agent
+    --> Analyzers["Framework Analyzers (theia, electron, canvas, etc.)
+  • Analyze codebase/docs
+  • Explain patterns, find proven patterns
+  • Return file refs
+  • Tools: Bash (READ-ONLY), Read, Glob, Grep, WebFetch, WebSearch
+  • Returns: Patterns + File lists (CREATE/MODIFY/DELETE/REF)
+  • NEVER: Write code, Edit, Commit"]:::wideBox
 
-    Responsibilities:
-    - Discover tech stack (Glob + Read)
-    - Analyze vision alignment
-    - Diagnose stack limitations
-    - Plan technology research
-    - Evaluate research results
-    - Check implementation status
-    - Review execution plans
-    - Manage documentation
-    - Maintain institutional memory
+    --> Label3["Level 3C: Code Execution"]:::branchLabel
 
-    Tools: Bash (discovery), Read, Glob, Grep,
-           Write/Edit (docs only), WebFetch/Search
+    --> Coding["coding-agent: ONLY entity writing app code
+  • Execute code writing/editing
+  • Read files for implementation
+  • Follow patterns from analyzers
+  • Discover EG-DESK (dynamic)
+  • Check conflicts (CODEBASE_STRUCTURE.md)
+  • STOP if conflict (report, user decides)
+  • Update structure doc after
+  • Tools: Write, Edit, Read, Glob, Grep
+  • NO: Bash (no builds/tests/commits)
+  • Returns: Implementation report"]:::wideBox
 
-    Writes: PRDs, vision docs, tech stack
-    NEVER: Application code"]
+    --> Label4["Level 3D: Agent Creation"]:::branchLabel
 
-    MT -->|"Technical<br/>patterns"| Analyzers["Framework Analyzer Agents
-    (theia, electron, infinite-canvas, etc.)
-
-    Responsibilities:
-    - Analyze codebase/documentation
-    - Provide evidence-based guidance
-    - Explain framework patterns
-    - Find proven patterns
-    - Return file references
-
-    Tools: Bash (READ-ONLY), Read, Glob, Grep,
-           WebFetch, WebSearch
-
-    Returns: Patterns + File lists
-    (CREATE/MODIFY/DELETE/REFERENCE)
-
-    NEVER: Write code, Edit files, Commit"]
-
-    MT -->|"Code<br/>execution"| Coding["coding-agent
-
-    ONLY entity that writes application code
-
-    Responsibilities:
-    - Execute code writing/editing
-    - Read files for implementation details
-    - Follow patterns from analyzers
-    - Discover EG-DESK codebase (dynamically)
-    - Check conflicts (CODEBASE_STRUCTURE.md)
-    - STOP if conflict (report, user decides)
-    - Update structure doc after implementation
-    - Return status reports
-
-    Tools: Write, Edit, Read, Glob, Grep
-    NO: Bash (no builds/tests/commits)
-
-    Receives: Direction + File list from MT
-    Returns: Implementation report"]
-
-    MT -->|"Agent<br/>creation"| SDK["claude-agent-sdk-analyzer
-
-    Responsibilities:
-    - Design new specialized agents
-    - Read best practices
-    - Examine existing agents
-    - Write agent definition files
-    - Provide SDK guidance
-
-    Tools: Read, Write (agent files only),
-           Glob, Grep, WebFetch/Search
-
-    Writes: .claude/agents/*.md
-    NEVER: Application code"]
+    --> SDK["claude-agent-sdk-analyzer
+  • Design new specialized agents
+  • Read practices, examine existing
+  • Write agent definition files
+  • Tools: Read, Write (agent files), Glob, Grep, WebFetch/Search
+  • Writes: .claude/agents/*.md
+  • NEVER: App code"]:::wideBox
 
     style User fill:#e1f5ff
     style MT fill:#e1ffe1
@@ -1790,7 +1498,7 @@ flowchart TD
 ## Key Architectural Principles (Visual Summary)
 
 ```mermaid
-flowchart LR
+flowchart TD
     P1["Principle 1:
     Metaphysical Separation
 
@@ -1855,6 +1563,8 @@ flowchart LR
     - CODEBASE_STRUCTURE.md maintained
     - Technology stack tracked"]
 
+    P1 --> P2 --> P3 --> P4 --> P5 --> P6
+
     style P1 fill:#e1f5ff
     style P2 fill:#ffe1f0
     style P3 fill:#e1ffe1
@@ -1871,59 +1581,40 @@ flowchart LR
 
 ```mermaid
 flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
     Principle["Tool Ownership Principle:
-
-    Tools restricted CONTEXTUALLY (via prompts)
-    NOT mechanically removed
-
-    Agents have tools, but role defines HOW to use"]
+  • Tools restricted CONTEXTUALLY (via prompts)
+  • NOT mechanically removed
+  • Agents have tools, role defines HOW to use"]:::wideBox
 
     Principle --> Analyzers["Framework Analyzer Agents
-
-    Tool Access:
-    - Bash, Glob, Grep, Read
-    - WebFetch, WebSearch
-
-    Contextual Restriction (via prompt):
-    ✅ Bash for READ-ONLY analysis
-       (inspect outputs, run tests to understand)
-    ❌ NEVER for implementation
-       (commits, builds, installations)
-
-    Example:
-    ✅ Bash: npm test (see test behavior)
-    ❌ Bash: npm install (implementation)
-
-    Enforced: Agent prompt instructions"]
+  • Tools: Bash, Glob, Grep, Read, WebFetch, WebSearch
+  • Contextual Restriction (via prompt):
+    ✅ Bash for READ-ONLY analysis (inspect, run tests)
+    ❌ NEVER for implementation (commits, builds, installs)
+  • Example: ✅ npm test ❌ npm install
+  • Enforced: Agent prompt instructions"]:::wideBox
 
     Principle --> Coding["coding-agent
-
-    Tool Access:
-    - Write, Edit, Read, Glob, Grep
-
-    Contextual Restriction:
+  • Tools: Write, Edit, Read, Glob, Grep
+  • Contextual Restriction:
     ✅ Code execution ONLY
     ❌ NO Bash (no builds/tests/commits)
-
-    Example:
-    ✅ Write: new-service.ts
-    ✅ Edit: existing-file.ts
-    ❌ Bash: npm run build
-
-    Enforced: Agent role description"]
+  • Example:
+    ✅ Write new-service.ts, Edit existing-file.ts
+    ❌ Bash npm run build
+  • Enforced: Agent role description"]:::wideBox
 
     Principle --> MT["Main Thread
-
-    Tool Access: ALL tools
-
-    Usage:
-    ✅ Bash: build, test, commit, git
-    ✅ Task: invoke agents
-    ✅ Read, Glob, Grep: orchestration
-    ❌ Write/Edit: application code
-       (always delegate to coding-agent)
-
-    Full access, contextually appropriate"]
+  • Tools: ALL tools
+  • Usage:
+    ✅ Bash (build, test, commit, git)
+    ✅ Task (invoke agents)
+    ✅ Read/Glob/Grep (orchestration)
+    ❌ Write/Edit app code (delegate to coding-agent)
+  • Full access, contextually appropriate"]:::wideBox
 
     style Principle fill:#e1ffe1
     style Analyzers fill:#f0e1ff
@@ -1943,57 +1634,47 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Task["Task arrives"]
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    Task["Task arrives"]:::wideBox
 
     --> Decision{"Requires heavy
-    domain-specific reading?"}
+  domain-specific reading?"}:::wideDecision
 
     Decision -->|Yes| Spawn["✅ SPAWN SUBAGENT
-
-    Scenarios:
+  • Scenarios:
     - Extensive domain reading
-      (vision docs, framework docs, large codebase)
-    - Synthesize knowledge from references
+    - Synthesize knowledge from refs
     - Domain analysis needed
-    - 'Learn this domain, then apply'
-    - Would pollute Main Thread context
-
-    Example:
-    'Analyze Theia DI system across 50 files'
+    - Would pollute MT context
+  • Example: 'Analyze Theia DI across 50 files'
     → theia-analyzer reads 50 files
     → Returns 3-paragraph summary
-    → Main Thread context: Clean (only summary)
-
-    Benefit: Context preserved"]
+    → MT context: Clean
+  • Benefit: Context preserved"]:::wideBox
 
     Decision -->|No| Direct["✅ MAIN THREAD DIRECT
-
-    Scenarios:
+  • Scenarios:
     - Simple questions (system knowledge)
     - File operations (clear instructions)
     - Orchestration tasks
-    - Already have guidance from agents
-
-    Example:
-    'List files in packages/core'
+    - Already have agent guidance
+  • Example: 'List files in packages/core'
     → Glob directly
     → No agent needed
+  • Benefit: Fast, efficient"]:::wideBox
 
-    Benefit: Fast, efficient"]
-
-    Spawn --> Effect1["Effect: Main Thread Context
-
-    WITHOUT subagent:
+    Spawn --> Effect1["Effect: MT Context
+  • WITHOUT subagent:
     MT reads 50 files → context polluted
-
-    WITH subagent:
+  • WITH subagent:
     Agent reads 50 files → returns summary
-    MT context: Clean (only summary)"]
+    → MT context: Clean (only summary)"]:::wideBox
 
     Direct --> Effect2["Effect: Immediate
-
-    No agent overhead
-    Fast execution"]
+  • No agent overhead
+  • Fast execution"]:::wideBox
 
     style Task fill:#e1f5ff
     style Decision fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
@@ -2009,59 +1690,38 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Tasks["Multiple analyses needed"]
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
 
-    --> Check{Independent<br/>analyses?}
+    Tasks["Multiple analyses needed"]:::wideBox
+
+    --> Check{Independent
+  analyses?}:::wideDecision
 
     Check -->|Yes| Parallel["✅ PARALLEL
-
-    Single message, multiple Tasks:
-
-    Main Thread sends ONE message:
-    - Task(agent: 'theia-analyzer', ...)
-    - Task(agent: 'electron-analyzer', ...)
-    - Task(agent: 'infinite-canvas-analyzer', ...)
-
-    All THREE execute simultaneously
-
-    Duration: max(T1, T2, T3)
-    Example: T1=10s, T2=8s, T3=12s
-    → Total: 12s (not 10+8+12=30s)
-
-    Benefit: 3x+ faster"]
+  • Single message, multiple Tasks
+  • All execute simultaneously
+  • Duration: max(T1, T2, T3)
+  • Example: 10s+8s+12s → 12s (not 30s)
+  • Benefit: 3x+ faster"]:::wideBox
 
     Check -->|No| Sequential["✅ SEQUENTIAL
-
-    Separate messages (dependencies):
-
-    Message 1:
-    - Task(agent: 'electron-analyzer',
-           'Find security requirements')
-    (Wait for response)
-
-    Message 2:
-    - Task(agent: 'theia-analyzer',
-           'Given security reqs from previous,
-            analyze Theia implementation')
-
-    Duration: T1 + T2
-    (Later agent needs earlier findings)
-
-    Necessary: Dependent analyses"]
+  • Separate messages (dependencies)
+  • Wait for each response before next
+  • Duration: T1 + T2
+  • Use when: Later agent needs earlier findings"]:::wideBox
 
     Parallel --> ParallelWhen["When to use PARALLEL:
-
-    ✅ Independent analyses
-    ✅ 'How does each framework handle X?'
-    ✅ Multiple research options
-    ✅ No dependencies between tasks"]
+  ✅ Independent analyses
+  ✅ 'How does each framework handle X?'
+  ✅ Multiple research options
+  ✅ No dependencies"]:::wideBox
 
     Sequential --> SeqWhen["When to use SEQUENTIAL:
-
-    ✅ Later agent needs earlier findings
-    ✅ 'Given security reqs, analyze implementation'
-    ✅ Dependent information
-    ✅ Phase N+1 needs Phase N results"]
+  ✅ Later agent needs earlier findings
+  ✅ 'Given security reqs analyze implementation'
+  ✅ Dependent information
+  ✅ Phase N+1 needs Phase N results"]:::wideBox
 
     style Tasks fill:#e1f5ff
     style Check fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
@@ -2077,62 +1737,44 @@ flowchart TD
 
 ```mermaid
 flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
     Agent1["Agent returns report
+  • Report:
+    ✓ Summary Present
+    ✓ Findings Present
+    ✗ Files Analyzed MISSING"]:::wideBox
 
-    Report:
-    ✓ Summary: Present
-    ✓ Findings: Present
-    ✗ Files Analyzed: MISSING"]
-
-    --> MT1["Main Thread
-    Action: Detect incomplete report
-
-    Missing: Files Analyzed section
-    (REQUIRED for implementation)"]
+    --> MT1["Main Thread: Detect incomplete
+  • Missing: Files Analyzed section (REQUIRED)"]:::wideBox
 
     --> Requery["Main Thread: Re-query Contextually
-
-    Tool: Task(agent: 'theia-analyzer-agent',
-          prompt: 'You previously provided this analysis:
-
-    [ENTIRE PREVIOUS REPORT QUOTED]
-
-    However, Files Analyzed section MISSING (REQUIRED).
-    Please provide complete file list with file:line refs.
-    No need to re-analyze - just add missing section.')
-
-    Key: Agent is stateless
-    BUT Main Thread provides full context"]
+  • Task(agent: 'theia-analyzer-agent',
+    prompt: 'You provided [REPORT].
+    Files Analyzed section MISSING (REQUIRED).
+    Please provide file list with file:line refs.
+    No re-analysis - just add missing section.')
+  • Key: Agent stateless BUT MT provides full context"]:::wideBox
 
     --> Agent2["Agent (stateless but with context)
+  • Reads own previous report (from prompt)
+  • Extracts file list from analysis
+  • Completes missing section
+  • Returns: Files Analyzed:
+    terminal-theme-service.ts:45,
+    terminal-frontend-module.ts:32,
+    workspace-service.ts:89"]:::wideBox
 
-    Actions:
-    - Reads own previous report (from prompt)
-    - Extracts file list from analysis
-    - Completes missing section
-
-    Returns:
-    Files Analyzed:
-    - terminal-theme-service.ts:45
-    - terminal-frontend-module.ts:32
-    - workspace-service.ts:89"]
-
-    --> MT2["Main Thread
-    Now has complete report
-    Can proceed to next phase"]
+    --> MT2["Main Thread: Now has complete report
+  • Can proceed to next phase"]:::wideBox
 
     --> End(["Continue
-
-    Benefit:
-    - Flexible (not strict validation)
-    - Natural conversation
-    - Agent can clarify/complete
-
-    When to use:
-    - Report missing sections
-    - Need clarification
-    - Want more detail
-    - File list breakdown needed"])
+  • Benefit: Flexible (not strict validation)
+    Natural conversation, Agent can clarify/complete
+  • When to use:
+    Missing sections, Need clarification
+    Want more detail, File list breakdown"]):::wideBox
 
     style Agent1 fill:#f0e1ff
     style MT1 fill:#e1ffe1
@@ -2147,7 +1789,7 @@ flowchart TD
 ### Principle 5: File List Format Enforcement
 
 ```mermaid
-flowchart LR
+flowchart TD
     Agent["Framework analyzer
     returns file list"]
 
@@ -2204,122 +1846,72 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Start(["Complex Development Task"])
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    Start(["Complex Development Task"]):::wideBox
 
     --> Step1["Step 1: Identify Agents
-
-    Source: System prompt knowledge
-    (Task tool description lists all agents)
-
-    Main Thread knows:
-    - egdesk-pm-agent
-    - theia-analyzer-agent
-    - electron-analyzer-agent
-    - infinite-canvas-analyzer-agent
-    - coding-agent
-    - ux-flow-simulator-agent
-    - etc."]
+  • Source: System prompt (Task tool lists agents)
+  • MT knows: egdesk-pm, theia-analyzer,
+    electron-analyzer, infinite-canvas-analyzer,
+    coding-agent, ux-flow-simulator, etc."]:::wideBox
 
     --> Step2["Step 2: Select Agents
-
-    Based on capabilities from descriptions
-
-    For 'Add custom menu with OS integration':
-    - PM (vision validation)
-    - theia-analyzer (menu patterns)
-    - electron-analyzer (OS integration)
-    - coding-agent (implementation)"]
+  • Based on capabilities from descriptions
+  • Ex: 'Add custom menu with OS integration':
+    PM (vision), theia-analyzer (menu patterns),
+    electron-analyzer (OS integration), coding (impl)"]:::wideBox
 
     --> Step3["Step 3: Analyze Task Requirements
-
-    From user request:
-    - What does user want?
-    - Which frameworks involved?
-    - Complexity level?
-    - Vision validation needed?"]
+  • From user request:
+    What does user want? Frameworks involved?
+    Complexity level? Vision validation needed?"]:::wideBox
 
     --> Step4["Step 4: (Optional) Read Agent Details
-
-    If needs specific implementation examples:
-    - Read: .claude/agents/[agent].md
-
-    Usually NOT needed:
-    - Agent descriptions in system prompt sufficient"]
+  • If needs specific examples:
+    Read .claude/agents/[agent].md
+  • Usually NOT needed:
+    Agent descriptions in system prompt sufficient"]:::wideBox
 
     --> Step5["Step 5: Create Mission Prompts
-
-    For each agent, create detailed prompt:
-
-    egdesk-pm-agent:
-    'Validate custom menu feature against
-    ambient AI workspace vision in whitepaper'
-
-    theia-analyzer-agent:
-    'Analyze Theia menu system at
-    packages/core/src/browser/menu/
-    to find registration patterns'"]
+  • For each agent, create detailed prompt
+  • egdesk-pm-agent:
+    'Validate custom menu vs ambient AI vision'
+  • theia-analyzer-agent:
+    'Analyze menu system at packages/core/.../menu/'"]:::wideBox
 
     --> Step6["Step 6: Plan Execution Phases
-
-    Identify parallel vs sequential:
-
-    Phase 1 (Parallel):
-    - PM validation
-    - Theia menu analysis
-
-    Phase 2 (Sequential, after P1):
-    - Electron OS integration
-      (needs Theia patterns from P1)"]
+  • Identify parallel vs sequential
+  • Phase 1 (Parallel): PM validation, Theia analysis
+  • Phase 2 (Sequential, after P1):
+    Electron OS integration (needs P1 patterns)"]:::wideBox
 
     --> Step7["Step 7: Identify Decision Points
-
-    Where user input needed:
-    - After PM evaluation?
-    - Conflict resolution?
-    - Multiple options to choose?
-
-    분기점 (Decision gates)"]
+  • Where user input needed:
+    After PM evaluation? Conflict resolution?
+    Multiple options to choose?
+  • 분기점 (Decision gates)"]:::wideBox
 
     --> Step8["Step 8: Invoke Agents
-
-    Tool: Task
-
-    Phase 1 (single message, 2 Tasks):
-    - Task(agent: 'egdesk-pm-agent', ...)
-    - Task(agent: 'theia-analyzer-agent', ...)
-
-    Wait for both
-
-    Phase 2 (after P1):
-    - Task(agent: 'electron-analyzer-agent',
-           prompt includes P1 findings)"]
+  • Tool: Task
+  • Phase 1 (single message, 2 Tasks):
+    Task(pm), Task(theia-analyzer) → Wait for both
+  • Phase 2 (after P1):
+    Task(electron-analyzer, prompt includes P1 findings)"]:::wideBox
 
     --> Step9["Step 9: Synthesize Agent Results
-
-    Collect:
-    - PM: APPROVE + considerations
-    - theia-analyzer: Menu patterns
-    - electron-analyzer: OS integration
-
-    Synthesize into:
-    - Implementation direction
-    - File list (CREATE/MODIFY/REF)
-    - Pattern references"]
+  • Collect: PM (APPROVE + considerations),
+    theia-analyzer (Menu patterns), electron (OS integration)
+  • Synthesize:
+    Implementation direction, File list (CREATE/MODIFY/REF)"]:::wideBox
 
     --> Step10["Step 10: Delegate Implementation
+  • Tool: Task(coding-agent, prompt: synthesized)
+    OR (if simple): MT handles directly
+  • Then: Bash: npm run build, Bash: git commit"]:::wideBox
 
-    Tool: Task(coding-agent,
-          prompt: synthesized guidance)
-
-    OR (if simple enough):
-    Main Thread handles directly
-
-    Then:
-    - Bash: npm run build
-    - Bash: git commit"]
-
-    --> End(["Complete
-    Orchestration Done"])
+    --> End(["Complete | Orchestration Done"]):::wideBox
 
     style Start fill:#e1f5ff
     style Step1 fill:#e1ffe1
@@ -2341,59 +1933,40 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    MT["Main Thread (When Orchestrating)"]
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
 
-    MT --> Can["✅ CAN Read:
+    MT["Main Thread (When Orchestrating)"]:::wideBox
 
-    Meta-level files:
-    - .claude/prompts/agent-orchestration.md
-      (orchestration guidelines)
-    - .claude/agents/*.md (OPTIONAL)
-      (only when needs specific examples
-       - agent discovery already in system prompt)
+    MT --> Can["✅ CAN Read: Meta-level files
+  • .claude/prompts/agent-orchestration.md
+  • .claude/agents/*.md (OPTIONAL - only when needs examples,
+    agent discovery already in system prompt)
+  • Purpose: Orchestration guidance only"]:::wideBox
 
-    Purpose: Orchestration guidance only"]
+    MT --> Cannot["❌ CANNOT Read (When Orchestrating): Domain files
+  • ideas&external_references/ (PM domain)
+  • packages/ (framework analyzer domain)
+  • App/framework code (Delegate to preserve context)
+  • Vision/strategy docs (PM reads these)
+  • Why: Preserve MT context
+  • Agents synthesize → return summary"]:::wideBox
 
-    MT --> Cannot["❌ CANNOT Read (When Orchestrating):
-
-    Domain files:
-    - ideas&external_references/eg-desk ideas/
-      (That's PM agent's domain)
-    - packages/
-      (That's framework analyzer agents' domain)
-    - Application/framework code
-      (Delegate to agents to preserve context)
-    - Vision/strategy documents
-      (PM agent reads these)
-
-    Why: Preserve Main Thread context
-    Agents synthesize → return summary"]
-
-    Cannot --> Effect["Effect of Context Preservation:
-
-    WITHOUT delegation:
+    Cannot --> Effect["Effect of Context Preservation
+  • WITHOUT delegation:
     MT reads 50 vision docs → context polluted
-
-    WITH delegation:
+  • WITH delegation:
     PM reads 50 docs → returns 3-paragraph summary
-    MT context: CLEAN (only summary)
+    → MT context: CLEAN (only summary)
+  • Benefit:
+    MT available for continued orchestration
+    Doesn't load unnecessary refs
+    Gets synthesized conclusions only"]:::wideBox
 
-    Benefit:
-    - Main Thread available for continued orchestration
-    - Doesn't load unnecessary reference materials
-    - Gets synthesized conclusions only"]
-
-    Can --> Exception["Exception:
-
-    Main Thread CAN read domain files when:
-    ✅ Directly implementing
-       (after receiving agent guidance)
-    ✅ Handling simple tasks
-       (no orchestration needed)
-
-    Example:
-    'Fix typo' - may read README directly
-    before delegating to coding-agent"]
+    Can --> Exception["Exception: MT CAN read domain files when:
+  • ✅ Directly implementing (after agent guidance)
+  • ✅ Handling simple tasks (no orchestration)
+  • Ex: 'Fix typo' - may read README before delegating"]:::wideBox
 
     style MT fill:#e1ffe1
     style Can fill:#e1ffe1,stroke:#00ff00,stroke-width:2px
@@ -2410,33 +1983,24 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Q["User: 'What files are in packages/core?'"]
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    Q["User: 'What files are in packages/core?'"]:::wideBox
 
     Q --> Bad["❌ BAD: Over-Orchestration
-
-    Main Thread:
-    - Creates elaborate plan
-    - Invokes agents
-    - Orchestrates unnecessarily
-
-    Problem:
-    - Wastes time
-    - Unnecessary complexity
-    - Agent overhead for simple task"]
+  • MT: Creates elaborate plan, Invokes agents
+  • Problem:
+    Wastes time, Unnecessary complexity
+    Agent overhead for simple task"]:::wideBox
 
     Q --> Good["✅ GOOD: Direct Execution
+  • MT: Tool: Glob packages/core/**/*
+    → Returns: File list immediately
+  • Benefit: Fast, Simple, No overhead"]:::wideBox
 
-    Main Thread:
-    - Tool: Glob packages/core/**/*
-    - Returns: File list immediately
-
-    Benefit:
-    - Fast
-    - Simple
-    - No agent overhead"]
-
-    Bad --> BadEnd([Slow, complex])
-    Good --> GoodEnd([Fast, simple])
+    Bad --> BadEnd([Slow, complex]):::wideBox
+    Good --> GoodEnd([Fast, simple]):::wideBox
 
     style Q fill:#e1f5ff
     style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
@@ -2451,40 +2015,30 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Task["Task: Analyze menus in
-    Theia AND Electron"]
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    Task["Task: Analyze menus in Theia AND Electron"]:::wideBox
 
     Task --> Bad["❌ BAD: Sequential
-
-    Phase 1: theia-analyzer analyzes menus
-    (Wait for completion)
-
-    Phase 2: electron-analyzer analyzes menus
-    (Wait for completion)
-
-    Problem:
-    - These are INDEPENDENT analyses
-    - No dependency between them
-    - 2x slower (sequential execution)"]
+  • Phase 1: theia-analyzer (Wait)
+  • Phase 2: electron-analyzer (Wait)
+  • Problem:
+    INDEPENDENT analyses
+    No dependency between them
+    2x slower"]:::wideBox
 
     Task --> Good["✅ GOOD: Parallel
+  • Phase 1 (Single message, 2 Tasks):
+    Task 1: theia-analyzer, Task 2: electron-analyzer
+  • Both run SIMULTANEOUSLY
+  • Benefit:
+    2x faster runtime
+    Efficient resources"]:::wideBox
 
-    Phase 1 (Single message, 2 Tasks):
-    - Task 1: theia-analyzer
-    - Task 2: electron-analyzer
+    Bad --> BadTime["Duration: T1 + T2 (slower)"]:::wideBox
 
-    Both run SIMULTANEOUSLY
-
-    Benefit:
-    - 2x faster runtime
-    - Efficient use of resources
-    - Independent analyses in parallel"]
-
-    Bad --> BadTime["Duration: T1 + T2
-    (Sequential = slower)"]
-
-    Good --> GoodTime["Duration: max(T1, T2)
-    (Parallel = faster)"]
+    Good --> GoodTime["Duration: max(T1, T2) (faster)"]:::wideBox
 
     style Task fill:#e1f5ff
     style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
@@ -2498,7 +2052,7 @@ flowchart TD
 ### ❌ Anti-Pattern 3: Agent Writing Code
 
 ```mermaid
-flowchart LR
+flowchart TD
     Task["Analyzer agent
     analyzing codebase"]
 
@@ -2541,7 +2095,7 @@ flowchart LR
 ### ❌ Anti-Pattern 4: Assumption-Based Guidance
 
 ```mermaid
-flowchart LR
+flowchart TD
     Agent["Analyzer agent"]
 
     Agent --> Bad["❌ BAD: Assumptions
@@ -2581,43 +2135,31 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Task["User: 'Fix typo in README'"]
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
 
-    Task --> Bad["❌ BAD: Main Thread Direct Edit
+    Task["User: 'Fix typo in README'"]:::wideBox
 
-    Main Thread:
-    - Tool: Edit README.md directly
-      (old: 'intsall' → new: 'install')
-
-    Problem:
-    - Breaks separation of concerns
-    - Inconsistent (sometimes MT, sometimes coding-agent)
-    - Main Thread context polluted
-    - NOT orchestrator behavior"]
+    Task --> Bad["❌ BAD: MT Direct Edit
+  • MT: Tool: Edit README.md directly
+  • Problem:
+    Breaks separation of concerns
+    Inconsistent (sometimes MT sometimes coding)
+    MT context polluted
+    NOT orchestrator behavior"]:::wideBox
 
     Task --> Good["✅ GOOD: Delegate to coding-agent
+  • MT: Task(coding-agent, 'Fix typo: intsall → install')
+  • coding-agent: Read, Edit, Return: Fixed
+  • MT: Bash: git commit
+  • Benefit:
+    Consistent delegation (ALWAYS)
+    MT stays clean
+    Single responsibility principle
+    Even 1-line fixes via coding-agent"]:::wideBox
 
-    Main Thread:
-    - Tool: Task(coding-agent,
-             'Fix typo: intsall → install
-              File: MODIFY README.md')
-
-    coding-agent:
-    - Read: README.md
-    - Edit: old → new
-    - Return: Fixed
-
-    Main Thread:
-    - Bash: git commit
-
-    Benefit:
-    - Consistent delegation (ALWAYS)
-    - Main Thread stays clean
-    - Single responsibility principle
-    - Even 1-line fixes go through coding-agent"]
-
-    Bad --> BadEnd([Inconsistent,<br/>polluted context])
-    Good --> GoodEnd([Consistent,<br/>clean separation])
+    Bad --> BadEnd([Inconsistent, polluted]):::wideBox
+    Good --> GoodEnd([Consistent, clean]):::wideBox
 
     style Task fill:#e1f5ff
     style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
@@ -2631,7 +2173,7 @@ flowchart TD
 ### ❌ Anti-Pattern 6: Hardcoding Paths
 
 ```mermaid
-flowchart LR
+flowchart TD
     Agent["PM or coding-agent"]
 
     Agent --> Bad["❌ BAD: Hardcoded Paths
@@ -2672,48 +2214,39 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Task["User: 'Bind Ctrl+K to QuickSearch'"]
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    Task["User: 'Bind Ctrl+K to QuickSearch'"]:::wideBox
 
     Task --> Bad["❌ BAD: No Conflict Check
-
-    coding-agent:
-    - Implements immediately
-    - Write: search-contribution.ts
-      (with Ctrl+K binding)
-    - NO conflict check
-
-    Result:
-    ❌ Ctrl+K already used elsewhere
-    → User confusion
+  • coding-agent: Implements immediately
+  • Write search-contribution.ts (Ctrl+K), NO check
+  • Result:
+    ❌ Ctrl+K already used → User confusion
     → Discovered only after deployment
-    → Hard to debug 'which feature uses Ctrl+K?'"]
+    → Hard to debug 'which feature uses Ctrl+K?'"]:::wideBox
 
     Task --> Good["✅ GOOD: Conflict Check FIRST
+  • coding-agent:
+    Step 1 BEFORE: Read CODEBASE_STRUCTURE.md, Grep 'Ctrl+K'
+    Step 2 If conflict: STOP, Report with alternatives
+    User chooses: Ctrl+Shift+K
+    Step 3 Implement:
+    Write search-contribution.ts (Ctrl+Shift+K)
+    Edit CODEBASE_STRUCTURE.md (update registry)
+  • Benefit:
+    Prevents duplicate keybindings
+    User decides before implementation
+    Registry up-to-date"]:::wideBox
 
-    coding-agent:
+    Bad --> BadEnd([Duplicate keybinding
+  User confusion
+  Wasted time]):::wideBox
 
-    Step 1: BEFORE implementing
-    - Read: CODEBASE_STRUCTURE.md
-    - Grep: 'Ctrl+K'
-
-    Step 2: If conflict
-    - STOP immediately
-    - Report to user with alternatives
-    - User chooses: Ctrl+Shift+K
-
-    Step 3: Implement with resolved key
-    - Write: search-contribution.ts (Ctrl+Shift+K)
-    - Edit: CODEBASE_STRUCTURE.md (update registry)
-
-    Benefit:
-    - Prevents duplicate keybindings
-    - User decides before implementation
-    - Registry always up-to-date
-    - No confusion"]
-
-    Bad --> BadEnd([Duplicate keybinding<br/>User confusion<br/>Wasted time])
-
-    Good --> GoodEnd([No conflicts<br/>Clean registry<br/>Prevented early])
+    Good --> GoodEnd([No conflicts
+  Clean registry
+  Prevented early]):::wideBox
 
     style Task fill:#e1f5ff
     style Bad fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
@@ -2735,11 +2268,13 @@ This visual guide provides **self-documenting Mermaid diagrams** where each node
 **You don't need to read external explanations** - the diagrams are self-contained.
 
 **Key Takeaways:**
-1. **User Decision Points** (red borders) are critical gates - user has control
-2. **Parallel execution** (shown as simultaneous branches) = faster runtime
-3. **PM guides, user decides** - all strategic decisions require user approval
-4. **Main Thread never writes code** - always delegates to coding-agent
-5. **Each node is self-documenting** - includes tools, actions, outputs
-6. **Diagrams tell the complete story** - no need for separate documentation
+1. **Pattern-first organization** - each pattern shows all scenario branches with decision points
+2. **User Decision Points** (red borders) are critical gates - user has control
+3. **Multiple conversation turns** between PM and user to refine ideas (Pattern 3)
+4. **Vision Impact Report** required before final approval (Pattern 3)
+5. **Parallel execution** (shown as simultaneous branches) = faster runtime
+6. **PM guides, user decides** - all strategic decisions require user approval
+7. **Main Thread never writes code** - always delegates to coding-agent
+8. **Each node is self-documenting** - includes tools, actions, outputs
 
 For detailed prose explanations and comprehensive context, see [AGENT_SWARM_FLOW.md](./AGENT_SWARM_FLOW.md).
