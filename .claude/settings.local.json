@@ -70,7 +70,9 @@
       "WebFetch(domain:apps.apple.com)",
       "WebFetch(domain:www.cometapi.com)",
       "WebFetch(domain:stevekinney.com)",
-      "WebFetch(domain:www.richsnapp.com)"
+      "WebFetch(domain:www.richsnapp.com)",
+      "WebFetch(domain:developer.mamezou-tech.com)",
+      "WebFetch(domain:mermaid.js.org)"
     ],
     "deny": [],
     "ask": []
