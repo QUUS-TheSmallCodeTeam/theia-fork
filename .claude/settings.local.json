@@ -72,7 +72,10 @@
       "WebFetch(domain:stevekinney.com)",
       "WebFetch(domain:www.richsnapp.com)",
       "WebFetch(domain:developer.mamezou-tech.com)",
-      "WebFetch(domain:mermaid.js.org)"
+      "WebFetch(domain:mermaid.js.org)",
+      "WebFetch(domain:biggo.com)",
+      "WebFetch(domain:deepwiki.com)",
+      "WebFetch(domain:paradox921.medium.com)"
     ],
     "deny": [],
     "ask": []
