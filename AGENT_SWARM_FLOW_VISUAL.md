@@ -1401,6 +1401,12 @@ flowchart TD
   • CODEBASE_STRUCTURE.md maintained
   • Tech stack tracked"]:::wideBox
 
+    --> M11["✅ File-Based Communication
+  • No prompt repetition
+  • Reports for multi-turn
+  • Clean subagent_reports/
+  • Stale report cleanup (<7 days)"]:::wideBox
+
     style Success fill:#e1ffe1
     style M1 fill:#e1f5ff
     style M2 fill:#e1f5ff
@@ -1412,6 +1418,7 @@ flowchart TD
     style M8 fill:#e1f5ff
     style M9 fill:#e1f5ff
     style M10 fill:#e1f5ff
+    style M11 fill:#e1f5ff
 ```
 
 ---
@@ -2257,6 +2264,214 @@ flowchart TD
 
 ---
 
+## Pattern 7: File-Based Reporting & Multi-turn Communication
+
+**When to use:** Complex investigations requiring multiple rounds of clarification between Main Thread and subagent.
+
+**Problem:** Subagents are stateless - repeating full context in every prompt is inefficient.
+
+**Solution:** File-based reporting system where subagents create reports that Main Thread can comment on.
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    Task(["Complex Investigation Task
+  • Multi-turn investigation needed"]):::wideBox
+
+    --> MT1["PHASE 1: Initial Investigation
+  • Main Thread: Invoke subagent
+  • Subagent: Creates report at
+    subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-name].md"]:::wideBox
+
+    --> Agent1["Subagent: Create Report
+  • Write: subagent_reports/20251021_1630_theme-pm.md
+  • Format:
+    # Topic
+    **Agent**: name | **Created**: datetime
+    ## Task
+    [What MT requested]
+    ## Findings
+    [Investigation results - bullet points]"]:::wideBox
+
+    --> MT2["PHASE 2: Main Thread Review
+  • Read report
+  • Add inline comments:
+    <!-- MT: Need more detail on X -->
+  • No re-invocation yet - just comments"]:::wideBox
+
+    --> MT3["PHASE 3: Re-invoke for Clarification
+  • Task(agent: '[agent-name]',
+    prompt: 'Update report at subagent_reports/[file].md
+    Address MT comments.')
+  • Subagent reads ENTIRE report + MT comments"]:::wideBox
+
+    --> Agent2["Subagent: Update Report
+  • Read previous report (includes MT comments)
+  • Address each MT request
+  • Append Updates section:
+    ---
+    ## Updates
+    **YYYY-MM-DD HH:MM**:
+    [Addressed MT comment 1]
+    [Addressed MT comment 2]"]:::wideBox
+
+    --> Loop{"More clarification
+  needed?"}:::wideDecision
+
+    Loop -->|Yes| MT2
+    Loop -->|No| MT4
+
+    MT4["PHASE 4: Task Complete
+  • Main Thread: Read final report
+  • Incorporate findings into implementation
+  • Cleanup:
+    Bash: rm subagent_reports/[file].md
+    OR
+    Bash: mv to ideas&external_references/ (if valuable)"]:::wideBox
+
+    --> End(["Complete
+  • Benefit:
+    - No prompt repetition
+    - Clear communication history
+    - Institutional memory if archived
+  • Lifecycle: Create → Review → Update → Delete/Archive"]):::wideBox
+
+    style Task fill:#e1f5ff
+    style Loop fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style MT1 fill:#e1ffe1
+    style MT2 fill:#e1ffe1
+    style MT3 fill:#e1ffe1
+    style MT4 fill:#e1ffe1
+    style Agent1 fill:#f0e1ff
+    style Agent2 fill:#f0e1ff
+    style End fill:#e1ffe1
+```
+
+**Key Features:**
+- **Datetime-stamped files**: `YYYYMMDD_HHMM_[topic]-[agent-name].md`
+- **MT comments**: `<!-- MT: ... -->` (inline, HTML comments)
+- **Multi-turn via file**: Eliminates prompt repetition
+- **Clean directory**: Delete when complete, archive if valuable
+- **Stale report check**: >7 days old = review and cleanup
+
+---
+
+## Tools & Commands
+
+### /codebase-check Command (PM-Driven Validation)
+
+**When to use:** After coding-agent completes implementation, before final commit.
+
+**Purpose:** Validate file lengths, update structure docs, suggest refactoring if needed.
+
+```mermaid
+flowchart TD
+    classDef wideBox padding:12px 20px,text-align:left,white-space:pre;
+    classDef wideDecision padding:12px 20px,text-align:left,white-space:pre;
+
+    Start(["Post-Implementation
+  coding-agent complete"]):::wideBox
+
+    --> Check["Phase 1: File Length Analysis
+  • Bash: git diff --name-only HEAD
+  • Read each modified file
+  • Count lines for each"]:::wideBox
+
+    --> Validate{"File length?
+  • <700: OK
+  • 700-750: WARNING
+  • >750: VIOLATION"}:::wideDecision
+
+    Validate -->|OK| StructUpdate
+    Validate -->|WARNING| Note["Note for monitoring
+  Approaching limit"]:::wideBox
+    Note --> StructUpdate
+
+    Validate -->|VIOLATION| Exception{"Exception?
+  • Data file?
+  • Generated?
+  • Test suite?"}:::wideDecision
+
+    Exception -->|Yes| StructUpdate
+    Exception -->|No| PMConsult["Phase 2: PM Consultation
+  • Task(pm): 'File [path] exceeds 750 lines.
+    Suggest refactoring strategy.'
+  • PM returns: Refactoring plan
+    (module boundaries, file splits)"]:::wideBox
+
+    PMConsult --> UserDec{"User Decision:
+  • A) Approve refactoring
+  • B) Override limit
+  • C) Cancel"}:::wideDecision
+
+    UserDec -->|A| Refactor["Invoke coding-agent
+  • Execute PM's refactoring plan
+  • coding-agent splits file
+  • Re-run /codebase-check"]:::wideBox
+    Refactor --> Start
+
+    UserDec -->|B| Document["Document override
+  • Edit CODEBASE_STRUCTURE.md
+  • Add to Exceptions section"]:::wideBox
+    Document --> StructUpdate
+
+    UserDec -->|C| End1([Canceled])
+
+    StructUpdate["Phase 3: Update Structure Doc
+  • Glob: CODEBASE_STRUCTURE.md
+  • Read current structure
+  • Update:
+    - Services Registry (new services)
+    - Keybindings Registry (new keys)
+    - Command Registry (new commands)
+    - Timeline (new feature entry)"]:::wideBox
+
+    --> StaleCheck["Phase 4: Check Stale Reports
+  • Bash: find subagent_reports -name '*.md' -mtime +7
+  • For each >7 days old:
+    Report to user (Delete? Archive? Keep?)"]:::wideBox
+
+    --> Report["Phase 5: Report to User
+  ✅ Passed: [N] files OK
+  ⚠️ Warning: [M] files approaching limit
+  ❌ Failed: [K] files need refactoring
+  ✅ Structure doc updated
+  ⚠️ Stale reports: [L] found"]:::wideBox
+
+    --> End2([Complete])
+
+    style Start fill:#e1f5ff
+    style Validate fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style Exception fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
+    style UserDec fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
+    style Check fill:#e1ffe1
+    style Note fill:#fff4e1
+    style StructUpdate fill:#e1ffe1
+    style StaleCheck fill:#e1ffe1
+    style Report fill:#e1ffe1
+    style PMConsult fill:#fff4e1
+    style Refactor fill:#ffe1f0
+    style Document fill:#e1ffe1
+    style End1 fill:#f0f0f0
+    style End2 fill:#e1ffe1
+```
+
+**Golden Rule:** 750 lines maximum (with documented exceptions)
+
+**Exceptions:**
+- Data files: Max 2000 lines
+- Generated code: No limit (must have AUTO-GENERATED header)
+- Test suites: Max 1500 lines
+
+**When to run:**
+- After coding-agent completes implementation
+- Before final commit
+- Weekly cleanup (stale reports)
+
+---
+
 ## Conclusion
 
 This visual guide provides **self-documenting Mermaid diagrams** where each node contains complete information:
@@ -2275,6 +2490,8 @@ This visual guide provides **self-documenting Mermaid diagrams** where each node
 5. **Parallel execution** (shown as simultaneous branches) = faster runtime
 6. **PM guides, user decides** - all strategic decisions require user approval
 7. **Main Thread never writes code** - always delegates to coding-agent
-8. **Each node is self-documenting** - includes tools, actions, outputs
+8. **File-based reporting** (Pattern 7) - eliminates prompt repetition for multi-turn investigations
+9. **/codebase-check command** - PM-driven file length validation and structure maintenance
+10. **Each node is self-documenting** - includes tools, actions, outputs
 
 For detailed prose explanations and comprehensive context, see [AGENT_SWARM_FLOW.md](./AGENT_SWARM_FLOW.md).

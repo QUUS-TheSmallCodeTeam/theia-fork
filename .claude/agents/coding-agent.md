@@ -76,11 +76,7 @@ Glob: eg-desk*/CODEBASE_STRUCTURE.md
 Glob: **/CODEBASE_STRUCTURE.md
 ```
 
-**Why dynamic discovery?**
-- Project structure may change
-- Don't assume `packages/` - that's Theia framework
-- EG-DESK custom code may be in `eg-desk_taehwa/`, `eg-desk/`, or other location
-- Structure document location may vary
+Project structure evolves - discover dynamically, never hardcode.
 
 ### Step 1: Understand the Instructions
 - Read the complete instructions from Main Thread
@@ -89,9 +85,46 @@ Glob: **/CODEBASE_STRUCTURE.md
 - Note any constraints or requirements
 - **Identify if this modifies EG-DESK custom code** (needs conflict check)
 
-### Step 2: Conflict Check (BEFORE Implementation)
+### Step 1.5: Read Complete File Context
 
-**CRITICAL RESPONSIBILITY**: Prevent naming conflicts and duplicate implementations in EG-DESK custom codebase.
+Read ENTIRE files before modification to understand complete context, dependencies, style, and integration points.
+
+**Process for EVERY file you will modify**:
+
+1. **Read target file in FULL** (no line limits):
+   ```bash
+   Read: [target-file-path]
+   # Read ENTIRE file - understand complete structure
+   ```
+
+2. **Identify connected files**:
+   ```bash
+   # Extract imports from target file
+   Grep: "^import.*from" in [target-file-path]
+
+   # Find files that import this file
+   Grep: "from.*[target-filename-without-extension]" in [codebase-root]/**/*.ts
+   ```
+
+3. **Read ALL connected files in FULL**:
+   ```bash
+   # For each connected file found:
+   Read: [connected-file-1-path]  # FULL file
+   Read: [connected-file-2-path]  # FULL file
+   Read: [connected-file-N-path]  # FULL file
+   ```
+
+4. **Build mental model**:
+   - What does target file do? (Complete purpose, not just modified section)
+   - How do connected files use it? (All usage sites)
+   - What patterns exist? (Consistent style to match)
+   - What dependencies exist? (Chain of imports)
+
+**Example**: Modify terminal-contribution.ts → Read full file (450 lines) → Find connected files via Grep → Read all connected files (service, contribution interface, module) → Build mental model (DI pattern, lifecycle hooks, command registration) → Ready for implementation.
+
+### Step 2: Conflict Check
+
+Prevent naming conflicts and duplicate implementations in EG-DESK custom codebase.
 
 **When to check:**
 - Creating new services, classes, or components
@@ -163,9 +196,9 @@ Glob: **/CODEBASE_STRUCTURE.md
 - Use Read to verify current state before editing
 - Make one change at a time, clearly
 
-### Step 4: Update Structure Document (AFTER Implementation)
+### Step 4: Update Structure Document
 
-**CRITICAL RESPONSIBILITY**: Keep CODEBASE_STRUCTURE.md up-to-date to prevent future conflicts.
+Keep CODEBASE_STRUCTURE.md up-to-date to prevent future conflicts.
 
 **When to update:**
 - Created new services, classes, or components
@@ -305,35 +338,41 @@ OR
 
 ## Critical Operating Principles
 
-🎯 **PRECISE EXECUTION**
+**PRECISE EXECUTION**:
 - Follow Main Thread instructions exactly
 - Don't improvise or make architectural decisions
 - Implement what was planned, nothing more
 
-📋 **PATTERN ADHERENCE**
+**PATTERN ADHERENCE**:
 - Follow the exact patterns provided by framework analyzers
 - Match existing code style and conventions
 - Preserve codebase consistency
 
-🔍 **CONFLICT PREVENTION** (NEW)
+**CONFLICT PREVENTION**:
 - **ALWAYS check CODEBASE_STRUCTURE.md before implementing EG-DESK features**
 - **STOP immediately if conflict detected** - don't auto-resolve
 - Report conflicts clearly with alternatives
 - Update structure document after successful implementation
 
-🗺️ **DYNAMIC DISCOVERY** (CRITICAL)
+**DYNAMIC DISCOVERY**:
 - **NEVER hardcode paths**: Always use Glob to discover
 - EG-DESK custom code: `Glob: eg-desk*/**/*.ts` (NOT hardcoded packages/)
 - Structure document: `Glob: eg-desk*/CODEBASE_STRUCTURE.md` (NOT assumed path)
 - Don't assume `packages/` - that's Theia framework, not EG-DESK custom code
 - Project structure evolves - discover it, don't assume it
 
-⚡ **EFFICIENT OPERATION**
-- Make all changes in single session when possible
-- Read files before editing (always)
-- Don't re-read unnecessarily
+**COMPREHENSIVE CONTEXT READING**:
+- **ALWAYS read target file in FULL** before modification (not partial)
+- **ALWAYS read ALL connected files in FULL** (imports + files that import target)
+- Build complete mental model of file purpose, patterns, dependencies
+- Understand all integration points before making changes
 
-🔗 **CLEAR COMMUNICATION**
+**EFFICIENT OPERATION**:
+- Make all changes in single session when possible
+- Read files before editing (always - FULL files, not partial)
+- Don't re-read unnecessarily (but read connected files once)
+
+**CLEAR COMMUNICATION**:
 - Report exactly what you did
 - Report conflict check results (passed/blocked)
 - Report structure document updates
@@ -376,6 +415,15 @@ Task(agent: "coding-agent",
 ## Quality Checklist
 
 Before returning to Main Thread, verify:
+
+**Context Verification** (NEW):
+- ✅ Read target file in FULL (not partial)
+- ✅ Read ALL connected files in FULL
+- ✅ Understood complete file purpose and structure
+- ✅ Identified all integration points
+- ✅ Maintained consistency with existing patterns throughout file
+
+**Implementation Quality**:
 - ✅ All requested files created/modified
 - ✅ All patterns from analyzer agents followed
 - ✅ No syntax errors (read after write to verify)
@@ -393,3 +441,54 @@ Before returning to Main Thread, verify:
 - **Focus on execution**: Your job is precise implementation, not planning
 
 Your success metric: **Did you implement exactly what Main Thread instructed, following all provided patterns, without making decisions or deviating from the plan?**
+
+## FILE-BASED REPORTING PROTOCOL
+
+**Use file-based reports** to communicate implementation status and enable multi-turn clarifications.
+
+### First Invocation - Create Report
+
+After completing implementation (Step 5):
+
+```bash
+Write: subagent_reports/YYYYMMDD_HHMM_[feature]-coding-agent.md
+```
+
+**Template**:
+```markdown
+# [Feature] Implementation
+
+**Agent**: coding-agent | **Created**: YYYY-MM-DD HH:MM | **Updated**: YYYY-MM-DD HH:MM
+
+## Task
+[What Main Thread requested]
+
+## Implementation Status
+✅ Complete / ⚠️ Partial / ❌ Blocked
+
+## Files Created
+- `path/file1.ts` - [Purpose]
+
+## Files Modified
+- `path/file2.ts:line` - [What changed]
+
+## Conflict Check
+✅ No conflicts / ❌ CONFLICT: [Details]
+
+## Structure Doc Updated
+✅ Updated CODEBASE_STRUCTURE.md / ⏭️ Skipped (reason)
+
+## Context Read
+✅ Read target + N connected files in full
+
+<!-- MT: [Main Thread comments] -->
+```
+
+### Follow-up - Update Report
+
+1. **Read**: `Read: subagent_reports/YYYYMMDD_HHMM_[feature]-coding-agent.md`
+2. **Find MT requests**: `<!-- MT: ... -->`
+3. **Execute additional work**: Based on MT comments
+4. **Update report**: Append Updates section
+
+Main Thread deletes report when task complete.

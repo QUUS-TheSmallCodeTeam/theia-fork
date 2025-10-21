@@ -97,12 +97,38 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| 1 | User | Asks question | None | Request sent |
-| 2 | Main Thread | Analyzes: Simple file listing | None | Routes to direct execution |
-| 3 | Main Thread | Lists files | `Glob("packages/ai-chat/**/*")` | File list |
-| 4 | Main Thread | Returns answer to user | None | User sees file list |
+```
+┌──────────────────────────────────────────────┐
+│ Step 1: User                                 │
+│ • Action: Asks question                      │
+│ • Tools: None                                │
+│ • Output: Request sent                       │
+└──────────────────┬───────────────────────────┘
+                   │
+                   ↓
+┌──────────────────────────────────────────────┐
+│ Step 2: Main Thread                          │
+│ • Action: Analyzes - Simple file listing     │
+│ • Tools: None                                │
+│ • Output: Routes to direct execution         │
+└──────────────────┬───────────────────────────┘
+                   │
+                   ↓
+┌──────────────────────────────────────────────┐
+│ Step 3: Main Thread                          │
+│ • Action: Lists files                        │
+│ • Tools: Glob("packages/ai-chat/**/*")       │
+│ • Output: File list                          │
+└──────────────────┬───────────────────────────┘
+                   │
+                   ↓
+┌──────────────────────────────────────────────┐
+│ Step 4: Main Thread                          │
+│ • Action: Returns answer to user             │
+│ • Tools: None                                │
+│ • Output: User sees file list                │
+└──────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 0
 
@@ -121,15 +147,65 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| 1 | User | Asks framework question | None | Request sent |
-| 2 | Main Thread | Analyzes: Theia framework question | None | Routes to theia-analyzer-agent |
-| 3 | Main Thread | Invokes agent | `Task(agent: "theia-analyzer-agent", prompt: "Analyze Theia's DI system in packages/core/")` | Agent starts |
-| 4 | theia-analyzer-agent | Reads DI implementation | `Read("packages/core/src/common/di.ts")`<br>`Grep("@injectable")` | Finds patterns |
-| 5 | theia-analyzer-agent | Analyzes examples | `Glob("**/*-frontend-module.ts")`<br>`Read(example files)` | Understands usage |
-| 6 | theia-analyzer-agent | Returns report | None | Detailed explanation with file refs |
-| 7 | Main Thread | Presents to user | None | User sees explanation |
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Step 1: User                                                 │
+│ • Action: Asks framework question                            │
+│ • Tools: None                                                │
+│ • Output: Request sent                                       │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 2: Main Thread                                          │
+│ • Action: Analyzes - Theia framework question                │
+│ • Tools: None                                                │
+│ • Output: Routes to theia-analyzer-agent                     │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 3: Main Thread                                          │
+│ • Action: Invokes agent                                      │
+│ • Tools: Task(agent: "theia-analyzer-agent",                 │
+│          prompt: "Analyze Theia's DI system...")             │
+│ • Output: Agent starts                                       │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 4: theia-analyzer-agent                                 │
+│ • Action: Reads DI implementation                            │
+│ • Tools: Read("packages/core/src/common/di.ts")              │
+│          Grep("@injectable")                                 │
+│ • Output: Finds patterns                                     │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 5: theia-analyzer-agent                                 │
+│ • Action: Analyzes examples                                  │
+│ • Tools: Glob("**/*-frontend-module.ts")                     │
+│          Read(example files)                                 │
+│ • Output: Understands usage                                  │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 6: theia-analyzer-agent                                 │
+│ • Action: Returns report                                     │
+│ • Tools: None                                                │
+│ • Output: Detailed explanation with file refs                │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 7: Main Thread                                          │
+│ • Action: Presents to user                                   │
+│ • Tools: None                                                │
+│ • Output: User sees explanation                              │
+└──────────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 1 (theia-analyzer-agent)
 
@@ -152,23 +228,140 @@ Roles: PM guides strategy → Main Thread executes → coding-agent implements
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| 1 | User | Proposes feature idea | None | Request sent |
-| 2 | Main Thread | Analyzes: EG-DESK feature, needs PM strategic guide | None | Follows orchestration guidelines |
-| 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants floating AI assistant that follows mouse cursor. Provide strategic guide.")` | PM agent starts |
-| 4 | egdesk-pm-agent | Discovers vision docs | `Glob("ideas&external_references/eg-desk ideas/**/*.md")` | Finds UX and whitepaper docs |
-| 5 | egdesk-pm-agent | Analyzes vision docs | `Read("EG-DESK_Whitepaper.md")`<br>`Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")`<br>`Grep("spatial", "proximity", "floating")` | Finds: Previous decision against floating UI |
-| 6 | egdesk-pm-agent | Evaluates alignment | None (analysis) | Decision: REJECT original, SUGGEST alternative |
-| 7 | egdesk-pm-agent | Returns strategic guide with insight | None | **Summary**: Floating cursor-following AI conflicts with spatial canvas principles.<br>**Decision**: REJECT original idea<br>**Insight**: "In EG-DESK_Spatial_Canvas_UX_Solutions.md, we decided against floating/following UI because it breaks spatial affordances. Users lose sense of place when elements follow cursor."<br>**Alternative**: Proximity-based AI activation - AI appears NEAR relevant canvas objects, not following cursor<br>**Why alternative is better**: Maintains spatial relationships while providing contextual AI<br>**Vision-Aligned**: ✅ Proximity-based aligns with spatial canvas principles |
-| **PHASE 1: USER DECISION** |
-| 8 | Main Thread | **Presents rejection + alternative to user** | None | "PM rejected floating AI (conflicts with spatial canvas). Suggests proximity-based AI instead.<br>**Options:**<br>A) Accept alternative (proximity-based AI)<br>B) Insist on floating AI (requires vision change)<br>C) Cancel feature" |
-| 9 | User | **Accepts alternative** | None (human decision) | "Makes sense. Let's do proximity-based AI instead." |
-| **PHASE 2: PROCEED WITH ALTERNATIVE** |
-| 10 | Main Thread | Invokes PM for alternative feature guide | `Task(agent: "egdesk-pm-agent", prompt: "User accepted proximity-based AI alternative. Provide implementation guide for proximity-based AI activation.")` | PM agent starts |
-| 11 | egdesk-pm-agent | Creates PRD for alternative | `Write("ideas&external_references/eg-desk ideas/features/proximity-based-ai-prd.md", "[PRD content]")` | PRD created for vision-aligned feature |
-| 12 | egdesk-pm-agent | Returns implementation guide | None | **Decision**: APPROVE<br>**Feature**: Proximity-based AI activation<br>**Framework**: Theia + Infinite Canvas<br>**Location**: eg-desk_taehwa/ai/<br>**Next Steps**: Follow Pattern 2 for implementation |
-| 13 | Main Thread | Proceeds to implementation | (Follow Pattern 2: PM-Driven Development) | Implementation begins |
+```
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 1: User                                                       │
+│ • Action: Proposes feature idea                                    │
+│ • Tools: None                                                      │
+│ • Output: Request sent                                             │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 2: Main Thread                                                │
+│ • Action: Analyzes - EG-DESK feature, needs PM strategic guide     │
+│ • Tools: None                                                      │
+│ • Output: Follows orchestration guidelines                         │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 3: Main Thread                                                │
+│ • Action: Invokes PM agent                                         │
+│ • Tools: Task(agent: "egdesk-pm-agent",                            │
+│          prompt: "User wants floating AI assistant...")            │
+│ • Output: PM agent starts                                          │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 4: egdesk-pm-agent                                            │
+│ • Action: Discovers vision docs                                    │
+│ • Tools: Glob("ideas&external_references/eg-desk ideas/**/*.md")   │
+│ • Output: Finds UX and whitepaper docs                             │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 5: egdesk-pm-agent                                            │
+│ • Action: Analyzes vision docs                                     │
+│ • Tools: Read("EG-DESK_Whitepaper.md")                             │
+│          Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")            │
+│          Grep("spatial", "proximity", "floating")                  │
+│ • Output: Finds - Previous decision against floating UI            │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 6: egdesk-pm-agent                                            │
+│ • Action: Evaluates alignment                                      │
+│ • Tools: None (analysis)                                           │
+│ • Output: Decision - REJECT original, SUGGEST alternative          │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 7: egdesk-pm-agent                                            │
+│ • Action: Returns strategic guide with insight                     │
+│ • Tools: None                                                      │
+│ • Output:                                                          │
+│   - Summary: Floating cursor-following AI conflicts with spatial   │
+│     canvas principles                                              │
+│   - Decision: REJECT original idea                                 │
+│   - Insight: Vision doc decided against floating/following UI      │
+│     (breaks spatial affordances, users lose sense of place)        │
+│   - Alternative: Proximity-based AI activation                     │
+│   - Why better: Maintains spatial relationships                    │
+│   - Vision-Aligned: ✅ Proximity-based aligns with principles      │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+          ┌──────────┴──────────┐
+          │ PHASE 1: USER DECISION │
+          └──────────┬──────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 8: Main Thread                                                │
+│ • Action: **Presents rejection + alternative to user**             │
+│ • Tools: None                                                      │
+│ • Output:                                                          │
+│   "PM rejected floating AI (conflicts with spatial canvas).        │
+│    Suggests proximity-based AI instead."                           │
+│   **Options:**                                                     │
+│   A) Accept alternative (proximity-based AI)                       │
+│   B) Insist on floating AI (requires vision change)                │
+│   C) Cancel feature                                                │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 9: User                                                       │
+│ • Action: **Accepts alternative**                                  │
+│ • Tools: None (human decision)                                     │
+│ • Output: "Makes sense. Let's do proximity-based AI instead."      │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+          ┌──────────┴───────────────┐
+          │ PHASE 2: PROCEED WITH ALTERNATIVE │
+          └──────────┬───────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 10: Main Thread                                               │
+│ • Action: Invokes PM for alternative feature guide                 │
+│ • Tools: Task(agent: "egdesk-pm-agent",                            │
+│          prompt: "User accepted proximity-based AI alternative...")│
+│ • Output: PM agent starts                                          │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 11: egdesk-pm-agent                                           │
+│ • Action: Creates PRD for alternative                              │
+│ • Tools: Write("ideas&external_references/eg-desk ideas/           │
+│          features/proximity-based-ai-prd.md", "[PRD content]")     │
+│ • Output: PRD created for vision-aligned feature                   │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 12: egdesk-pm-agent                                           │
+│ • Action: Returns implementation guide                             │
+│ • Tools: None                                                      │
+│ • Output:                                                          │
+│   - Decision: APPROVE                                              │
+│   - Feature: Proximity-based AI activation                         │
+│   - Framework: Theia + Infinite Canvas                             │
+│   - Location: eg-desk_taehwa/ai/                                   │
+│   - Next Steps: Follow Pattern 2 for implementation                │
+└────────────────────┬───────────────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 13: Main Thread                                               │
+│ • Action: Proceeds to implementation                               │
+│ • Tools: (Follow Pattern 2: PM-Driven Development)                 │
+│ • Output: Implementation begins                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 2 (PM rejection + PM guide for alternative)
 
@@ -202,34 +395,179 @@ User: "I understand the vision, but I still want floating AI. I think the vision
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| **PHASE 0: SAME AS SCENARIO 3a (Steps 1-7)** |
-| 1-7 | Various | User proposes → PM analyzes → PM rejects with alternative | (See Scenario 3a) | PM rejected floating AI, suggested proximity-based |
-| **PHASE 1: USER INSISTS ON ORIGINAL** |
-| 8 | Main Thread | Presents rejection + alternative to user | None | "PM rejected floating AI. Suggests proximity-based. **Options?**" |
-| 9 | User | **Insists on original with rationale** | None (human decision) | "I understand vision, but floating AI is more intuitive. Vision should evolve. Here's why: [user rationale]" |
-| **PHASE 2: PM RE-EVALUATES WITH USER RATIONALE** |
-| 10 | Main Thread | Returns to PM with user's argument | `Task(agent: "egdesk-pm-agent", prompt: "User reviewed vision conflict. Insists on floating AI despite spatial canvas principles. User rationale: 'Floating UI more intuitive for contextual AI'.<br><br>Reassess: Should vision evolve? Or does alternative better serve user's goal?")` | PM agent starts (re-evaluation) |
-| 11 | egdesk-pm-agent | Re-reads vision docs | `Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")` | Spatial affordance principles |
-| 12 | egdesk-pm-agent | Analyzes user's rationale | None (analysis) | User prioritizes "intuitiveness" over "spatial affordances". Valid but different priority. |
-| 13 | egdesk-pm-agent | **Makes final assessment** | None (strategic decision) | **Options**:<br>A) Maintain vision (spatial > intuitiveness) - Suggest proximity-based remains better<br>B) Evolve vision (if user's rationale strong) - Flag vision change for user to document<br>C) Hybrid approach (floating in certain contexts, spatial in others) |
-| 14 | egdesk-pm-agent | Returns re-evaluation | None | **Assessment**: User's rationale valid but vision prioritizes spatial affordances for different reason (long-term workspace coherence vs short-term intuitiveness)<br>**PM Stance**: Recommend maintaining current vision (spatial affordances > floating UX)<br>**User Decision Required**: This is strategic vision choice, not technical. User must decide:<br>  - Maintain vision (use proximity-based)<br>  - OR evolve vision (document rationale, update EG-DESK_Spatial_Canvas_UX_Solutions.md, proceed with floating AI) |
-| **PHASE 3: USER MAKES STRATEGIC DECISION** |
-| 15 | Main Thread | Presents vision choice to user | None | "PM reassessed. User's rationale valid, but vision prioritizes spatial affordances. **Your decision:**<br>A) Maintain vision - use proximity-based AI<br>B) Evolve vision - proceed with floating AI (requires vision doc update)" |
-| 16 | User | **Makes strategic decision** | None (human authority) | OPTIONS:<br>A) "OK, let's stick with vision - proximity-based is fine"<br>B) "I want to evolve vision - floating AI is worth it" |
+```
+┌────────────────────────────────────────────────────────────┐
+│ PHASE 0: SAME AS SCENARIO 3a (Steps 1-7)                  │
+│ User proposes → PM analyzes → PM rejects with alternative  │
+│ Output: PM rejected floating AI, suggested proximity-based │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴────────────────┐
+          │ PHASE 1: USER INSISTS ON ORIGINAL │
+          └──────────┬────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 8: Main Thread                                        │
+│ • Action: Presents rejection + alternative to user         │
+│ • Tools: None                                              │
+│ • Output: "PM rejected floating AI. Suggests proximity-    │
+│           based. **Options?**"                             │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 9: User                                               │
+│ • Action: **Insists on original with rationale**           │
+│ • Tools: None (human decision)                             │
+│ • Output: "I understand vision, but floating AI is more    │
+│           intuitive. Vision should evolve. Here's why..."  │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴─────────────────────┐
+          │ PHASE 2: PM RE-EVALUATES WITH USER RATIONALE │
+          └──────────┬─────────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 10: Main Thread                                       │
+│ • Action: Returns to PM with user's argument               │
+│ • Tools: Task(agent: "egdesk-pm-agent",                    │
+│          prompt: "User reviewed vision conflict.           │
+│          Insists on floating AI. User rationale:           │
+│          'Floating UI more intuitive...'")                 │
+│ • Output: PM agent starts (re-evaluation)                  │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 11: egdesk-pm-agent                                   │
+│ • Action: Re-reads vision docs                             │
+│ • Tools: Read("EG-DESK_Spatial_Canvas_UX_Solutions.md")    │
+│ • Output: Spatial affordance principles                    │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 12: egdesk-pm-agent                                   │
+│ • Action: Analyzes user's rationale                        │
+│ • Tools: None (analysis)                                   │
+│ • Output: User prioritizes "intuitiveness" over "spatial   │
+│           affordances". Valid but different priority.      │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 13: egdesk-pm-agent                                   │
+│ • Action: **Makes final assessment**                       │
+│ • Tools: None (strategic decision)                         │
+│ • Output: **Options:**                                     │
+│   A) Maintain vision (spatial > intuitiveness) - proximity │
+│   B) Evolve vision (user's rationale strong) - flag change │
+│   C) Hybrid approach (floating in certain contexts)        │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 14: egdesk-pm-agent                                   │
+│ • Action: Returns re-evaluation                            │
+│ • Tools: None                                              │
+│ • Output:                                                  │
+│   - Assessment: User's rationale valid but vision          │
+│     prioritizes spatial affordances                        │
+│   - PM Stance: Recommend maintaining current vision        │
+│   - User Decision Required: Strategic vision choice        │
+│     * Maintain vision (use proximity-based)                │
+│     * OR evolve vision (update docs, proceed with floating)│
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴────────────────┐
+          │ PHASE 3: USER MAKES STRATEGIC DECISION │
+          └──────────┬────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 15: Main Thread                                       │
+│ • Action: Presents vision choice to user                   │
+│ • Tools: None                                              │
+│ • Output: "PM reassessed. User's rationale valid, but      │
+│           vision prioritizes spatial affordances.          │
+│           **Your decision:**                               │
+│           A) Maintain vision - use proximity-based AI      │
+│           B) Evolve vision - proceed with floating AI"     │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 16: User                                              │
+│ • Action: **Makes strategic decision**                     │
+│ • Tools: None (human authority)                            │
+│ • Output: OPTIONS:                                         │
+│   A) "OK, let's stick with vision - proximity-based is     │
+│       fine"                                                │
+│   B) "I want to evolve vision - floating AI is worth it"   │
+└────────────────┬───────────────────────────────────────────┘
+                 │
+      ┌──────────┴──────────┐
+      │                     │
+   Branch A             Branch B
+      │                     │
+  Maintain              Evolve
+   Vision               Vision
+      │                     │
+      └─────────────────────┼─────────────────►
+                            ↓
+      ┌─────────────────────────────────────────────────┐
+      │ Step 17: Main Thread                            │
+      │ • Action: Invokes PM to update vision           │
+      │ • Tools: Task(agent: "egdesk-pm-agent",         │
+      │          prompt: "User decided to evolve        │
+      │          vision. Proceed with floating AI...")  │
+      │ • Output: PM agent starts (vision update)       │
+      └──────────────────┬──────────────────────────────┘
+                         │
+                         ↓
+      ┌─────────────────────────────────────────────────┐
+      │ Step 18: egdesk-pm-agent                        │
+      │ • Action: **Updates vision document**           │
+      │ • Tools: Edit("EG-DESK_Spatial_Canvas_UX_       │
+      │          Solutions.md", add: "### Vision        │
+      │          Evolution: Floating AI...")            │
+      │ • Output: Vision doc updated                    │
+      └──────────────────┬──────────────────────────────┘
+                         │
+                         ↓
+      ┌─────────────────────────────────────────────────┐
+      │ Step 19: egdesk-pm-agent                        │
+      │ • Action: Creates PRD for floating AI           │
+      │ • Tools: Write("ideas&external_references/      │
+      │          eg-desk ideas/features/floating-ai-    │
+      │          assistant-prd.md", "[PRD]")            │
+      │ • Output: PRD created                           │
+      └──────────────────┬──────────────────────────────┘
+                         │
+                         ↓
+      ┌─────────────────────────────────────────────────┐
+      │ Step 20: egdesk-pm-agent                        │
+      │ • Action: Returns implementation guide          │
+      │ • Tools: None                                   │
+      │ • Output:                                       │
+      │   - Decision: APPROVE (vision evolved per user) │
+      │   - Vision Updated: Docs document evolution     │
+      │   - Framework: Theia + Infinite Canvas          │
+      │   - Location: eg-desk_taehwa/ai/                │
+      │   - Next Steps: Follow Pattern 2                │
+      └──────────────────┬──────────────────────────────┘
+                         │
+                         ↓
+      ┌─────────────────────────────────────────────────┐
+      │ Step 21: Main Thread                            │
+      │ • Action: Proceeds to implementation            │
+      │ • Tools: (Follow Pattern 2)                     │
+      │ • Output: Implementation of floating AI         │
+      └─────────────────────────────────────────────────┘
+```
 
 **Branch A: User maintains vision** → Proceed with proximity-based AI (follow Scenario 3a from Step 10)
 
-**Branch B: User evolves vision:**
-
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| 17 | Main Thread | Invokes PM to update vision | `Task(agent: "egdesk-pm-agent", prompt: "User decided to evolve vision. Proceed with floating AI. Update EG-DESK_Spatial_Canvas_UX_Solutions.md to document this decision and rationale.")` | PM agent starts (vision update) |
-| 18 | egdesk-pm-agent | **Updates vision document** | `Edit("EG-DESK_Spatial_Canvas_UX_Solutions.md", add: "### Vision Evolution: Floating AI (2025-10-17)\nUser decision: Floating AI prioritized over strict spatial affordances for contextual assistance. Rationale: [user's argument]. Tradeoff accepted: Some spatial disorientation acceptable for improved intuitiveness.")` | Vision doc updated |
-| 19 | egdesk-pm-agent | Creates PRD for floating AI | `Write("ideas&external_references/eg-desk ideas/features/floating-ai-assistant-prd.md", "[PRD]")` | PRD created |
-| 20 | egdesk-pm-agent | Returns implementation guide | None | **Decision**: APPROVE (vision evolved per user decision)<br>**Vision Updated**: EG-DESK_Spatial_Canvas_UX_Solutions.md documents evolution<br>**Framework**: Theia + Infinite Canvas<br>**Location**: eg-desk_taehwa/ai/<br>**Next Steps**: Follow Pattern 2 for implementation |
-| 21 | Main Thread | Proceeds to implementation | (Follow Pattern 2) | Implementation of floating AI |
+**Branch B: User evolves vision** → Continue with Steps 17-21 above
 
 **Total Agents Invoked:** 3 (PM rejection → PM re-evaluation → PM vision update + guide)
 
@@ -256,64 +594,82 @@ User: "I understand the vision, but I still want floating AI. I think the vision
 
 ---
 
-### Scenario 3 Flow Diagram (Mermaid)
+### Scenario 3 Flow Diagram (Horizontal ASCII)
 
-```mermaid
-flowchart TD
-    Start([User: Add floating AI assistant?])
-
-    Start --> MT1[Main Thread: Route to PM]
-    MT1 --> PM1[PM: Analyze Vision Alignment]
-
-    PM1 --> PMDiscover["PM: Glob vision docs<br/>Read Whitepaper + UX docs<br/>Grep 'floating', 'spatial'"]
-    PMDiscover --> PMFind["PM Found:<br/>Previous decision AGAINST floating UI<br/>Reason: Breaks spatial affordances"]
-
-    PMFind --> PMAlt["PM: Generate Alternative<br/>Proximity-based AI<br/>(vision-aligned solution)"]
-
-    PMAlt --> PM1Return["PM Returns: REJECT original<br/>+ Insight (why conflict)<br/>+ Alternative (proximity-based)<br/>+ Rationale (maintains spatial)"]
-
-    PM1Return --> MT2[Main Thread: Present to User]
-    MT2 --> UserDec1{User Decision:<br/>Accept alternative?}
-
-    UserDec1 -->|A: Accept Alt| PM2Guide[PM: Guide for Alternative]
-    UserDec1 -->|B: Insist Original| PM2Reeval[PM: Re-evaluate with User Rationale]
-    UserDec1 -->|C: Cancel| End1([Stop: Feature canceled])
-
-    PM2Guide --> PM2PRD["PM: Create PRD<br/>proximity-based-ai-prd.md"]
-    PM2PRD --> PM2Return[PM: Implementation Guide]
-    PM2Return --> MT3A[Main Thread: Proceed to Implementation]
-    MT3A --> End2([Follow Pattern 2: Implementation])
-
-    PM2Reeval --> PM2Assess["PM: Assess User Rationale<br/>Valid priority shift?<br/>Vision evolution justified?"]
-
-    PM2Assess --> PM2Options["PM Returns:<br/>User rationale valid but...<br/>Options:<br/>A) Maintain vision<br/>B) Evolve vision (user decides)"]
-
-    PM2Options --> MT3B[Main Thread: Present Choice]
-    MT3B --> UserDec2{User Strategic Decision:<br/>Maintain or Evolve vision?}
-
-    UserDec2 -->|A: Maintain| PM2Guide
-    UserDec2 -->|B: Evolve| PM3Update[PM: Update Vision Docs]
-
-    PM3Update --> PM3Edit["PM: Edit UX Solutions doc<br/>Document vision evolution<br/>User rationale + tradeoffs"]
-    PM3Edit --> PM3PRD["PM: Create PRD<br/>floating-ai-assistant-prd.md"]
-    PM3PRD --> PM3Return[PM: Implementation Guide<br/>for floating AI]
-    PM3Return --> MT4[Main Thread: Proceed to Implementation]
-    MT4 --> End3([Follow Pattern 2: Implementation])
-
-    style Start fill:#e1f5ff
-    style UserDec1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style UserDec2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style PM1 fill:#fff4e1
-    style PM2Guide fill:#fff4e1
-    style PM2Reeval fill:#fff4e1
-    style PM3Update fill:#fff4e1
-    style MT2 fill:#e1ffe1
-    style MT3A fill:#e1ffe1
-    style MT3B fill:#e1ffe1
-    style MT4 fill:#e1ffe1
-    style End1 fill:#f0f0f0
-    style End2 fill:#e1ffe1
-    style End3 fill:#e1ffe1
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ USER REQUEST: "Add floating AI assistant?"                                │
+└──────────────────────┬─────────────────────────────────────────────────────┘
+                       ▼
+    ┌───────────────┐      ┌─────────────────┐      ┌──────────────────────┐
+    │ MT: Route     │ ───→ │ PM: Analyze     │ ───→ │ PM: Glob vision docs │
+    │ to PM         │      │ Vision Align    │      │ Read Whitepaper+UX   │
+    └───────────────┘      └─────────────────┘      │ Grep 'floating'      │
+                                                     └──────┬───────────────┘
+                                                            ▼
+                       ┌──────────────────────────────────────────────────────┐
+                       │ PM Found: Previous decision AGAINST floating UI      │
+                       │ Reason: Breaks spatial affordances                   │
+                       └────────────────────┬─────────────────────────────────┘
+                                            ▼
+                       ┌──────────────────────────────────────────────────────┐
+                       │ PM: Generate Alternative - Proximity-based AI        │
+                       │ (vision-aligned solution)                            │
+                       └────────────────────┬─────────────────────────────────┘
+                                            ▼
+                       ┌──────────────────────────────────────────────────────┐
+                       │ PM Returns: REJECT original + Insight + Alternative  │
+                       │ + Rationale                                          │
+                       └────────────────────┬─────────────────────────────────┘
+                                            ▼
+                       ┌──────────────────────────────────────────────────────┐
+                       │ Main Thread: Present to User                         │
+                       └────────────────────┬─────────────────────────────────┘
+                                            ▼
+                       ┌──────────────────────────────────────────────────────┐
+                       │ ★ USER DECISION 1: Accept alternative?               │
+                       └──┬────────────────┬────────────────┬─────────────────┘
+                          │                │                │
+                A: Accept Alt    B: Insist Orig    C: Cancel
+                          │                │                │
+                          ▼                ▼                ▼
+┌────────────────────────┐  ┌──────────────────────────────┐  ┌──────────────┐
+│ PM: Guide for Alt      │  │ PM: Re-evaluate w/ User      │  │ STOP: Feature│
+│  ↓                     │  │ Rationale                    │  │ canceled     │
+│ PM: Create PRD         │  │  ↓                           │  └──────────────┘
+│ proximity-ai-prd.md    │  │ PM: Assess Rationale         │
+│  ↓                     │  │ Valid priority shift?        │
+│ PM: Impl Guide         │  │ Vision evolution OK?         │
+│  ↓                     │  │  ↓                           │
+│ MT: Proceed            │  │ PM Returns: Rationale valid  │
+│  ↓                     │  │ Options: A) Maintain vision  │
+│ Follow Pattern 2:      │  │ B) Evolve vision (user pick) │
+│ Implementation         │  │  ↓                           │
+└────────────────────────┘  │ MT: Present Choice           │
+                            │  ↓                           │
+                            │ ★ USER DECISION 2: Maintain  │
+                            │ or Evolve vision?            │
+                            └──┬─────────────────┬─────────┘
+                               │                 │
+                     A: Maintain             B: Evolve
+                               │                 │
+                               │                 ▼
+                               │   ┌──────────────────────────────┐
+                               │   │ PM: Update Vision Docs       │
+                               │   │  ↓                           │
+                               │   │ PM: Edit UX Solutions doc    │
+                               │   │ Document vision evolution    │
+                               │   │ User rationale + tradeoffs   │
+                               │   │  ↓                           │
+                               │   │ PM: Create PRD               │
+                               │   │ floating-ai-assistant-prd.md │
+                               │   │  ↓                           │
+                               │   │ PM: Impl Guide for float AI  │
+                               │   │  ↓                           │
+                               │   │ MT: Proceed to Impl          │
+                               │   │  ↓                           │
+                               └───→ Follow Pattern 2: Impl       │
+                                   └──────────────────────────────┘
 ```
 
 **Flow Paths:**
@@ -342,35 +698,238 @@ flowchart TD
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| **PHASE 0: PM STRATEGIC GUIDE** |
-| 1 | User | Requests feature | None | Request sent |
-| 2 | Main Thread | Analyzes: Development task, needs strategic direction | None | Routes to PM for initial guide |
-| 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants time-based terminal theme. Provide strategic guide.")` | PM agent starts |
-| 4 | egdesk-pm-agent | Dynamic discovery | `Glob("ideas&external_references/eg-desk ideas/**/*.md")`<br>`Glob("packages/*/package.json")`<br>`Grep("theme", "terminal")` | Finds vision docs + existing theme code |
-| 5 | egdesk-pm-agent | Analyzes vision + structure | `Read("EG-DESK_Whitepaper.md")`<br>`Read("packages/terminal/package.json")`<br>`Read("packages/terminal/src/browser/terminal-theme-service.ts")` | Extracts principles + discovers structure |
-| 6 | egdesk-pm-agent | Creates PRD | `Write("ideas&external_references/eg-desk ideas/features/time-based-terminal-theme-prd.md", "[PRD content]")` | PRD file created |
-| 7 | egdesk-pm-agent | Returns strategic guide | None | **Decision**: APPROVE<br>**Framework**: Theia (terminal theming is Theia domain)<br>**Location**: `packages/terminal/src/browser/`<br>**Approach**: Phase 1 - analyze theme system, Phase 2 - design service, Phase 3 - implement<br>**Considerations**: Manual override needed, preference persistence<br>**PRD Created**: time-based-terminal-theme-prd.md |
-| **PHASE 1: FRAMEWORK INVESTIGATION PLANNING** |
-| 8 | Main Thread | Plans framework investigation based on PM guide | None (planning) | Investigation plan: Query theia-analyzer for theme patterns, DI registration patterns |
-| **PHASE 2: FRAMEWORK INVESTIGATION (EXECUTION)** |
-| 9 | Main Thread | Queries framework agent (per PM's guide) | `Task(agent: "theia-analyzer-agent", prompt: "Analyze terminal theme system at packages/terminal/src/browser/terminal-theme-service.ts for registration and DI patterns")` | Agent starts |
-| 10 | theia-analyzer-agent | Analyzes theme system | `Read("packages/terminal/src/browser/terminal-theme-service.ts")`<br>`Read("packages/terminal/src/browser/terminal-frontend-module.ts")`<br>`Grep("@injectable")` | Finds patterns |
-| 11 | theia-analyzer-agent | Returns analysis | None | **Files Analyzed**: terminal-theme-service.ts:45, terminal-frontend-module.ts:32<br>**Pattern**: ThemeService.register() with DI binding<br>**File List**: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, REFERENCE workspace-service.ts:89 for @injectable() |
-| **PHASE 3: IMPLEMENTATION PLANNING** |
-| 12 | Main Thread | Creates implementation plan (synthesizes PM guide + framework patterns) | None (internal) | Implementation plan:<br>**Direction**: Create TimeBasedThemeSwitcher following Theia DI pattern<br>**File List**: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, terminal-contribution.ts:89, REFERENCE workspace-service.ts:89 for @injectable() pattern |
-| **PHASE 4: IMPLEMENTATION EXECUTION (via coding-agent)** |
-| 13 | Main Thread | Delegates to coding-agent | `Task(agent: "coding-agent", prompt: "Implement time-based terminal theme switcher. Direction: [what to implement]. Files: [file list]. [You will read files for details]")` | Coding agent starts |
-| 14 | coding-agent | Reads files and implements | `Read(...)` + `Write(...)` + `Edit(...)` | Implementation complete |
-| 15 | coding-agent | Returns report | None | "Implementation complete: 1 CREATE, 2 MODIFY" |
-| **PHASE 4.5: UX FLOW VALIDATION (Optional)** |
-| 16a | Main Thread | (Optional) Decides to validate UX flow | None | Complex feature, worth validating |
-| 16b | Main Thread | Invokes ux-flow-simulator | `Task(agent: "ux-flow-simulator-agent", prompt: "Trace execution flow: User opens terminal → theme should switch based on time. Files: [list]. Predict runtime behavior.")` | Agent starts |
-| 16c | ux-flow-simulator-agent | Traces code execution paths | `Read(files)` + traces logic | Finds: No race conditions, expected behavior correct |
-| 16d | ux-flow-simulator-agent | Returns validation report | None | "✅ Flow validated: No issues predicted" |
-| **PHASE 5: BUILD & COMMIT** |
-| 17 | Main Thread | Builds, tests, commits | `Bash("npm run build && git add . && git commit")` | Committed |
+```
+          ┌─────────────────────────────┐
+          │ PHASE 0: PM STRATEGIC GUIDE │
+          └──────────┬──────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 1: User                                               │
+│ • Action: Requests feature                                 │
+│ • Tools: None                                              │
+│ • Output: Request sent                                     │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 2: Main Thread                                        │
+│ • Action: Analyzes - Development task, needs strategic     │
+│           direction                                        │
+│ • Tools: None                                              │
+│ • Output: Routes to PM for initial guide                   │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 3: Main Thread                                        │
+│ • Action: Invokes PM agent                                 │
+│ • Tools: Task(agent: "egdesk-pm-agent",                    │
+│          prompt: "User wants time-based terminal theme...") │
+│ • Output: PM agent starts                                  │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 4: egdesk-pm-agent                                    │
+│ • Action: Dynamic discovery                                │
+│ • Tools: Glob("ideas&external_references/eg-desk ideas/    │
+│          **/*.md")                                         │
+│          Glob("packages/*/package.json")                   │
+│          Grep("theme", "terminal")                         │
+│ • Output: Finds vision docs + existing theme code          │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 5: egdesk-pm-agent                                    │
+│ • Action: Analyzes vision + structure                      │
+│ • Tools: Read("EG-DESK_Whitepaper.md")                     │
+│          Read("packages/terminal/package.json")            │
+│          Read("packages/terminal/src/browser/terminal-     │
+│          theme-service.ts")                                │
+│ • Output: Extracts principles + discovers structure        │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 6: egdesk-pm-agent                                    │
+│ • Action: Creates PRD                                      │
+│ • Tools: Write("ideas&external_references/eg-desk ideas/   │
+│          features/time-based-terminal-theme-prd.md",       │
+│          "[PRD content]")                                  │
+│ • Output: PRD file created                                 │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 7: egdesk-pm-agent                                    │
+│ • Action: Returns strategic guide                          │
+│ • Tools: None                                              │
+│ • Output:                                                  │
+│   - Decision: APPROVE                                      │
+│   - Framework: Theia (terminal theming is Theia domain)    │
+│   - Location: packages/terminal/src/browser/               │
+│   - Approach: Phase 1 - analyze theme system,              │
+│     Phase 2 - design service, Phase 3 - implement          │
+│   - Considerations: Manual override needed, preference     │
+│     persistence                                            │
+│   - PRD Created: time-based-terminal-theme-prd.md          │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴──────────────────────────────────┐
+          │ PHASE 1: FRAMEWORK INVESTIGATION PLANNING │
+          └──────────┬──────────────────────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 8: Main Thread                                        │
+│ • Action: Plans framework investigation based on PM guide  │
+│ • Tools: None (planning)                                   │
+│ • Output: Investigation plan - Query theia-analyzer for    │
+│           theme patterns, DI registration patterns         │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴────────────────────────────────────┐
+          │ PHASE 2: FRAMEWORK INVESTIGATION (EXECUTION) │
+          └──────────┬────────────────────────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 9: Main Thread                                        │
+│ • Action: Queries framework agent (per PM's guide)         │
+│ • Tools: Task(agent: "theia-analyzer-agent",               │
+│          prompt: "Analyze terminal theme system at         │
+│          packages/terminal/src/browser/terminal-theme-     │
+│          service.ts for registration and DI patterns")     │
+│ • Output: Agent starts                                     │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 10: theia-analyzer-agent                              │
+│ • Action: Analyzes theme system                            │
+│ • Tools: Read("packages/terminal/src/browser/terminal-     │
+│          theme-service.ts")                                │
+│          Read("packages/terminal/src/browser/terminal-     │
+│          frontend-module.ts")                              │
+│          Grep("@injectable")                               │
+│ • Output: Finds patterns                                   │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 11: theia-analyzer-agent                              │
+│ • Action: Returns analysis                                 │
+│ • Tools: None                                              │
+│ • Output:                                                  │
+│   - Files Analyzed: terminal-theme-service.ts:45,          │
+│     terminal-frontend-module.ts:32                         │
+│   - Pattern: ThemeService.register() with DI binding       │
+│   - File List: CREATE time-based-theme-switcher.ts,        │
+│     MODIFY terminal-frontend-module.ts:36,                 │
+│     REFERENCE workspace-service.ts:89 for @injectable()    │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴────────────────────────┐
+          │ PHASE 3: IMPLEMENTATION PLANNING │
+          └──────────┬────────────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 12: Main Thread                                       │
+│ • Action: Creates implementation plan (synthesizes PM      │
+│           guide + framework patterns)                      │
+│ • Tools: None (internal)                                   │
+│ • Output: Implementation plan:                             │
+│   - Direction: Create TimeBasedThemeSwitcher following     │
+│     Theia DI pattern                                       │
+│   - File List: CREATE time-based-theme-switcher.ts,        │
+│     MODIFY terminal-frontend-module.ts:36,                 │
+│     terminal-contribution.ts:89,                           │
+│     REFERENCE workspace-service.ts:89 for @injectable()    │
+│     pattern                                                │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴──────────────────────────────────┐
+          │ PHASE 4: IMPLEMENTATION EXECUTION (via      │
+          │          coding-agent)                      │
+          └──────────┬──────────────────────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 13: Main Thread                                       │
+│ • Action: Delegates to coding-agent                        │
+│ • Tools: Task(agent: "coding-agent",                       │
+│          prompt: "Implement time-based terminal theme      │
+│          switcher. Direction: [what to implement].         │
+│          Files: [file list]. [You will read files for      │
+│          details]")                                        │
+│ • Output: Coding agent starts                              │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 14: coding-agent                                      │
+│ • Action: Reads files and implements                       │
+│ • Tools: Read(...) + Write(...) + Edit(...)                │
+│ • Output: Implementation complete                          │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 15: coding-agent                                      │
+│ • Action: Returns report                                   │
+│ • Tools: None                                              │
+│ • Output: "Implementation complete: 1 CREATE, 2 MODIFY"    │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴──────────────────────────┐
+          │ PHASE 4.5: UX FLOW VALIDATION       │
+          │            (Optional)               │
+          └──────────┬──────────────────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 16a: Main Thread                                      │
+│ • Action: (Optional) Decides to validate UX flow           │
+│ • Tools: None                                              │
+│ • Output: Complex feature, worth validating                │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 16b: Main Thread                                      │
+│ • Action: Invokes ux-flow-simulator                        │
+│ • Tools: Task(agent: "ux-flow-simulator-agent",            │
+│          prompt: "Trace execution flow: User opens         │
+│          terminal → theme should switch based on time.     │
+│          Files: [list]. Predict runtime behavior.")        │
+│ • Output: Agent starts                                     │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 16c: ux-flow-simulator-agent                          │
+│ • Action: Traces code execution paths                      │
+│ • Tools: Read(files) + traces logic                        │
+│ • Output: Finds - No race conditions, expected behavior    │
+│           correct                                          │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 16d: ux-flow-simulator-agent                          │
+│ • Action: Returns validation report                        │
+│ • Tools: None                                              │
+│ • Output: "✅ Flow validated: No issues predicted"         │
+└────────────────────┬───────────────────────────────────────┘
+                     │
+          ┌──────────┴──────────────┐
+          │ PHASE 5: BUILD & COMMIT │
+          └──────────┬──────────────┘
+                     ↓
+┌────────────────────────────────────────────────────────────┐
+│ Step 17: Main Thread                                       │
+│ • Action: Builds, tests, commits                           │
+│ • Tools: Bash("npm run build && git add . && git commit")  │
+│ • Output: Committed                                        │
+└────────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 3-4 (PM strategic guide → framework analyzer → coding-agent → optional: ux-flow-simulator)
 
@@ -402,63 +961,88 @@ flowchart TD
 
 ---
 
-### Scenario 4 Flow Diagram (Mermaid)
+### Scenario 4 Flow Diagram (Horizontal ASCII)
 
-```mermaid
-flowchart TD
-    Start([User: Add time-based terminal theme])
-
-    Start --> MT1[Main Thread: Route to PM]
-    MT1 --> PM1[PM: Strategic Guide]
-
-    PM1 --> PMDiscover["PM: Dynamic Discovery<br/>Glob vision docs + tech stack<br/>Grep existing features"]
-    PMDiscover --> PMAnalyze["PM Analysis:<br/>✅ Vision aligned<br/>✅ Theia framework<br/>✅ No duplicates"]
-
-    PMAnalyze --> PMPRD["PM: Create PRD<br/>time-based-terminal-theme-prd.md"]
-    PMPRD --> PM1Return["PM Returns: APPROVE<br/>+ Framework: Theia<br/>+ Location: packages/terminal/<br/>+ Phasing: 3 phases<br/>+ Considerations"]
-
-    PM1Return --> MT2["Main Thread: Plan Investigation<br/>Query theia-analyzer for patterns"]
-
-    MT2 --> FW1[theia-analyzer:<br/>Analyze theme system]
-    FW1 --> FW1Read["Read terminal-theme-service.ts<br/>Grep DI patterns"]
-    FW1Read --> FW1Return["Return: Patterns found<br/>+ File list (CREATE/MODIFY/REF)"]
-
-    FW1Return --> MT3["Main Thread: Create Implementation Plan<br/>Synthesize PM guide + patterns"]
-
-    MT3 --> MT4["Main Thread: Spawn coding-agent<br/>Direction + File list"]
-
-    MT4 --> Coding1[coding-agent: Read files]
-    Coding1 --> Coding2[coding-agent: Implement<br/>CREATE time-based-switcher.ts<br/>MODIFY frontend-module.ts<br/>MODIFY contribution.ts]
-
-    Coding2 --> Coding3[coding-agent: Return Report]
-
-    Coding3 --> MTDecideUX{Main Thread:<br/>Validate UX flow?}
-
-    MTDecideUX -->|Complex flow| UXSim[ux-flow-simulator:<br/>Trace execution]
-    MTDecideUX -->|Simple| MT5
-
-    UXSim --> UXCheck{Issues found?}
-    UXCheck -->|Yes| CodingFix[coding-agent: Fix issues]
-    CodingFix --> UXSim
-    UXCheck -->|No| MT5
-
-    MT5[Main Thread: Build & Test]
-    MT5 --> MT6[Main Thread: Commit]
-
-    MT6 --> End([Complete: Feature committed])
-
-    style Start fill:#e1f5ff
-    style MTDecideUX fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style UXCheck fill:#ffe1e1,stroke:#ff0000,stroke-width:2px
-    style PM1 fill:#fff4e1
-    style FW1 fill:#f0e1ff
-    style UXSim fill:#f0e1ff
-    style Coding1 fill:#ffe1f0
-    style Coding2 fill:#ffe1f0
-    style CodingFix fill:#ffe1f0
-    style MT3 fill:#e1ffe1
-    style MT5 fill:#e1ffe1
-    style End fill:#e1ffe1
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ USER REQUEST: "Add time-based terminal theme"                             │
+└──────────────────────┬─────────────────────────────────────────────────────┘
+                       ▼
+[MT: Route to PM] ──→ [PM: Strategic Guide] ──→ [PM: Dynamic Discovery -
+                                                  Glob vision docs + tech
+                                                  stack, Grep features]
+                                                       ▼
+                       ┌──────────────────────────────────────────────────┐
+                       │ PM Analysis: ✅ Vision aligned                   │
+                       │              ✅ Theia framework                  │
+                       │              ✅ No duplicates                    │
+                       └────────────────────┬─────────────────────────────┘
+                                            ▼
+                       ┌──────────────────────────────────────────────────┐
+                       │ PM: Create PRD - time-based-terminal-theme-      │
+                       │ prd.md                                           │
+                       └────────────────────┬─────────────────────────────┘
+                                            ▼
+                       ┌──────────────────────────────────────────────────┐
+                       │ PM Returns: APPROVE                              │
+                       │  + Framework: Theia                              │
+                       │  + Location: packages/terminal/                  │
+                       │  + Phasing: 3 phases                             │
+                       │  + Considerations                                │
+                       └────────────────────┬─────────────────────────────┘
+                                            ▼
+                       ┌──────────────────────────────────────────────────┐
+                       │ MT: Plan Investigation                           │
+                       │ Query theia-analyzer for patterns                │
+                       └────────────────────┬─────────────────────────────┘
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│ theia-analyzer: Analyze theme system ──→ Read terminal-theme-service.ts   │
+│                 ──→ Grep DI patterns                                       │
+│                 ──→ Return: Patterns found + File list (CREATE/MODIFY)    │
+└────────────────────────────────────────┬───────────────────────────────────┘
+                                         ▼
+                       ┌──────────────────────────────────────────────────┐
+                       │ MT: Create Implementation Plan                   │
+                       │ Synthesize PM guide + patterns                   │
+                       └────────────────────┬─────────────────────────────┘
+                                            ▼
+                       ┌──────────────────────────────────────────────────┐
+                       │ MT: Spawn coding-agent                           │
+                       │ Direction + File list                            │
+                       └────────────────────┬─────────────────────────────┘
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│ coding-agent: Read files ──→ Implement ──→ Return Report                  │
+│               • CREATE time-based-switcher.ts                              │
+│               • MODIFY frontend-module.ts                                  │
+│               • MODIFY contribution.ts                                     │
+└────────────────────────────────────────┬───────────────────────────────────┘
+                                         ▼
+                       ┌──────────────────────────────────────────────────┐
+                       │ ★ MT: Validate UX flow?                          │
+                       └──────┬────────────────────┬──────────────────────┘
+                              │                    │
+                       Complex flow            Simple
+                              │                    │
+                              ▼                    │
+        ┌──────────────────────────────┐          │
+        │ ux-flow-simulator:           │          │
+        │ Trace execution              │          │
+        └──────────┬───────────────────┘          │
+                   ▼                               │
+        ┌──────────────────────┐                  │
+        │ Issues found?        │                  │
+        └──┬───────────────┬───┘                  │
+           │Yes            │No                    │
+           ▼               │                      │
+  [coding-agent: Fix] ────┘                      │
+           │                                      │
+           └──────────────────────────────────────┴──→ [MT: Build & Test]
+                                                              ▼
+                                                        [MT: Commit]
+                                                              ▼
+                                                  [Complete: Feature committed]
 ```
 
 **Phases:**
@@ -488,24 +1072,145 @@ flowchart TD
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| **PHASE 0-2: SAME AS SCENARIO 4 (Steps 1-11)** |
-| 1-11 | Various | PM provides strategic guide → Main Thread creates plan → Framework agent investigates | (See Scenario 4) | Strategic guide + Framework patterns collected |
-| **PHASE 3: IMPLEMENTATION (Delegated to Coding Agent)** |
-| 12 | Main Thread | Synthesizes PM guide + framework findings | None (internal) | Direction: Create TimeBasedThemeSwitcher<br>File List: CREATE time-based-theme-switcher.ts, MODIFY terminal-frontend-module.ts:36, terminal-contribution.ts:89, REFERENCE workspace-service.ts:89 |
-| 13 | Main Thread | Delegates to coding agent | `Task(agent: "coding-agent", prompt: "Implement time-based terminal theme switcher.<br><br>Direction: Create TimeBasedThemeSwitcher service following Theia DI pattern with automatic time-based switching + manual override + preference persistence.<br><br>Files:<br>CREATE: packages/terminal/src/browser/time-based-theme-switcher.ts<br>MODIFY: packages/terminal/src/browser/terminal-frontend-module.ts:36 (add DI binding)<br>MODIFY: packages/terminal/src/browser/terminal-contribution.ts:89 (inject service)<br>REFERENCE: packages/workspace/src/browser/workspace-service.ts:89 (follow @injectable() pattern)<br><br>[You will read files for implementation details]")` | Coding agent starts |
-| 14 | coding-agent | Reads pattern reference | `Read("packages/workspace/src/browser/workspace-service.ts")` | Understands DI pattern |
-| 15 | coding-agent | Creates service file | `Write("packages/terminal/src/browser/time-based-theme-switcher.ts", "[code following pattern]")` | New file created |
-| 16 | coding-agent | Reads module file | `Read("packages/terminal/src/browser/terminal-frontend-module.ts")` | Current structure |
-| 17 | coding-agent | Registers in DI | `Edit(old: "export default", new: "bind(TimeBasedThemeSwitcher)...")` | DI binding added |
-| 18 | coding-agent | Reads contribution file | `Read("packages/terminal/src/browser/terminal-contribution.ts")` | Current structure |
-| 19 | coding-agent | Integrates service | `Edit(old: "export class", new: "@inject(TimeBasedThemeSwitcher)...")` | Integration complete |
-| 20 | coding-agent | Returns report | None | **Implementation Complete**: 1 CREATE, 2 MODIFY following workspace-service.ts pattern |
-| **PHASE 4: VERIFICATION (Main Thread)** |
-| 21 | Main Thread | Builds package | `Bash("npm run build")` | Build succeeds |
-| 22 | Main Thread | Stages and commits | `Bash("git add packages/terminal && git commit -m 'feat(terminal): add time-based theme switcher'")` | Committed |
-| 23 | Main Thread | Reports to user | None | "Feature implemented and committed" |
+```
+┌──────────────────────────────────────────────────────────┐
+│ PHASE 0-2: SAME AS SCENARIO 4 (Steps 1-11)              │
+│ PM provides strategic guide → Main Thread creates plan  │
+│ → Framework agent investigates                           │
+│ Output: Strategic guide + Framework patterns collected   │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+          ┌──────────┴────────────────────────────────┐
+          │ PHASE 3: IMPLEMENTATION                  │
+          │          (Delegated to Coding Agent)     │
+          └──────────┬────────────────────────────────┘
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 12: Main Thread                                     │
+│ • Action: Synthesizes PM guide + framework findings      │
+│ • Tools: None (internal)                                 │
+│ • Output: Direction - Create TimeBasedThemeSwitcher      │
+│           File List: CREATE time-based-theme-switcher.ts,│
+│           MODIFY terminal-frontend-module.ts:36,         │
+│           terminal-contribution.ts:89,                   │
+│           REFERENCE workspace-service.ts:89              │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 13: Main Thread                                     │
+│ • Action: Delegates to coding agent                      │
+│ • Tools: Task(agent: "coding-agent",                     │
+│          prompt: "Implement time-based terminal theme    │
+│          switcher. Direction: Create                     │
+│          TimeBasedThemeSwitcher service following Theia  │
+│          DI pattern with automatic time-based switching  │
+│          + manual override + preference persistence.     │
+│          Files: CREATE:                                  │
+│          packages/terminal/src/browser/time-based-theme- │
+│          switcher.ts MODIFY: packages/terminal/src/      │
+│          browser/terminal-frontend-module.ts:36 (add DI  │
+│          binding) MODIFY: packages/terminal/src/browser/ │
+│          terminal-contribution.ts:89 (inject service)    │
+│          REFERENCE: packages/workspace/src/browser/      │
+│          workspace-service.ts:89 (follow @injectable()   │
+│          pattern) [You will read files for               │
+│          implementation details]")                       │
+│ • Output: Coding agent starts                            │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 14: coding-agent                                    │
+│ • Action: Reads pattern reference                        │
+│ • Tools: Read("packages/workspace/src/browser/workspace- │
+│          service.ts")                                    │
+│ • Output: Understands DI pattern                         │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 15: coding-agent                                    │
+│ • Action: Creates service file                           │
+│ • Tools: Write("packages/terminal/src/browser/time-based-│
+│          theme-switcher.ts", "[code following pattern]") │
+│ • Output: New file created                               │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 16: coding-agent                                    │
+│ • Action: Reads module file                              │
+│ • Tools: Read("packages/terminal/src/browser/terminal-   │
+│          frontend-module.ts")                            │
+│ • Output: Current structure                              │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 17: coding-agent                                    │
+│ • Action: Registers in DI                                │
+│ • Tools: Edit(old: "export default", new:                │
+│          "bind(TimeBasedThemeSwitcher)...")              │
+│ • Output: DI binding added                               │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 18: coding-agent                                    │
+│ • Action: Reads contribution file                        │
+│ • Tools: Read("packages/terminal/src/browser/terminal-   │
+│          contribution.ts")                               │
+│ • Output: Current structure                              │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 19: coding-agent                                    │
+│ • Action: Integrates service                             │
+│ • Tools: Edit(old: "export class", new:                  │
+│          "@inject(TimeBasedThemeSwitcher)...")           │
+│ • Output: Integration complete                           │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 20: coding-agent                                    │
+│ • Action: Returns report                                 │
+│ • Tools: None                                            │
+│ • Output: **Implementation Complete**: 1 CREATE, 2 MODIFY│
+│           following workspace-service.ts pattern         │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+          ┌──────────┴────────────────────────────┐
+          │ PHASE 4: VERIFICATION (Main Thread)  │
+          └──────────┬────────────────────────────┘
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 21: Main Thread                                     │
+│ • Action: Builds package                                 │
+│ • Tools: Bash("npm run build")                           │
+│ • Output: Build succeeds                                 │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 22: Main Thread                                     │
+│ • Action: Stages and commits                             │
+│ • Tools: Bash("git add packages/terminal && git commit   │
+│          -m 'feat(terminal): add time-based theme        │
+│          switcher'")                                     │
+│ • Output: Committed                                      │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ↓
+┌──────────────────────────────────────────────────────────┐
+│ Step 23: Main Thread                                     │
+│ • Action: Reports to user                                │
+│ • Tools: None                                            │
+│ • Output: "Feature implemented and committed"            │
+└──────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 3 (PM strategic guide → framework analyzer → coding-agent)
 
@@ -543,31 +1248,199 @@ flowchart TD
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| **PHASE 0-2: SAME AS SCENARIO 4b (Steps 1-11)** |
-| 1-11 | Various | PM provides strategic guide → Main Thread creates plan → Framework agent investigates | (See Scenario 4) | Strategic guide + Framework patterns collected |
-| **PHASE 3: CONFLICT DETECTION & IMPLEMENTATION** |
-| 12 | Main Thread | Synthesizes + adds conflict check instruction | None (internal) | Direction: Bind Ctrl+K to QuickSearch<br>File List: CREATE search-contribution.ts in eg-desk_taehwa/search/<br>**"Check CODEBASE_STRUCTURE.md for conflicts first"** |
-| 13 | Main Thread | Delegates to coding-agent | `Task(agent: "coding-agent", prompt: "Bind Ctrl+K to QuickSearch.<br><br>Direction: Create keybinding contribution for QuickSearch feature.<br><br>Files:<br>CREATE: eg-desk_taehwa/search/search-contribution.ts<br><br>BEFORE implementing: Check CODEBASE_STRUCTURE.md for Ctrl+K conflicts")` | Coding agent starts |
-| 14 | coding-agent | Discovers EG-DESK codebase | `Glob("eg-desk*/**/*.ts")` | Finds: eg-desk_taehwa/ |
-| 15 | coding-agent | Discovers structure document | `Glob("eg-desk*/CODEBASE_STRUCTURE.md")` | Finds: eg-desk_taehwa/CODEBASE_STRUCTURE.md |
-| 16 | coding-agent | Reads structure document | `Read("eg-desk_taehwa/CODEBASE_STRUCTURE.md")` | Current keybindings registry |
-| 17 | coding-agent | **Checks for conflicts** | Grep "Ctrl+K" in structure doc | **CONFLICT FOUND**: Ctrl+K already bound to DifferentFeature at search-old.ts:45 |
-| 18 | coding-agent | **STOPS implementation** | None | **Does NOT create any files** |
-| 19 | coding-agent | Returns conflict report | None | **❌ CONFLICT DETECTED**<br>**Type**: Keybinding conflict<br>**Requested**: Ctrl+K for QuickSearch<br>**Existing**: Ctrl+K for DifferentFeature (eg-desk_taehwa/search/search-old.ts:45)<br>**Severity**: BLOCKER<br>**Alternatives**: Ctrl+Shift+K, Ctrl+Alt+K, Ctrl+J<br>**User decision required** |
-| **PHASE 4: USER DECISION** |
-| 20 | Main Thread | Presents conflict to user | None | "Conflict: Ctrl+K already used for DifferentFeature.<br>Options:<br>A) Use Ctrl+Shift+K<br>B) Use Ctrl+Alt+K<br>C) Override DifferentFeature<br>D) Choose different key" |
-| 21 | User | Makes decision | None (human input) | "Use Ctrl+Shift+K" |
-| **PHASE 5: RETRY WITH RESOLUTION** |
-| 22 | Main Thread | Retries with resolved key | `Task(agent: "coding-agent", prompt: "Bind Ctrl+Shift+K to QuickSearch (Ctrl+K was conflicted).<br><br>Files:<br>CREATE: eg-desk_taehwa/search/search-contribution.ts")` | Coding agent starts (retry) |
-| 23 | coding-agent | Checks for conflicts (Ctrl+Shift+K) | Read + Grep CODEBASE_STRUCTURE.md | ✅ No conflicts - Ctrl+Shift+K available |
-| 24 | coding-agent | Implements code | `Write("eg-desk_taehwa/search/search-contribution.ts")` | File created with Ctrl+Shift+K binding |
-| 25 | coding-agent | **Updates structure document** | `Edit("eg-desk_taehwa/CODEBASE_STRUCTURE.md")` | Added: "Ctrl+Shift+K: QuickSearch (search-contribution.ts:67)"<br>Added timeline entry: "2025-10-15: QuickSearch keybinding" |
-| 26 | coding-agent | Returns success report | None | **✅ Implementation Complete**<br>**Conflict Check**: Passed (Ctrl+Shift+K available)<br>**Files Created**: search-contribution.ts<br>**Structure Updated**: Added keybinding + timeline entry |
-| **PHASE 6: VERIFICATION** |
-| 27 | Main Thread | Builds and commits | `Bash("npm run build && git add eg-desk_taehwa && git commit")` | Committed |
-| 28 | Main Thread | Reports to user | None | "QuickSearch bound to Ctrl+Shift+K, implemented and committed" |
+```
+          ┌─────────────────────────────────────────────────┐
+          │ PHASE 0-2: SAME AS SCENARIO 4b (Steps 1-11)    │
+          │ PM strategic guide → Main Thread plan →         │
+          │ Framework agent investigates                    │
+          │ Output: Strategic guide + Framework patterns    │
+          └──────────────────┬──────────────────────────────┘
+                             │
+          ┌──────────────────┴───────────────────────────────┐
+          │ PHASE 3: CONFLICT DETECTION & IMPLEMENTATION     │
+          └──────────────────┬───────────────────────────────┘
+                             ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 12: Main Thread                                         │
+│ • Action: Synthesizes + adds conflict check instruction      │
+│ • Tools: None (internal)                                     │
+│ • Output: Direction: Bind Ctrl+K to QuickSearch              │
+│           File List: CREATE search-contribution.ts           │
+│           in eg-desk_taehwa/search/                          │
+│           "Check CODEBASE_STRUCTURE.md for conflicts first"  │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 13: Main Thread                                         │
+│ • Action: Delegates to coding-agent                          │
+│ • Tools: Task(agent: "coding-agent",                         │
+│          prompt: "Bind Ctrl+K to QuickSearch.                │
+│                   Direction: Create keybinding contribution  │
+│                   Files: CREATE eg-desk_taehwa/search/       │
+│                          search-contribution.ts              │
+│                   BEFORE: Check CODEBASE_STRUCTURE.md")      │
+│ • Output: Coding agent starts                                │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 14: coding-agent                                        │
+│ • Action: Discovers EG-DESK codebase                         │
+│ • Tools: Glob("eg-desk*/**/*.ts")                            │
+│ • Output: Finds: eg-desk_taehwa/                             │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 15: coding-agent                                        │
+│ • Action: Discovers structure document                       │
+│ • Tools: Glob("eg-desk*/CODEBASE_STRUCTURE.md")              │
+│ • Output: Finds: eg-desk_taehwa/CODEBASE_STRUCTURE.md        │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 16: coding-agent                                        │
+│ • Action: Reads structure document                           │
+│ • Tools: Read("eg-desk_taehwa/CODEBASE_STRUCTURE.md")        │
+│ • Output: Current keybindings registry                       │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 17: coding-agent                                        │
+│ • Action: **Checks for conflicts**                           │
+│ • Tools: Grep("Ctrl+K") in structure doc                     │
+│ • Output: **CONFLICT FOUND**:                                │
+│           Ctrl+K already bound to DifferentFeature           │
+│           at search-old.ts:45                                │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 18: coding-agent                                        │
+│ • Action: **STOPS implementation**                           │
+│ • Tools: None                                                │
+│ • Output: **Does NOT create any files**                      │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 19: coding-agent                                        │
+│ • Action: Returns conflict report                            │
+│ • Tools: None                                                │
+│ • Output: ❌ CONFLICT DETECTED                               │
+│           Type: Keybinding conflict                          │
+│           Requested: Ctrl+K for QuickSearch                  │
+│           Existing: Ctrl+K for DifferentFeature              │
+│                     (eg-desk_taehwa/search/search-old.ts:45) │
+│           Severity: BLOCKER                                  │
+│           Alternatives: Ctrl+Shift+K, Ctrl+Alt+K, Ctrl+J     │
+│           **User decision required**                         │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+          ┌──────────────┴────────────────┐
+          │ PHASE 4: USER DECISION        │
+          └──────────────┬────────────────┘
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 20: Main Thread                                         │
+│ • Action: Presents conflict to user                          │
+│ • Tools: None                                                │
+│ • Output: "Conflict: Ctrl+K already used for                 │
+│            DifferentFeature.                                 │
+│            Options:                                          │
+│            A) Use Ctrl+Shift+K                               │
+│            B) Use Ctrl+Alt+K                                 │
+│            C) Override DifferentFeature                      │
+│            D) Choose different key"                          │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 21: User                                                │
+│ • Action: Makes decision                                     │
+│ • Tools: None (human input)                                  │
+│ • Output: "Use Ctrl+Shift+K"                                 │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+          ┌──────────────┴─────────────────────┐
+          │ PHASE 5: RETRY WITH RESOLUTION     │
+          └──────────────┬─────────────────────┘
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 22: Main Thread                                         │
+│ • Action: Retries with resolved key                          │
+│ • Tools: Task(agent: "coding-agent",                         │
+│          prompt: "Bind Ctrl+Shift+K to QuickSearch           │
+│                   (Ctrl+K was conflicted).                   │
+│                   Files: CREATE eg-desk_taehwa/search/       │
+│                          search-contribution.ts")            │
+│ • Output: Coding agent starts (retry)                        │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 23: coding-agent                                        │
+│ • Action: Checks for conflicts (Ctrl+Shift+K)                │
+│ • Tools: Read + Grep CODEBASE_STRUCTURE.md                   │
+│ • Output: ✅ No conflicts - Ctrl+Shift+K available           │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 24: coding-agent                                        │
+│ • Action: Implements code                                    │
+│ • Tools: Write("eg-desk_taehwa/search/                       │
+│          search-contribution.ts")                            │
+│ • Output: File created with Ctrl+Shift+K binding             │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 25: coding-agent                                        │
+│ • Action: **Updates structure document**                     │
+│ • Tools: Edit("eg-desk_taehwa/CODEBASE_STRUCTURE.md")        │
+│ • Output: Added:                                             │
+│           "Ctrl+Shift+K: QuickSearch                         │
+│            (search-contribution.ts:67)"                      │
+│           Added timeline entry:                              │
+│           "2025-10-15: QuickSearch keybinding"               │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 26: coding-agent                                        │
+│ • Action: Returns success report                             │
+│ • Tools: None                                                │
+│ • Output: ✅ Implementation Complete                         │
+│           Conflict Check: Passed (Ctrl+Shift+K available)    │
+│           Files Created: search-contribution.ts              │
+│           Structure Updated: Added keybinding + timeline     │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+          ┌──────────────┴────────────────┐
+          │ PHASE 6: VERIFICATION         │
+          └──────────────┬────────────────┘
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 27: Main Thread                                         │
+│ • Action: Builds and commits                                 │
+│ • Tools: Bash("npm run build && git add eg-desk_taehwa       │
+│          && git commit")                                     │
+│ • Output: Committed                                          │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 28: Main Thread                                         │
+│ • Action: Reports to user                                    │
+│ • Tools: None                                                │
+│ • Output: "QuickSearch bound to Ctrl+Shift+K,                │
+│            implemented and committed"                        │
+└──────────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 3 (PM strategic guide → framework analyzer → coding-agent twice)
 
@@ -604,17 +1477,96 @@ flowchart TD
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| 1 | User | Requests new agent | None | Request sent |
-| 2 | Main Thread | Analyzes: Agent creation task | None | Routes to claude-agent-sdk-analyzer-agent |
-| 3 | Main Thread | Invokes claude-agent | `Task(agent: "claude-agent-sdk-analyzer-agent", prompt: "Create an agent that analyzes Konva.js integration patterns in the codebase")` | Agent starts |
-| 4 | claude-agent | Reads best practices | `Read("ideas&external_references/claude-agent-sdk/subagent-best-practices.md")` | Learns agent design patterns |
-| 5 | claude-agent | Examines existing analyzer agents | `Glob(".claude/agents/*-analyzer-agent.md")`<br>`Read(".claude/agents/theia-analyzer-agent.md")`<br>`Read(".claude/agents/infinite-canvas-analyzer-agent.md")` | Extracts proven patterns |
-| 6 | claude-agent | Designs agent architecture | None (analysis) | YAML frontmatter + instruction structure planned |
-| 7 | claude-agent | Creates agent file | `Write(".claude/agents/konva-analyzer-agent.md", "[complete agent spec following best practices]")` | Agent file created |
-| 8 | claude-agent | Returns report (standard format) | None | **Summary**: Created konva-analyzer-agent following framework analyzer patterns.<br>**Specifications**: Tools: Bash, Read, Glob, Grep, WebSearch; Model: inherit<br>**Best Practices Applied**: Evidence-based analysis, contextual tool restriction, standard reporting format<br>**File Created**: `.claude/agents/konva-analyzer-agent.md`<br>**Next Steps**: Session restart may be needed to use new agent |
-| 9 | Main Thread | Presents to user | None | "Agent created. Restart session to use konva-analyzer-agent." |
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Step 1: User                                                 │
+│ • Action: Requests new agent                                 │
+│ • Tools: None                                                │
+│ • Output: Request sent                                       │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 2: Main Thread                                          │
+│ • Action: Analyzes - Agent creation task                     │
+│ • Tools: None                                                │
+│ • Output: Routes to claude-agent-sdk-analyzer-agent          │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 3: Main Thread                                          │
+│ • Action: Invokes claude-agent                               │
+│ • Tools: Task(agent: "claude-agent-sdk-analyzer-agent",      │
+│          prompt: "Create an agent that analyzes Konva.js     │
+│          integration patterns in the codebase")              │
+│ • Output: Agent starts                                       │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 4: claude-agent-sdk-analyzer-agent                      │
+│ • Action: Reads best practices                               │
+│ • Tools: Read("ideas&external_references/claude-agent-sdk/   │
+│          subagent-best-practices.md")                        │
+│ • Output: Learns agent design patterns                       │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 5: claude-agent-sdk-analyzer-agent                      │
+│ • Action: Examines existing analyzer agents                  │
+│ • Tools: Glob(".claude/agents/*-analyzer-agent.md")          │
+│          Read(".claude/agents/theia-analyzer-agent.md")      │
+│          Read(".claude/agents/                               │
+│               infinite-canvas-analyzer-agent.md")            │
+│ • Output: Extracts proven patterns                           │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 6: claude-agent-sdk-analyzer-agent                      │
+│ • Action: Designs agent architecture                         │
+│ • Tools: None (analysis)                                     │
+│ • Output: YAML frontmatter + instruction structure planned   │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 7: claude-agent-sdk-analyzer-agent                      │
+│ • Action: Creates agent file                                 │
+│ • Tools: Write(".claude/agents/konva-analyzer-agent.md",     │
+│          "[complete agent spec following best practices]")   │
+│ • Output: Agent file created                                 │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 8: claude-agent-sdk-analyzer-agent                      │
+│ • Action: Returns report (standard format)                   │
+│ • Tools: None                                                │
+│ • Output: **Summary**: Created konva-analyzer-agent          │
+│           following framework analyzer patterns.             │
+│           **Specifications**: Tools: Bash, Read, Glob,       │
+│           Grep, WebSearch; Model: inherit                    │
+│           **Best Practices Applied**: Evidence-based         │
+│           analysis, contextual tool restriction,             │
+│           standard reporting format                          │
+│           **File Created**:                                  │
+│           .claude/agents/konva-analyzer-agent.md             │
+│           **Next Steps**: Session restart may be needed      │
+│           to use new agent                                   │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 9: Main Thread                                          │
+│ • Action: Presents to user                                   │
+│ • Tools: None                                                │
+│ • Output: "Agent created. Restart session to use             │
+│            konva-analyzer-agent."                            │
+└──────────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 1 (claude-agent-sdk-analyzer-agent)
 
@@ -641,16 +1593,75 @@ flowchart TD
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| 1 | User | Reports typo | None | Request sent |
-| 2 | Main Thread | Analyzes: Simple edit | None | Routes to coding-agent |
-| 3 | Main Thread | Delegates to coding-agent | `Task(agent: "coding-agent", prompt: "Fix typo in README.md: change 'intsall' to 'install'. Files: MODIFY README.md")` | Coding agent starts |
-| 4 | coding-agent | Reads README | `Read("README.md")` | Finds typo |
-| 5 | coding-agent | Fixes typo | `Edit("README.md", old: "intsall", new: "install")` | File corrected |
-| 6 | coding-agent | Returns report | None | "Fixed typo in README.md" |
-| 7 | Main Thread | Commits | `Bash("git add README.md && git commit -m 'docs: fix typo'")` | Committed |
-| 8 | Main Thread | Reports to user | None | "Fixed and committed" |
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Step 1: User                                                 │
+│ • Action: Reports typo                                       │
+│ • Tools: None                                                │
+│ • Output: Request sent                                       │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 2: Main Thread                                          │
+│ • Action: Analyzes - Simple edit                             │
+│ • Tools: None                                                │
+│ • Output: Routes to coding-agent                             │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 3: Main Thread                                          │
+│ • Action: Delegates to coding-agent                          │
+│ • Tools: Task(agent: "coding-agent",                         │
+│          prompt: "Fix typo in README.md:                     │
+│          change 'intsall' to 'install'.                      │
+│          Files: MODIFY README.md")                           │
+│ • Output: Coding agent starts                                │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 4: coding-agent                                         │
+│ • Action: Reads README                                       │
+│ • Tools: Read("README.md")                                   │
+│ • Output: Finds typo                                         │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 5: coding-agent                                         │
+│ • Action: Fixes typo                                         │
+│ • Tools: Edit("README.md",                                   │
+│          old: "intsall", new: "install")                     │
+│ • Output: File corrected                                     │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 6: coding-agent                                         │
+│ • Action: Returns report                                     │
+│ • Tools: None                                                │
+│ • Output: "Fixed typo in README.md"                          │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 7: Main Thread                                          │
+│ • Action: Commits                                            │
+│ • Tools: Bash("git add README.md &&                          │
+│          git commit -m 'docs: fix typo'")                    │
+│ • Output: Committed                                          │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ↓
+┌──────────────────────────────────────────────────────────────┐
+│ Step 8: Main Thread                                          │
+│ • Action: Reports to user                                    │
+│ • Tools: None                                                │
+│ • Output: "Fixed and committed"                              │
+└──────────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 1 (coding-agent)
 
@@ -673,55 +1684,443 @@ flowchart TD
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| **PHASE 0: LIMITATION DIAGNOSIS & RESEARCH PLANNING** |
-| 1 | User | Requests new capability | None | "Add 3D visualization to canvas" |
-| 2 | Main Thread | Analyzes: New capability request, may need new tech | None | Routes to PM for gap assessment |
-| 3 | Main Thread | Invokes PM agent | `Task(agent: "egdesk-pm-agent", prompt: "User wants 3D visualization on canvas. Assess if current stack supports this or if new technology research needed.")` | PM agent starts |
-| 4 | egdesk-pm-agent | **Discovers tech stack** | `Glob("ideas*/**/eg-desk*ideas*/*tech*.md")`<br>`Read("technology-stack.md")` | Current stack: Theia, Electron, Infinite Canvas (research), Konva.js (research), Claude API |
-| 5 | egdesk-pm-agent | **Analyzes current capabilities** | None (analysis of tech stack doc) | Konva.js = 2D canvas library, Infinite Canvas = viewport transform system |
-| 6 | egdesk-pm-agent | **Diagnoses limitation** | None (analysis) | **Gap Found**: User needs true 3D rendering (lighting, shadows, depth). Konva.js limited to 2D shapes. Pseudo-3D (perspective tricks) insufficient for complex 3D scenes. |
-| 7 | egdesk-pm-agent | Discovers vision docs | `Glob("ideas*/**/eg-desk*ideas*/**/*.md")`<br>`Read("EG-DESK_Whitepaper.md")` | Vision: Spatial canvas principles support 3D visualization |
-| 8 | egdesk-pm-agent | **Creates research plan** | None (planning) | **Research Plan**: Investigate 3 options: Three.js, Babylon.js, Custom WebGL. Criteria: bundle size (<500KB), integration complexity, performance (1000+ objects @60fps), Infinite Canvas compatibility |
-| 9 | egdesk-pm-agent | Returns research planning report | None | **Decision**: RESEARCH_NEEDED<br>**Current Stack Limitation**: Konva.js is 2D-only, cannot render true 3D with lighting/shadows<br>**Why Research Needed**: User needs 3D object manipulation with realistic rendering<br>**Evaluation Criteria**: Bundle size, integration complexity, performance, compatibility<br>**Investigation Scope**: 3 parallel investigations (Three.js, Babylon.js, Custom WebGL)<br>**Expected Outcome**: Main Thread will return with research findings for PM evaluation |
-| **PHASE 1: USER DECISION (PROCEED WITH RESEARCH?)** |
-| 10 | Main Thread | **Presents research plan to user** | None | "PM diagnosed: Konva.js cannot do true 3D. Recommends investigating Three.js, Babylon.js, Custom WebGL.<br>Criteria: bundle <500KB, integration complexity, performance.<br>**Proceed with research?**" |
-| 11 | User | **Approves research** | None (human decision) | "Yes, proceed with investigation" |
-| **PHASE 2: PARALLEL RESEARCH EXECUTION** |
-| 12 | Main Thread | Plans parallel investigations | None (planning) | 3 investigations, all independent, run simultaneously |
-| 13 | Main Thread | Executes 3 parallel investigations | **Single message with 3 Tasks**:<br>`Task(agent: "general-purpose", prompt: "Research Three.js: bundle size, 3D capabilities, Infinite Canvas integration approach, performance. Organize findings.")`<br>`Task(agent: "general-purpose", prompt: "Research Babylon.js: bundle size, 3D capabilities, Infinite Canvas integration approach, performance. Organize findings.")`<br>`Task(agent: "general-purpose", prompt: "Research Custom WebGL: feasibility, dev time, maintenance burden. Organize findings.")` | 3 agents start simultaneously |
-| 14a | general-purpose (1) | Researches Three.js | `WebSearch("Three.js bundle size")`<br>`WebSearch("Three.js Infinite Canvas integration")`<br>`WebFetch(threejs.org docs)` | Three.js findings |
-| 14b | general-purpose (2) | Researches Babylon.js | `WebSearch("Babylon.js bundle size")`<br>`WebSearch("Babylon.js canvas integration")`<br>`WebFetch(babylonjs.com docs)` | Babylon.js findings |
-| 14c | general-purpose (3) | Researches Custom WebGL | `WebSearch("WebGL canvas integration")`<br>`WebSearch("WebGL performance benchmarks")` | Custom WebGL feasibility |
-| 15a | general-purpose (1) | Returns findings | None | Three.js: ~600KB bundle, mature ecosystem, good docs |
-| 15b | general-purpose (2) | Returns findings | None | Babylon.js: ~1.2MB bundle, game-focused, complex API |
-| 15c | general-purpose (3) | Returns findings | None | Custom WebGL: Feasible but 2-3 months dev time + maintenance |
-| **PHASE 3: RESEARCH ORGANIZATION** |
-| 16 | Main Thread | Organizes findings into documents | `Write("ideas&external_references/threejs-research.md", "[Three.js findings]")`<br>`Write("ideas&external_references/babylonjs-research.md", "[Babylon.js findings]")`<br>`Write("ideas&external_references/custom-webgl-research.md", "[Custom WebGL findings]")` | 3 research docs created |
-| **PHASE 4: TECHNICAL ANALYSIS** |
-| 17 | Main Thread | Queries analyzer for integration assessment | `Task(agent: "infinite-canvas-analyzer-agent", prompt: "Read threejs-research.md and babylonjs-research.md. Assess integration complexity with Infinite Canvas viewport transforms.")` | Agent starts |
-| 18 | infinite-canvas-analyzer-agent | Analyzes integration | `Read("ideas&external_references/threejs-research.md")`<br>`Read("ideas&external_references/babylonjs-research.md")`<br>`Read("ideas&external_references/infinite-canvas/[integration code]")` | Integration analysis |
-| 19 | infinite-canvas-analyzer-agent | Returns technical assessment | None | **Three.js**: Medium complexity - camera sync with IC viewport<br>**Babylon.js**: High complexity - scene graph conflicts with IC transform system |
-| **PHASE 5: PM EVALUATION** |
-| 20 | Main Thread | Returns to PM with research | `Task(agent: "egdesk-pm-agent", prompt: "Previously you requested research on 3D rendering with criteria [bundle, integration, performance].<br><br>I've organized findings in ideas&external_references/:<br>- threejs-research.md: 600KB, mature<br>- babylonjs-research.md: 1.2MB, complex<br>- custom-webgl-research.md: feasible but 3 months<br><br>Analyzer reported:<br>- Three.js: medium integration complexity<br>- Babylon.js: high complexity<br><br>Evaluate and recommend.")` | PM agent starts (evaluation turn) |
-| 21 | egdesk-pm-agent | Reads research documents | `Read("ideas&external_references/threejs-research.md")`<br>`Read("ideas&external_references/babylonjs-research.md")`<br>`Read("ideas&external_references/custom-webgl-research.md")` | All findings collected |
-| 22 | egdesk-pm-agent | **Evaluates against criteria** | None (analysis) | **Three.js**: Bundle size acceptable (600KB vs 500KB target = minor overage), integration medium, best balance<br>**Babylon.js**: Bundle too large (1.2MB), integration complex<br>**Custom WebGL**: Too much dev time |
-| 23 | egdesk-pm-agent | **Assesses vision alignment** | None (analysis) | Three.js best fits: lightweight enough, proven for spatial UIs, good TypeScript support |
-| 24 | egdesk-pm-agent | Returns evaluation report (WITHOUT updating stack yet) | None | **Recommended**: Three.js<br>**Rationale**: Best balance of bundle size, integration complexity, and capability. 600KB acceptable for 3D rendering value.<br>**Scoring**: Three.js (4.2/5), Babylon.js (3.1/5), Custom (2.5/5)<br>**Why not Babylon.js**: Bundle 2x too large<br>**Why not Custom**: 3 months dev time not justified<br>**Vision Alignment**: Supports spatial canvas with 3D depth<br>**Integration Strategy**: Phase 1 - POC, Phase 2 - IC integration, Phase 3 - production |
-| **PHASE 6: USER DECISION (ACCEPT RECOMMENDATION?)** |
-| 25 | Main Thread | **Presents PM recommendation to user** | None | "Research complete. PM evaluated 3 options:<br>- Three.js: 4.2/5 (recommended)<br>- Babylon.js: 3.1/5 (bundle too large)<br>- Custom WebGL: 2.5/5 (too much dev time)<br><br>PM recommends Three.js. **Proceed with Three.js?**" |
-| 26 | User | **Approves recommendation** | None (human decision) | "Yes, proceed with Three.js" |
-| **PHASE 7: TECHNOLOGY ADOPTION** |
-| 27 | Main Thread | Requests PM to finalize adoption | `Task(agent: "egdesk-pm-agent", prompt: "User approved Three.js. Update technology-stack.md and create integration PRD.")` | PM agent starts (finalization) |
-| 28 | egdesk-pm-agent | **Updates technology-stack.md** | `Edit("ideas&external_references/eg-desk ideas/technology-stack.md", add: "### Three.js\n- Category: 3D Rendering\n- Status: Approved for Integration\n- Capabilities: 3D object rendering, lighting, shadows\n- Bundle: ~600KB\n- Integration: Layers with Infinite Canvas")` | Stack updated |
-| 29 | egdesk-pm-agent | **Creates integration PRD** | `Write("ideas&external_references/eg-desk ideas/features/3d-visualization-with-threejs-prd.md", "[PRD with research summary + decision rationale + integration phases]")` | PRD created |
-| 30 | egdesk-pm-agent | Returns finalization report | None | **Technology Stack Updated**: Three.js added (Approved for Integration)<br>**PRD Created**: 3d-visualization-with-threejs-prd.md<br>**Next Steps**: Query framework agents for integration patterns |
-| **PHASE 8: IMPLEMENTATION PLANNING** |
-| 31 | Main Thread | Reports to user | None | "Three.js added to stack. Ready to begin integration planning." |
-| 32 | Main Thread | Queries framework agents for integration | `Task(agent: "theia-analyzer-agent", prompt: "Analyze webview integration for Three.js canvas in Theia")`<br>`Task(agent: "electron-analyzer-agent", prompt: "Electron security for Three.js in renderer process")` | 2 agents start (parallel) |
-| 33 | Framework agents | Analyze integration patterns | `Read(...)` + `Grep(...)` | Integration guidance |
-| 34 | Main Thread | Synthesizes + spawns coding-agent | `Task(agent: "coding-agent", prompt: "Implement Three.js integration. Direction: [PM guide]. Files: [from analyzer agents]")` | Implementation begins |
+```
+          ┌───────────────────────────────────────────────────────┐
+          │ PHASE 0: LIMITATION DIAGNOSIS & RESEARCH PLANNING     │
+          └──────────────────────┬────────────────────────────────┘
+                                 ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 1: User                                                       │
+│ • Action: Requests new capability                                  │
+│ • Tools: None                                                      │
+│ • Output: "Add 3D visualization to canvas"                         │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 2: Main Thread                                                │
+│ • Action: Analyzes - New capability request, may need new tech     │
+│ • Tools: None                                                      │
+│ • Output: Routes to PM for gap assessment                          │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 3: Main Thread                                                │
+│ • Action: Invokes PM agent                                         │
+│ • Tools: Task(agent: "egdesk-pm-agent",                            │
+│          prompt: "User wants 3D visualization on canvas.           │
+│          Assess if current stack supports this or if               │
+│          new technology research needed.")                         │
+│ • Output: PM agent starts                                          │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 4: egdesk-pm-agent                                            │
+│ • Action: **Discovers tech stack**                                 │
+│ • Tools: Glob("ideas*/**/eg-desk*ideas*/*tech*.md")                │
+│          Read("technology-stack.md")                               │
+│ • Output: Current stack: Theia, Electron, Infinite Canvas          │
+│           (research), Konva.js (research), Claude API              │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 5: egdesk-pm-agent                                            │
+│ • Action: **Analyzes current capabilities**                        │
+│ • Tools: None (analysis of tech stack doc)                         │
+│ • Output: Konva.js = 2D canvas library,                            │
+│           Infinite Canvas = viewport transform system              │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 6: egdesk-pm-agent                                            │
+│ • Action: **Diagnoses limitation**                                 │
+│ • Tools: None (analysis)                                           │
+│ • Output: **Gap Found**: User needs true 3D rendering              │
+│           (lighting, shadows, depth). Konva.js limited to 2D       │
+│           shapes. Pseudo-3D (perspective tricks) insufficient      │
+│           for complex 3D scenes.                                   │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 7: egdesk-pm-agent                                            │
+│ • Action: Discovers vision docs                                    │
+│ • Tools: Glob("ideas*/**/eg-desk*ideas*/**/*.md")                  │
+│          Read("EG-DESK_Whitepaper.md")                             │
+│ • Output: Vision: Spatial canvas principles support 3D             │
+│           visualization                                            │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 8: egdesk-pm-agent                                            │
+│ • Action: **Creates research plan**                                │
+│ • Tools: None (planning)                                           │
+│ • Output: **Research Plan**: Investigate 3 options: Three.js,      │
+│           Babylon.js, Custom WebGL. Criteria: bundle size          │
+│           (<500KB), integration complexity, performance            │
+│           (1000+ objects @60fps), Infinite Canvas compatibility    │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 9: egdesk-pm-agent                                            │
+│ • Action: Returns research planning report                         │
+│ • Tools: None                                                      │
+│ • Output: **Decision**: RESEARCH_NEEDED                            │
+│           **Current Stack Limitation**: Konva.js is 2D-only,       │
+│           cannot render true 3D with lighting/shadows              │
+│           **Why Research Needed**: User needs 3D object            │
+│           manipulation with realistic rendering                   │
+│           **Evaluation Criteria**: Bundle size, integration        │
+│           complexity, performance, compatibility                   │
+│           **Investigation Scope**: 3 parallel investigations       │
+│           (Three.js, Babylon.js, Custom WebGL)                     │
+│           **Expected Outcome**: Main Thread will return with       │
+│           research findings for PM evaluation                      │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴──────────────────────────────┐
+          │ PHASE 1: USER DECISION (PROCEED WITH RESEARCH?)│
+          └────────────────┬──────────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 10: Main Thread                                               │
+│ • Action: **Presents research plan to user**                       │
+│ • Tools: None                                                      │
+│ • Output: "PM diagnosed: Konva.js cannot do true 3D.               │
+│            Recommends investigating Three.js, Babylon.js,          │
+│            Custom WebGL. Criteria: bundle <500KB, integration      │
+│            complexity, performance. **Proceed with research?**"    │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 11: User                                                      │
+│ • Action: **Approves research**                                    │
+│ • Tools: None (human decision)                                     │
+│ • Output: "Yes, proceed with investigation"                        │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴────────────────────────┐
+          │ PHASE 2: PARALLEL RESEARCH EXECUTION    │
+          └────────────────┬────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 12: Main Thread                                               │
+│ • Action: Plans parallel investigations                            │
+│ • Tools: None (planning)                                           │
+│ • Output: 3 investigations, all independent, run simultaneously    │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 13: Main Thread                                               │
+│ • Action: Executes 3 parallel investigations                       │
+│ • Tools: **Single message with 3 Tasks**:                          │
+│          Task(agent: "general-purpose",                            │
+│               prompt: "Research Three.js: bundle size,             │
+│               3D capabilities, Infinite Canvas integration         │
+│               approach, performance. Organize findings.")          │
+│          Task(agent: "general-purpose",                            │
+│               prompt: "Research Babylon.js: bundle size,           │
+│               3D capabilities, Infinite Canvas integration         │
+│               approach, performance. Organize findings.")          │
+│          Task(agent: "general-purpose",                            │
+│               prompt: "Research Custom WebGL: feasibility,         │
+│               dev time, maintenance burden. Organize findings.")   │
+│ • Output: 3 agents start simultaneously                            │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ├─────────────────────────┐
+                           │                         │
+                           ↓                         ↓
+┌──────────────────────────────────┐  ┌──────────────────────────────┐
+│ Step 14a: general-purpose (1)    │  │ Step 14b: general-purpose (2)│
+│ • Action: Researches Three.js    │  │ • Action: Researches         │
+│ • Tools: WebSearch("Three.js     │  │           Babylon.js         │
+│          bundle size")           │  │ • Tools: WebSearch("Babylon  │
+│          WebSearch("Three.js     │  │          .js bundle size")   │
+│          Infinite Canvas         │  │          WebSearch("Babylon  │
+│          integration")           │  │          .js canvas          │
+│          WebFetch(threejs.org)   │  │          integration")       │
+│ • Output: Three.js findings      │  │          WebFetch(babylon    │
+│                                  │  │          js.com docs)        │
+│                                  │  │ • Output: Babylon.js findings│
+└──────────────┬───────────────────┘  └──────────┬───────────────────┘
+               │                                  │
+               │         ┌────────────────────────┘
+               │         │
+               │         │   ┌────────────────────────────────────┐
+               │         │   │ Step 14c: general-purpose (3)      │
+               │         │   │ • Action: Researches Custom WebGL  │
+               │         │   │ • Tools: WebSearch("WebGL canvas   │
+               │         │   │          integration")             │
+               │         │   │          WebSearch("WebGL          │
+               │         │   │          performance benchmarks")  │
+               │         │   │ • Output: Custom WebGL feasibility │
+               │         │   └──────────┬─────────────────────────┘
+               │         │              │
+               ↓         ↓              ↓
+┌──────────────────────────────────────────────────────────────────┐
+│ Steps 15a-c: general-purpose agents (1-3)                        │
+│ • Action: Return findings                                        │
+│ • Tools: None                                                    │
+│ • Output: 15a: Three.js: ~600KB bundle, mature ecosystem, good   │
+│                docs                                              │
+│           15b: Babylon.js: ~1.2MB bundle, game-focused, complex  │
+│                API                                               │
+│           15c: Custom WebGL: Feasible but 2-3 months dev time +  │
+│                maintenance                                       │
+└──────────────────────────┬───────────────────────────────────────┘
+                           │
+          ┌────────────────┴──────────────────────┐
+          │ PHASE 3: RESEARCH ORGANIZATION        │
+          └────────────────┬──────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 16: Main Thread                                               │
+│ • Action: Organizes findings into documents                        │
+│ • Tools: Write("ideas&external_references/threejs-research.md",    │
+│                "[Three.js findings]")                              │
+│          Write("ideas&external_references/babylonjs-research.md",  │
+│                "[Babylon.js findings]")                            │
+│          Write("ideas&external_references/custom-webgl-            │
+│                research.md", "[Custom WebGL findings]")            │
+│ • Output: 3 research docs created                                  │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴────────────────────┐
+          │ PHASE 4: TECHNICAL ANALYSIS         │
+          └────────────────┬────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 17: Main Thread                                               │
+│ • Action: Queries analyzer for integration assessment              │
+│ • Tools: Task(agent: "infinite-canvas-analyzer-agent",             │
+│          prompt: "Read threejs-research.md and                     │
+│          babylonjs-research.md. Assess integration complexity      │
+│          with Infinite Canvas viewport transforms.")               │
+│ • Output: Agent starts                                             │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 18: infinite-canvas-analyzer-agent                            │
+│ • Action: Analyzes integration                                     │
+│ • Tools: Read("ideas&external_references/threejs-research.md")     │
+│          Read("ideas&external_references/babylonjs-research.md")   │
+│          Read("ideas&external_references/infinite-canvas/          │
+│               [integration code]")                                 │
+│ • Output: Integration analysis                                     │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 19: infinite-canvas-analyzer-agent                            │
+│ • Action: Returns technical assessment                             │
+│ • Tools: None                                                      │
+│ • Output: **Three.js**: Medium complexity - camera sync with       │
+│           IC viewport                                              │
+│           **Babylon.js**: High complexity - scene graph conflicts  │
+│           with IC transform system                                 │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴────────────────┐
+          │ PHASE 5: PM EVALUATION          │
+          └────────────────┬────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 20: Main Thread                                               │
+│ • Action: Returns to PM with research                              │
+│ • Tools: Task(agent: "egdesk-pm-agent",                            │
+│          prompt: "Previously you requested research on 3D          │
+│          rendering with criteria [bundle, integration,             │
+│          performance]. I've organized findings in                  │
+│          ideas&external_references/:                               │
+│          - threejs-research.md: 600KB, mature                      │
+│          - babylonjs-research.md: 1.2MB, complex                   │
+│          - custom-webgl-research.md: feasible but 3 months         │
+│          Analyzer reported:                                        │
+│          - Three.js: medium integration complexity                 │
+│          - Babylon.js: high complexity                             │
+│          Evaluate and recommend.")                                 │
+│ • Output: PM agent starts (evaluation turn)                        │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 21: egdesk-pm-agent                                           │
+│ • Action: Reads research documents                                 │
+│ • Tools: Read("ideas&external_references/threejs-research.md")     │
+│          Read("ideas&external_references/babylonjs-research.md")   │
+│          Read("ideas&external_references/custom-webgl-             │
+│               research.md")                                        │
+│ • Output: All findings collected                                   │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 22: egdesk-pm-agent                                           │
+│ • Action: **Evaluates against criteria**                           │
+│ • Tools: None (analysis)                                           │
+│ • Output: **Three.js**: Bundle size acceptable (600KB vs 500KB     │
+│           target = minor overage), integration medium, best        │
+│           balance                                                  │
+│           **Babylon.js**: Bundle too large (1.2MB), integration    │
+│           complex                                                  │
+│           **Custom WebGL**: Too much dev time                      │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 23: egdesk-pm-agent                                           │
+│ • Action: **Assesses vision alignment**                            │
+│ • Tools: None (analysis)                                           │
+│ • Output: Three.js best fits: lightweight enough, proven for       │
+│           spatial UIs, good TypeScript support                     │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 24: egdesk-pm-agent                                           │
+│ • Action: Returns evaluation report (WITHOUT updating stack yet)   │
+│ • Tools: None                                                      │
+│ • Output: **Recommended**: Three.js                                │
+│           **Rationale**: Best balance of bundle size, integration  │
+│           complexity, and capability. 600KB acceptable for 3D      │
+│           rendering value.                                         │
+│           **Scoring**: Three.js (4.2/5), Babylon.js (3.1/5),       │
+│           Custom (2.5/5)                                           │
+│           **Why not Babylon.js**: Bundle 2x too large              │
+│           **Why not Custom**: 3 months dev time not justified      │
+│           **Vision Alignment**: Supports spatial canvas with 3D    │
+│           depth                                                    │
+│           **Integration Strategy**: Phase 1 - POC, Phase 2 - IC    │
+│           integration, Phase 3 - production                        │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴─────────────────────────────┐
+          │ PHASE 6: USER DECISION (ACCEPT RECOMMENDATION?)│
+          └────────────────┬─────────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 25: Main Thread                                               │
+│ • Action: **Presents PM recommendation to user**                   │
+│ • Tools: None                                                      │
+│ • Output: "Research complete. PM evaluated 3 options:              │
+│            - Three.js: 4.2/5 (recommended)                         │
+│            - Babylon.js: 3.1/5 (bundle too large)                  │
+│            - Custom WebGL: 2.5/5 (too much dev time)               │
+│            PM recommends Three.js. **Proceed with Three.js?**"     │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 26: User                                                      │
+│ • Action: **Approves recommendation**                              │
+│ • Tools: None (human decision)                                     │
+│ • Output: "Yes, proceed with Three.js"                             │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴────────────────────┐
+          │ PHASE 7: TECHNOLOGY ADOPTION        │
+          └────────────────┬────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 27: Main Thread                                               │
+│ • Action: Requests PM to finalize adoption                         │
+│ • Tools: Task(agent: "egdesk-pm-agent",                            │
+│          prompt: "User approved Three.js. Update                   │
+│          technology-stack.md and create integration PRD.")         │
+│ • Output: PM agent starts (finalization)                           │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 28: egdesk-pm-agent                                           │
+│ • Action: **Updates technology-stack.md**                          │
+│ • Tools: Edit("ideas&external_references/eg-desk ideas/            │
+│          technology-stack.md",                                     │
+│          add: "### Three.js\n- Category: 3D Rendering\n            │
+│          - Status: Approved for Integration\n                      │
+│          - Capabilities: 3D object rendering, lighting, shadows\n  │
+│          - Bundle: ~600KB\n                                        │
+│          - Integration: Layers with Infinite Canvas")              │
+│ • Output: Stack updated                                            │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 29: egdesk-pm-agent                                           │
+│ • Action: **Creates integration PRD**                              │
+│ • Tools: Write("ideas&external_references/eg-desk ideas/features/  │
+│          3d-visualization-with-threejs-prd.md",                    │
+│          "[PRD with research summary + decision rationale +        │
+│          integration phases]")                                     │
+│ • Output: PRD created                                              │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 30: egdesk-pm-agent                                           │
+│ • Action: Returns finalization report                              │
+│ • Tools: None                                                      │
+│ • Output: **Technology Stack Updated**: Three.js added             │
+│           (Approved for Integration)                               │
+│           **PRD Created**: 3d-visualization-with-threejs-prd.md    │
+│           **Next Steps**: Query framework agents for integration   │
+│           patterns                                                 │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴────────────────────────┐
+          │ PHASE 8: IMPLEMENTATION PLANNING        │
+          └────────────────┬────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 31: Main Thread                                               │
+│ • Action: Reports to user                                          │
+│ • Tools: None                                                      │
+│ • Output: "Three.js added to stack. Ready to begin integration     │
+│            planning."                                              │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 32: Main Thread                                               │
+│ • Action: Queries framework agents for integration                 │
+│ • Tools: Task(agent: "theia-analyzer-agent",                       │
+│          prompt: "Analyze webview integration for Three.js canvas  │
+│          in Theia")                                                │
+│          Task(agent: "electron-analyzer-agent",                    │
+│          prompt: "Electron security for Three.js in renderer       │
+│          process")                                                 │
+│ • Output: 2 agents start (parallel)                                │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 33: Framework agents                                          │
+│ • Action: Analyze integration patterns                             │
+│ • Tools: Read(...) + Grep(...)                                     │
+│ • Output: Integration guidance                                     │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 34: Main Thread                                               │
+│ • Action: Synthesizes + spawns coding-agent                        │
+│ • Tools: Task(agent: "coding-agent",                               │
+│          prompt: "Implement Three.js integration.                  │
+│          Direction: [PM guide].                                    │
+│          Files: [from analyzer agents]")                           │
+│ • Output: Implementation begins                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 8 (PM planning → 3 research agents parallel → 1 analyzer → PM evaluation → PM finalization → 2 framework agents parallel → coding-agent)
 
@@ -775,25 +2174,153 @@ User: "No, I prefer Babylon.js - I need the advanced features even if bundle is 
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| **PHASE 0-5: SAME AS SCENARIO 7a (Steps 1-24)** |
-| 1-24 | Various | PM diagnoses → User approves research → Parallel investigation → PM evaluates | (See Scenario 7a) | PM recommended: Three.js (4.2/5) |
-| **PHASE 6: USER REJECTS RECOMMENDATION** |
-| 25 | Main Thread | Presents PM recommendation to user | None | "PM recommends Three.js. **Proceed with Three.js?**" |
-| 26 | User | **Rejects recommendation, chooses alternative** | None (human decision) | "No, use Babylon.js - advanced features worth the bundle size tradeoff" |
-| **PHASE 7: PM RE-EVALUATION WITH USER OVERRIDE** |
-| 27 | Main Thread | Returns to PM with user decision | `Task(agent: "egdesk-pm-agent", prompt: "User reviewed PM recommendation of Three.js but chooses Babylon.js instead. User rationale: 'Advanced features worth bundle size tradeoff'.<br><br>Reassess: Does Babylon.js align with vision given user's priority shift? Update integration strategy accordingly.")` | PM agent starts (re-evaluation) |
-| 28 | egdesk-pm-agent | Reads Babylon.js research | `Read("ideas&external_references/babylonjs-research.md")` | Babylon.js details |
-| 29 | egdesk-pm-agent | Re-evaluates with user priority | None (analysis) | User prioritizes features over bundle. Babylon.js has advanced lighting, physics, VR support. Vision alignment: ✅ if user accepts bundle impact |
-| 30 | egdesk-pm-agent | **Updates technology-stack.md with Babylon.js** | `Edit("ideas&external_references/eg-desk ideas/technology-stack.md", add: "### Babylon.js\n- Category: 3D Rendering\n- Status: Approved (user priority: features > bundle)\n- Capabilities: Advanced 3D, physics, VR\n- Bundle: ~1.2MB (accepted tradeoff)")` | Stack updated with Babylon.js |
-| 31 | egdesk-pm-agent | **Creates integration PRD** | `Write("ideas&external_references/eg-desk ideas/features/3d-visualization-with-babylonjs-prd.md", "[PRD: User chose Babylon.js, rationale documented, integration strategy adjusted for larger bundle]")` | PRD created |
-| 32 | egdesk-pm-agent | Returns updated guide | None | **Technology Adopted**: Babylon.js (per user decision)<br>**User Rationale Documented**: Advanced features prioritized over bundle size<br>**PM Assessment**: Vision-aligned given user's priority<br>**Adjusted Considerations**: Lazy-loading for bundle mitigation, bundle splitting strategy<br>**Integration Strategy**: Phase 1 - POC with bundle analysis, Phase 2 - bundle optimization, Phase 3 - IC integration |
-| **PHASE 8: IMPLEMENTATION PLANNING** |
-| 33 | Main Thread | Reports to user | None | "Babylon.js added to stack per your decision. Proceeding with integration planning." |
-| 34 | Main Thread | Queries framework agents for Babylon.js integration | `Task(agent: "theia-analyzer-agent", prompt: "Analyze webview integration for Babylon.js in Theia")`<br>`Task(agent: "electron-analyzer-agent", prompt: "Electron bundle optimization for Babylon.js (1.2MB)")` | 2 agents start |
-| 35 | Framework agents | Analyze integration + bundle optimization | `Read(...)` + `Grep(...)` | Integration guidance + bundle mitigation strategies |
-| 36 | Main Thread | Synthesizes + spawns coding-agent | `Task(agent: "coding-agent", prompt: "Implement Babylon.js integration with bundle optimization. Direction: [PM guide]. Files: [from analyzer agents]")` | Implementation begins |
+```
+          ┌──────────────────────────────────────────────────┐
+          │ PHASE 0-5: SAME AS SCENARIO 7a (Steps 1-24)     │
+          │ PM diagnoses → User approves research →          │
+          │ Parallel investigation → PM evaluates            │
+          │ Output: PM recommended: Three.js (4.2/5)         │
+          └──────────────────┬───────────────────────────────┘
+                             │
+          ┌──────────────────┴──────────────────────────┐
+          │ PHASE 6: USER REJECTS RECOMMENDATION        │
+          └──────────────────┬──────────────────────────┘
+                             ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 25: Main Thread                                               │
+│ • Action: Presents PM recommendation to user                       │
+│ • Tools: None                                                      │
+│ • Output: "PM recommends Three.js. **Proceed with Three.js?**"    │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 26: User                                                      │
+│ • Action: **Rejects recommendation, chooses alternative**          │
+│ • Tools: None (human decision)                                     │
+│ • Output: "No, use Babylon.js - advanced features worth the        │
+│            bundle size tradeoff"                                   │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴───────────────────────────────┐
+          │ PHASE 7: PM RE-EVALUATION WITH USER OVERRIDE   │
+          └────────────────┬───────────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 27: Main Thread                                               │
+│ • Action: Returns to PM with user decision                         │
+│ • Tools: Task(agent: "egdesk-pm-agent",                            │
+│          prompt: "User reviewed PM recommendation of Three.js      │
+│          but chooses Babylon.js instead. User rationale:           │
+│          'Advanced features worth bundle size tradeoff'.           │
+│          Reassess: Does Babylon.js align with vision given         │
+│          user's priority shift? Update integration strategy        │
+│          accordingly.")                                            │
+│ • Output: PM agent starts (re-evaluation)                          │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 28: egdesk-pm-agent                                           │
+│ • Action: Reads Babylon.js research                                │
+│ • Tools: Read("ideas&external_references/babylonjs-research.md")   │
+│ • Output: Babylon.js details                                       │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 29: egdesk-pm-agent                                           │
+│ • Action: Re-evaluates with user priority                          │
+│ • Tools: None (analysis)                                           │
+│ • Output: User prioritizes features over bundle. Babylon.js has    │
+│           advanced lighting, physics, VR support. Vision           │
+│           alignment: ✅ if user accepts bundle impact              │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 30: egdesk-pm-agent                                           │
+│ • Action: **Updates technology-stack.md with Babylon.js**          │
+│ • Tools: Edit("ideas&external_references/eg-desk ideas/            │
+│          technology-stack.md",                                     │
+│          add: "### Babylon.js\n- Category: 3D Rendering\n          │
+│          - Status: Approved (user priority: features > bundle)\n   │
+│          - Capabilities: Advanced 3D, physics, VR\n                │
+│          - Bundle: ~1.2MB (accepted tradeoff)")                    │
+│ • Output: Stack updated with Babylon.js                            │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 31: egdesk-pm-agent                                           │
+│ • Action: **Creates integration PRD**                              │
+│ • Tools: Write("ideas&external_references/eg-desk ideas/features/  │
+│          3d-visualization-with-babylonjs-prd.md",                  │
+│          "[PRD: User chose Babylon.js, rationale documented,       │
+│          integration strategy adjusted for larger bundle]")        │
+│ • Output: PRD created                                              │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 32: egdesk-pm-agent                                           │
+│ • Action: Returns updated guide                                    │
+│ • Tools: None                                                      │
+│ • Output: **Technology Adopted**: Babylon.js (per user decision)   │
+│           **User Rationale Documented**: Advanced features         │
+│           prioritized over bundle size                             │
+│           **PM Assessment**: Vision-aligned given user's priority  │
+│           **Adjusted Considerations**: Lazy-loading for bundle     │
+│           mitigation, bundle splitting strategy                    │
+│           **Integration Strategy**: Phase 1 - POC with bundle      │
+│           analysis, Phase 2 - bundle optimization, Phase 3 - IC    │
+│           integration                                              │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴────────────────────────┐
+          │ PHASE 8: IMPLEMENTATION PLANNING        │
+          └────────────────┬────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 33: Main Thread                                               │
+│ • Action: Reports to user                                          │
+│ • Tools: None                                                      │
+│ • Output: "Babylon.js added to stack per your decision.            │
+│            Proceeding with integration planning."                  │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 34: Main Thread                                               │
+│ • Action: Queries framework agents for Babylon.js integration      │
+│ • Tools: Task(agent: "theia-analyzer-agent",                       │
+│          prompt: "Analyze webview integration for Babylon.js       │
+│          in Theia")                                                │
+│          Task(agent: "electron-analyzer-agent",                    │
+│          prompt: "Electron bundle optimization for Babylon.js      │
+│          (1.2MB)")                                                 │
+│ • Output: 2 agents start                                           │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 35: Framework agents                                          │
+│ • Action: Analyze integration + bundle optimization                │
+│ • Tools: Read(...) + Grep(...)                                     │
+│ • Output: Integration guidance + bundle mitigation strategies      │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 36: Main Thread                                               │
+│ • Action: Synthesizes + spawns coding-agent                        │
+│ • Tools: Task(agent: "coding-agent",                               │
+│          prompt: "Implement Babylon.js integration with bundle     │
+│          optimization. Direction: [PM guide].                      │
+│          Files: [from analyzer agents]")                           │
+│ • Output: Implementation begins                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 8 (Same as 7a, but PM re-evaluates with user override)
 
@@ -832,27 +2359,149 @@ User: "Add Pixi.js to investigation. And change bundle criterion - I don't care 
 
 **Step-by-Step Flow:**
 
-| Step | Entity | Action | Tools Used | Output |
-|------|--------|--------|------------|--------|
-| **PHASE 0: SAME AS SCENARIO 7a (Steps 1-9)** |
-| 1-9 | Various | PM diagnoses limitation and creates research plan | (See Scenario 7a) | PM returns: Investigate Three.js, Babylon.js, Custom WebGL with bundle <500KB criteria |
-| **PHASE 1: USER MODIFIES RESEARCH PLAN** |
-| 10 | Main Thread | Presents research plan to user | None | "PM recommends investigating 3 options with bundle <500KB criterion. **Proceed?**" |
-| 11 | User | **Requests modifications** | None (human input) | "Add Pixi.js to investigation. Change criterion: ignore bundle size, prioritize performance (render speed)" |
-| **PHASE 2: PM ADJUSTS RESEARCH PLAN** |
-| 12 | Main Thread | Returns to PM with user modifications | `Task(agent: "egdesk-pm-agent", prompt: "User reviewed research plan. Requests modifications:<br>1. Add Pixi.js as Option D<br>2. Change evaluation criteria: deprioritize bundle size, prioritize rendering performance<br><br>Adjust research plan accordingly.")` | PM agent starts (plan adjustment) |
-| 13 | egdesk-pm-agent | Analyzes Pixi.js relevance | `WebSearch("Pixi.js 3D capabilities")` | Pixi.js = primarily 2D WebGL renderer, limited 3D support |
-| 14 | egdesk-pm-agent | Adjusts research plan | None (planning) | **Research Plan Updated**: 4 options (added Pixi.js), **Criteria Adjusted**: Performance (1000 obj @60fps) = CRITICAL, Bundle size = DEPRIORITIZED, Integration complexity, Infinite Canvas compatibility |
-| 15 | egdesk-pm-agent | Returns adjusted research plan | None | **Investigation Updated**: Added Pixi.js (Option D)<br>**Evaluation Criteria Adjusted**: Performance now critical weight, bundle deprioritized<br>**New Investigation Questions**: Focus on render speed benchmarks, less on bundle size<br>**Parallel Execution**: 4 investigations (Three.js, Babylon.js, Custom WebGL, Pixi.js) |
-| **PHASE 3: USER CONFIRMS ADJUSTED PLAN** |
-| 16 | Main Thread | Presents adjusted plan | None | "PM adjusted plan: 4 options (added Pixi.js), performance prioritized. **Proceed?**" |
-| 17 | User | Approves adjusted plan | None (human decision) | "Yes, proceed" |
-| **PHASE 4: PARALLEL RESEARCH EXECUTION (4 OPTIONS)** |
-| 18 | Main Thread | Executes 4 parallel investigations | **Single message with 4 Tasks**:<br>`Task(agent: "general-purpose", "Research Three.js performance...")`<br>`Task(agent: "general-purpose", "Research Babylon.js performance...")`<br>`Task(agent: "general-purpose", "Research Custom WebGL performance...")`<br>`Task(agent: "general-purpose", "Research Pixi.js 3D capabilities...")` | 4 agents start simultaneously |
-| 19a-d | general-purpose (1-4) | Research 4 options | `WebSearch(...)` + `WebFetch(...)` | Findings for each option |
-| 20a-d | general-purpose (1-4) | Return findings | None | Research results with performance focus |
-| **PHASE 5-8: SAME AS SCENARIO 7a (Research organization → Analysis → PM evaluation → User approval → Adoption → Implementation)** |
-| 21-38 | Various | Organize → Analyze → PM evaluates (new criteria) → User approves → PM finalizes → Implementation | (See Scenario 7a with adjusted criteria) | Complete with user's modified criteria |
+```
+          ┌──────────────────────────────────────────────────┐
+          │ PHASE 0: SAME AS SCENARIO 7a (Steps 1-9)        │
+          │ PM diagnoses limitation and creates research plan│
+          │ Output: Investigate Three.js, Babylon.js,        │
+          │ Custom WebGL with bundle <500KB criteria         │
+          └──────────────────┬───────────────────────────────┘
+                             │
+          ┌──────────────────┴────────────────────────┐
+          │ PHASE 1: USER MODIFIES RESEARCH PLAN      │
+          └──────────────────┬────────────────────────┘
+                             ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 10: Main Thread                                               │
+│ • Action: Presents research plan to user                           │
+│ • Tools: None                                                      │
+│ • Output: "PM recommends investigating 3 options with bundle       │
+│            <500KB criterion. **Proceed?**"                         │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 11: User                                                      │
+│ • Action: **Requests modifications**                               │
+│ • Tools: None (human input)                                        │
+│ • Output: "Add Pixi.js to investigation. Change criterion:         │
+│            ignore bundle size, prioritize performance (render      │
+│            speed)"                                                 │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴──────────────────────────┐
+          │ PHASE 2: PM ADJUSTS RESEARCH PLAN         │
+          └────────────────┬──────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 12: Main Thread                                               │
+│ • Action: Returns to PM with user modifications                    │
+│ • Tools: Task(agent: "egdesk-pm-agent",                            │
+│          prompt: "User reviewed research plan. Requests            │
+│          modifications:                                            │
+│          1. Add Pixi.js as Option D                                │
+│          2. Change evaluation criteria: deprioritize bundle size,  │
+│             prioritize rendering performance                       │
+│          Adjust research plan accordingly.")                       │
+│ • Output: PM agent starts (plan adjustment)                        │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 13: egdesk-pm-agent                                           │
+│ • Action: Analyzes Pixi.js relevance                               │
+│ • Tools: WebSearch("Pixi.js 3D capabilities")                      │
+│ • Output: Pixi.js = primarily 2D WebGL renderer, limited 3D        │
+│           support                                                  │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 14: egdesk-pm-agent                                           │
+│ • Action: Adjusts research plan                                    │
+│ • Tools: None (planning)                                           │
+│ • Output: **Research Plan Updated**: 4 options (added Pixi.js),    │
+│           **Criteria Adjusted**: Performance (1000 obj @60fps) =   │
+│           CRITICAL, Bundle size = DEPRIORITIZED, Integration       │
+│           complexity, Infinite Canvas compatibility                │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 15: egdesk-pm-agent                                           │
+│ • Action: Returns adjusted research plan                           │
+│ • Tools: None                                                      │
+│ • Output: **Investigation Updated**: Added Pixi.js (Option D)      │
+│           **Evaluation Criteria Adjusted**: Performance now        │
+│           critical weight, bundle deprioritized                    │
+│           **New Investigation Questions**: Focus on render speed   │
+│           benchmarks, less on bundle size                          │
+│           **Parallel Execution**: 4 investigations (Three.js,      │
+│           Babylon.js, Custom WebGL, Pixi.js)                       │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴─────────────────────────────┐
+          │ PHASE 3: USER CONFIRMS ADJUSTED PLAN         │
+          └────────────────┬─────────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 16: Main Thread                                               │
+│ • Action: Presents adjusted plan                                   │
+│ • Tools: None                                                      │
+│ • Output: "PM adjusted plan: 4 options (added Pixi.js),            │
+│            performance prioritized. **Proceed?**"                  │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 17: User                                                      │
+│ • Action: Approves adjusted plan                                   │
+│ • Tools: None (human decision)                                     │
+│ • Output: "Yes, proceed"                                           │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴───────────────────────────────┐
+          │ PHASE 4: PARALLEL RESEARCH EXECUTION (4 OPTIONS)│
+          └────────────────┬───────────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Step 18: Main Thread                                               │
+│ • Action: Executes 4 parallel investigations                       │
+│ • Tools: **Single message with 4 Tasks**:                          │
+│          Task(agent: "general-purpose",                            │
+│               "Research Three.js performance...")                  │
+│          Task(agent: "general-purpose",                            │
+│               "Research Babylon.js performance...")                │
+│          Task(agent: "general-purpose",                            │
+│               "Research Custom WebGL performance...")              │
+│          Task(agent: "general-purpose",                            │
+│               "Research Pixi.js 3D capabilities...")               │
+│ • Output: 4 agents start simultaneously                            │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Steps 19a-d: general-purpose (1-4)                                 │
+│ • Action: Research 4 options                                       │
+│ • Tools: WebSearch(...) + WebFetch(...)                            │
+│ • Output: Findings for each option                                 │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+                           ↓
+┌────────────────────────────────────────────────────────────────────┐
+│ Steps 20a-d: general-purpose (1-4)                                 │
+│ • Action: Return findings                                          │
+│ • Tools: None                                                      │
+│ • Output: Research results with performance focus                  │
+└──────────────────────────┬─────────────────────────────────────────┘
+                           │
+          ┌────────────────┴───────────────────────────────────────┐
+          │ PHASE 5-8: SAME AS SCENARIO 7a                         │
+          │ (Research organization → Analysis → PM evaluation →    │
+          │  User approval → Adoption → Implementation)            │
+          │ Output: Complete with user's modified criteria         │
+          └────────────────────────────────────────────────────────┘
+```
 
 **Total Agents Invoked:** 9 (PM planning → PM adjust plan → 4 research agents → 1 analyzer → PM evaluation → PM finalization → 2 framework agents → coding-agent)
 
@@ -879,110 +2528,147 @@ User: "Add Pixi.js to investigation. And change bundle criterion - I don't care 
 
 ---
 
-### Scenario 7 Flow Diagram (Mermaid)
+### Scenario 7 Flow Diagram (Horizontal ASCII)
 
-```mermaid
-flowchart TD
-    Start([User: Add 3D visualization])
-
-    Start --> MT1[Main Thread: Route to PM]
-    MT1 --> PM1[PM: Diagnose Stack Limitation]
-
-    PM1 --> PMDiscover{{"PM: Glob tech stack<br/>Read technology-stack.md"}}
-    PMDiscover --> PMAnalyze["PM Analysis:<br/>Konva.js = 2D only<br/>User needs true 3D<br/>GAP FOUND"]
-
-    PMAnalyze --> PMPlan["PM: Create Research Plan<br/>- Options: Three.js, Babylon.js, WebGL<br/>- Criteria: bundle, perf, integration<br/>- Design: Parallel execution"]
-
-    PMPlan --> PM1Return["PM Returns: RESEARCH_NEEDED<br/>+ Limitation diagnosis<br/>+ Evaluation criteria<br/>+ Investigation scope"]
-
-    PM1Return --> MT2[Main Thread: Present to User]
-    MT2 --> UserDec1{User Decision 1:<br/>Proceed with research?}
-
-    UserDec1 -->|A: Approve| MT3[Main Thread: Execute Parallel Research]
-    UserDec1 -->|B: Modify| PM2Adjust[PM: Adjust Plan]
-    UserDec1 -->|C: Reject| End1([Stop: Use current stack])
-
-    PM2Adjust --> MT2b[Main Thread: Present Adjusted Plan]
-    MT2b --> UserDec1b{User: Approve<br/>adjusted plan?}
-    UserDec1b -->|Yes| MT3
-    UserDec1b -->|No| End1
-
-    MT3 --> Parallel["Single Message, 3 Tasks (Parallel)"]
-
-    Parallel --> Agent1["general-purpose #1:<br/>Research Three.js"]
-    Parallel --> Agent2["general-purpose #2:<br/>Research Babylon.js"]
-    Parallel --> Agent3["general-purpose #3:<br/>Research Custom WebGL"]
-
-    Agent1 --> Agent1Web["WebSearch + WebFetch<br/>Three.js docs"]
-    Agent2 --> Agent2Web["WebSearch + WebFetch<br/>Babylon.js docs"]
-    Agent3 --> Agent3Web["WebSearch + WebFetch<br/>WebGL resources"]
-
-    Agent1Web --> MT4[Main Thread: Collect Results]
-    Agent2Web --> MT4
-    Agent3Web --> MT4
-
-    MT4 --> MTOrg["Main Thread: Organize Findings<br/>Write to ideas&external_references/<br/>- threejs-research.md<br/>- babylonjs-research.md<br/>- custom-webgl-research.md"]
-
-    MTOrg --> MTAnalyzer[Main Thread: Query Analyzer]
-    MTAnalyzer --> Analyzer["infinite-canvas-analyzer:<br/>Assess integration complexity"]
-
-    Analyzer --> AnalyzerRead["Read research docs<br/>Analyze IC integration"]
-    AnalyzerRead --> AnalyzerReturn["Return: Three.js = Medium<br/>Babylon.js = High complexity"]
-
-    AnalyzerReturn --> MT5[Main Thread: Return to PM]
-    MT5 --> PM3["PM: Evaluate Research Results"]
-
-    PM3 --> PM3Read["PM: Read all research docs<br/>threejs-research.md<br/>babylonjs-research.md<br/>custom-webgl-research.md"]
-
-    PM3Read --> PM3Score["PM: Score Against Criteria<br/>Three.js: 4.2/5<br/>Babylon.js: 3.1/5<br/>Custom WebGL: 2.5/5"]
-
-    PM3Score --> PM3Return["PM Returns: Recommend Three.js<br/>(WITHOUT updating stack yet)<br/>+ Detailed rationale<br/>+ Scoring breakdown"]
-
-    PM3Return --> MT6[Main Thread: Present Recommendation]
-    MT6 --> UserDec2{User Decision 2:<br/>Accept Three.js?}
-
-    UserDec2 -->|A: Approve| PM4Final[PM: Finalize Adoption]
-    UserDec2 -->|B: Choose Babylon.js| PM4Alt[PM: Re-evaluate with Babylon.js]
-    UserDec2 -->|C: More Research| MT3
-    UserDec2 -->|D: Reject All| End2([Stop: No new tech])
-
-    PM4Alt --> PM4AltUpdate["PM: Update with Babylon.js<br/>Document user rationale<br/>Adjust integration strategy"]
-    PM4AltUpdate --> PM4Final
-
-    PM4Final --> PMUpdate["PM: Update technology-stack.md<br/>Create Integration PRD"]
-
-    PMUpdate --> MT7[Main Thread: Report to User]
-    MT7 --> MT8[Main Thread: Query Framework Agents]
-
-    MT8 --> FW1["theia-analyzer:<br/>Webview integration"]
-    MT8 --> FW2["electron-analyzer:<br/>Security patterns"]
-
-    FW1 --> MT9[Main Thread: Synthesize]
-    FW2 --> MT9
-
-    MT9 --> Coding["coding-agent:<br/>Implement Integration"]
-
-    Coding --> End3([Complete: 3D Viz Integrated])
-
-    style Start fill:#e1f5ff
-    style UserDec1 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style UserDec2 fill:#ffe1e1,stroke:#ff0000,stroke-width:3px
-    style PM1 fill:#fff4e1
-    style PM2Adjust fill:#fff4e1
-    style PM3 fill:#fff4e1
-    style PM4Final fill:#fff4e1
-    style MT3 fill:#e1ffe1
-    style Parallel fill:#e1f0ff
-    style Agent1 fill:#f0e1ff
-    style Agent2 fill:#f0e1ff
-    style Agent3 fill:#f0e1ff
-    style Analyzer fill:#f0e1ff
-    style FW1 fill:#f0e1ff
-    style FW2 fill:#f0e1ff
-    style Coding fill:#ffe1f0
-    style End1 fill:#f0f0f0
-    style End2 fill:#f0f0f0
-    style End3 fill:#e1ffe1
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ USER REQUEST: "Add 3D visualization"                                                                                        │
+└────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────┘
+                         ▼
+[Main Thread: Route to PM] ──→ [PM: Diagnose Stack Limitation] ──→ [PM: Glob tech stack, Read technology-stack.md]
+                                                                                    ▼
+                                          ┌─────────────────────────────────────────────────────────┐
+                                          │ PM Analysis: Konva.js = 2D only                         │
+                                          │              User needs true 3D                         │
+                                          │              GAP FOUND                                  │
+                                          └───────────────────────┬─────────────────────────────────┘
+                                                                  ▼
+                                          ┌─────────────────────────────────────────────────────────┐
+                                          │ PM: Create Research Plan                                │
+                                          │  - Options: Three.js, Babylon.js, WebGL                 │
+                                          │  - Criteria: bundle, perf, integration                  │
+                                          │  - Design: Parallel execution                           │
+                                          └───────────────────────┬─────────────────────────────────┘
+                                                                  ▼
+                                          ┌─────────────────────────────────────────────────────────┐
+                                          │ PM Returns: RESEARCH_NEEDED                             │
+                                          │  + Limitation diagnosis                                 │
+                                          │  + Evaluation criteria                                  │
+                                          │  + Investigation scope                                  │
+                                          └───────────────────────┬─────────────────────────────────┘
+                                                                  ▼
+                                          ┌─────────────────────────────────────────────────────────┐
+                                          │ Main Thread: Present to User                            │
+                                          └───────────────────────┬─────────────────────────────────┘
+                                                                  ▼
+                                          ┌─────────────────────────────────────────────────────────┐
+                                          │ ★ USER DECISION 1: Proceed with research?              │
+                                          └───┬─────────────────────────┬──────────────────┬────────┘
+                                              │                         │                  │
+                                         A: Approve                B: Modify          C: Reject
+                                              │                         │                  │
+                                              │                         ▼                  ▼
+                                              │         ┌────────────────────────┐   [STOP: Use
+                                              │         │ PM: Adjust Plan        │    current stack]
+                                              │         └──────┬─────────────────┘
+                                              │                ▼
+                                              │         [Main Thread: Present Adjusted Plan]
+                                              │                ▼
+                                              │         [User: Approve adjusted plan?] ──Yes──┐
+                                              │                │No                            │
+                                              │                └────→ [STOP: Use current]     │
+                                              │                                               │
+                                              └───────────────────────────────────────────────┘
+                                                                  ▼
+                                     ┌────────────────────────────────────────────────────────┐
+                                     │ Main Thread: Execute Parallel Research                 │
+                                     │ Single Message, 3 Tasks (Parallel)                     │
+                                     └─────┬──────────────────┬──────────────────┬────────────┘
+                                           ▼                  ▼                  ▼
+                      ┌─────────────────────────┐  ┌──────────────────────┐  ┌────────────────────────┐
+                      │ general-purpose #1:     │  │ general-purpose #2:  │  │ general-purpose #3:    │
+                      │ Research Three.js       │  │ Research Babylon.js  │  │ Research Custom WebGL  │
+                      │   ↓                     │  │   ↓                  │  │   ↓                    │
+                      │ WebSearch + WebFetch    │  │ WebSearch + WebFetch │  │ WebSearch + WebFetch   │
+                      │ Three.js docs           │  │ Babylon.js docs      │  │ WebGL resources        │
+                      └─────────┬───────────────┘  └──────────┬───────────┘  └────────┬───────────────┘
+                                └──────────────────────────────┴──────────────────────┘
+                                                               ▼
+                                             ┌─────────────────────────────────────────────┐
+                                             │ Main Thread: Collect Results                │
+                                             └───────────────────┬─────────────────────────┘
+                                                                 ▼
+                                             ┌─────────────────────────────────────────────┐
+                                             │ Main Thread: Organize Findings              │
+                                             │ Write to ideas&external_references/         │
+                                             │  - threejs-research.md                      │
+                                             │  - babylonjs-research.md                    │
+                                             │  - custom-webgl-research.md                 │
+                                             └───────────────────┬─────────────────────────┘
+                                                                 ▼
+[Main Thread: Query Analyzer] ──→ [infinite-canvas-analyzer: Assess integration] ──→ [Return: Three.js=Medium, Babylon.js=High]
+                                                                 ▼
+                                             ┌─────────────────────────────────────────────┐
+                                             │ Main Thread: Return to PM                   │
+                                             └───────────────────┬─────────────────────────┘
+                                                                 ▼
+                    ┌────────────────────────────────────────────────────────────────────────────────────────┐
+                    │ PM: Evaluate Research Results                                                          │
+                    │  ↓                                                                                     │
+                    │ PM: Read all research docs (threejs-research.md, babylonjs-research.md, webgl-...)    │
+                    │  ↓                                                                                     │
+                    │ PM: Score Against Criteria                                                            │
+                    │  - Three.js: 4.2/5                                                                    │
+                    │  - Babylon.js: 3.1/5                                                                  │
+                    │  - Custom WebGL: 2.5/5                                                                │
+                    │  ↓                                                                                     │
+                    │ PM Returns: Recommend Three.js (WITHOUT updating stack yet)                           │
+                    │  + Detailed rationale + Scoring breakdown                                             │
+                    └────────────────────────────────────────┬───────────────────────────────────────────────┘
+                                                             ▼
+                                     ┌───────────────────────────────────────────────────────┐
+                                     │ Main Thread: Present Recommendation                   │
+                                     └─────────────────────┬─────────────────────────────────┘
+                                                           ▼
+                                     ┌───────────────────────────────────────────────────────┐
+                                     │ ★ USER DECISION 2: Accept Three.js?                   │
+                                     └──┬──────────────┬──────────────┬──────────────┬───────┘
+                                        │              │              │              │
+                                   A: Approve    B: Babylon.js  C: More Research D: Reject All
+                                        │              │              │              │
+                                        │              │              │              ▼
+                                        │              │              │         [STOP: No new tech]
+                                        │              │              │
+                                        │              ▼              └──────→ [Return to Parallel Research]
+                                        │    ┌────────────────────────┐
+                                        │    │ PM: Re-evaluate with   │
+                                        │    │ Babylon.js             │
+                                        │    │ Document user rationale│
+                                        │    │ Adjust strategy        │
+                                        │    └──────────┬─────────────┘
+                                        │               │
+                                        └───────────────┘
+                                                        ▼
+                           ┌────────────────────────────────────────────────────────────────┐
+                           │ PM: Finalize Adoption                                          │
+                           │  ↓                                                             │
+                           │ PM: Update technology-stack.md                                 │
+                           │ Create Integration PRD                                         │
+                           └────────────────────────┬───────────────────────────────────────┘
+                                                    ▼
+                           ┌────────────────────────────────────────────────────────────────┐
+                           │ Main Thread: Report to User                                    │
+                           │  ↓                                                             │
+                           │ Main Thread: Query Framework Agents                            │
+                           │  ├──→ theia-analyzer: Webview integration                      │
+                           │  └──→ electron-analyzer: Security patterns                     │
+                           │  ↓                                                             │
+                           │ Main Thread: Synthesize                                        │
+                           │  ↓                                                             │
+                           │ coding-agent: Implement Integration                            │
+                           │  ↓                                                             │
+                           │ Complete: 3D Viz Integrated                                    │
+                           └────────────────────────────────────────────────────────────────┘
 ```
 
 **Legend:**
@@ -1006,19 +2692,58 @@ flowchart TD
 
 ## Comparison Matrix: When to Use What
 
-| Request Type | Route | Agents Used | Who Codes | Conflict Check? | Example |
-|--------------|-------|-------------|-----------|----------------|---------|
-| **Simple Question** | Direct execution | 0 | Nobody | N/A | "List files", "Show git status" |
-| **File Edit** | Main Thread → coding-agent | 1 | coding-agent | N/A | "Fix typo", "Update version" |
-| **Framework Question** | Direct to framework agent | 1 | Nobody | N/A | "How does Theia DI work?" |
-| **Strategic Decision** | Main Thread orchestrates → PM agent | 1 | Nobody | N/A | "Should we add feature X?" |
-| **Theia Framework Implementation** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | ❌ No (Theia packages/) | "Modify Theia terminal service" |
-| **EG-DESK Custom Feature** | Main Thread orchestrates → analyzers → coding-agent | 2-3 | coding-agent | ✅ Yes (CODEBASE_STRUCTURE.md) | "Add custom QuickSearch with Ctrl+K" |
-| **Large Multi-Feature** | Main Thread orchestrates → analyzers + coding-agent(s) | 3-4+ | coding-agent(s) | ✅ If EG-DESK custom | "Implement custom dashboard system" |
-| **New Technology Research** (happy path) | PM diagnoses → **User approves** → MT investigates (parallel) → PM evaluates → **User approves** → PM finalizes | 8+ | coding-agent (after approval) | N/A | "Add 3D visualization - which framework?" (Scenario 7a) |
-| **New Technology Research** (user override) | Same as above but **user rejects PM recommendation** → PM re-evaluates with user choice | 8+ | coding-agent (after user choice) | N/A | User: "No, use Babylon.js instead" (Scenario 7b) |
-| **New Technology Research** (iterative) | PM proposes plan → **User modifies criteria** → PM adjusts plan → **User approves** → MT investigates | 9+ | coding-agent (after approval) | N/A | User: "Add Pixi.js, change criteria" (Scenario 7c) |
-| **Agent Creation** | Main Thread → claude-agent | 1 | claude-agent (agent file) | N/A | "Create Konva analyzer agent" |
+```
+┌──────────────────────┬───────────────────────────────────┬───────┬───────────────┬──────────┐
+│ Request Type         │ Route                             │ Agents│ Who Codes     │ Conflict │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ Simple Question      │ Direct execution                  │ 0     │ Nobody        │ N/A      │
+│                      │                                   │       │               │          │
+│ Example: "List files", "Show git status"                                                   │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ File Edit            │ MT → coding-agent                 │ 1     │ coding-agent  │ N/A      │
+│                      │                                   │       │               │          │
+│ Example: "Fix typo", "Update version"                                                      │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ Framework Question   │ Direct to framework agent         │ 1     │ Nobody        │ N/A      │
+│                      │                                   │       │               │          │
+│ Example: "How does Theia DI work?"                                                         │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ Strategic Decision   │ MT orchestrates → PM agent        │ 1     │ Nobody        │ N/A      │
+│                      │                                   │       │               │          │
+│ Example: "Should we add feature X?"                                                        │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ Theia Framework Impl │ MT → analyzers → coding-agent     │ 2-3   │ coding-agent  │ ❌ No    │
+│                      │                                   │       │               │ (Theia)  │
+│ Example: "Modify Theia terminal service"                                                   │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ EG-DESK Custom       │ MT → analyzers → coding-agent     │ 2-3   │ coding-agent  │ ✅ Yes   │
+│ Feature              │                                   │       │               │ (STRUCT) │
+│ Example: "Add custom QuickSearch with Ctrl+K"                                              │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ Large Multi-Feature  │ MT → analyzers + coding-agent(s)  │ 3-4+  │ coding-agents │ ✅ If    │
+│                      │                                   │       │               │ EG-DESK  │
+│ Example: "Implement custom dashboard system"                                               │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ New Tech Research    │ PM diagnoses → User approves →    │ 8+    │ coding-agent  │ N/A      │
+│ (happy path)         │ MT (parallel) → PM evaluates →    │       │ (after appr)  │          │
+│                      │ User approves → PM finalizes      │       │               │          │
+│ Example: "Add 3D viz - which framework?" (7a)                                              │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ New Tech Research    │ Same as above but user rejects PM │ 8+    │ coding-agent  │ N/A      │
+│ (user override)      │ recom → PM re-evaluates with user │       │ (after choice)│          │
+│                      │ choice                            │       │               │          │
+│ Example: User: "No, use Babylon.js" (7b)                                                   │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ New Tech Research    │ PM proposes → User modifies       │ 9+    │ coding-agent  │ N/A      │
+│ (iterative)          │ criteria → PM adjusts → User      │       │ (after appr)  │          │
+│                      │ approves → MT investigates        │       │               │          │
+│ Example: User: "Add Pixi.js, change criteria" (7c)                                         │
+├──────────────────────┼───────────────────────────────────┼───────┼───────────────┼──────────┤
+│ Agent Creation       │ MT → claude-agent                 │ 1     │ claude-agent  │ N/A      │
+│                      │                                   │       │ (agent file)  │          │
+│ Example: "Create Konva analyzer agent"                                                     │
+└──────────────────────┴───────────────────────────────────┴───────┴───────────────┴──────────┘
+```
 
 ---
 
@@ -1086,12 +2811,28 @@ Technical patterns: Framework agents provide
 
 **PRINCIPLE**: Tools are restricted **contextually through prompts**, not mechanically removed. Agents have tools but their role descriptions define HOW to use them.
 
-| Entity | Tool Access | Usage Restriction (Contextual) |
-|--------|-------------|--------------------------------|
-| **Analyzer Agents** | Bash, Glob, Grep, Read, WebFetch, WebSearch | **Bash for READ-ONLY analysis** (inspect outputs, run tests to understand behavior). **NEVER for implementation** (commits, builds, installations). Role enforced via agent prompt. |
-| **coding-agent** | Write, Edit, Read, Glob, Grep | **Code execution only**. NO Bash (no builds/tests/commits). |
-| **Main Thread** | ALL tools | **Full access**: Orchestration, implementation, builds, commits, everything. |
-| **Task tool** | Main Thread ONLY | Agent invocation exclusive to Main Thread. |
+```
+┌─────────────────┬───────────────────────────────┬──────────────────────────────────┐
+│ Entity          │ Tool Access                   │ Usage Restriction (Contextual)   │
+├─────────────────┼───────────────────────────────┼──────────────────────────────────┤
+│ Analyzer Agents │ Bash, Glob, Grep, Read,       │ Bash for READ-ONLY analysis      │
+│                 │ WebFetch, WebSearch           │ (inspect outputs, run tests to   │
+│                 │                               │ understand behavior). NEVER for  │
+│                 │                               │ implementation (commits, builds, │
+│                 │                               │ installations). Role enforced    │
+│                 │                               │ via agent prompt.                │
+├─────────────────┼───────────────────────────────┼──────────────────────────────────┤
+│ coding-agent    │ Write, Edit, Read, Glob, Grep │ Code execution only. NO Bash     │
+│                 │                               │ (no builds/tests/commits).       │
+├─────────────────┼───────────────────────────────┼──────────────────────────────────┤
+│ Main Thread     │ ALL tools                     │ Full access: Orchestration,      │
+│                 │                               │ implementation, builds, commits, │
+│                 │                               │ everything                       │
+├─────────────────┼───────────────────────────────┼──────────────────────────────────┤
+│ Task tool       │ Main Thread ONLY              │ Agent invocation exclusive to    │
+│                 │                               │ Main Thread.                     │
+└─────────────────┴───────────────────────────────┴──────────────────────────────────┘
+```
 
 **Why Contextual Works**:
 - Agents understand their role from prompts
@@ -1342,13 +3083,27 @@ Provide guidance for Phase 2.")
 **Example: Plan Review Turn**
 
 ```
-| Step | Entity | Action | Output |
-|------|--------|--------|--------|
-| 8a | Main Thread | Created plan, wants PM review | Plan: [3-phase implementation] |
-| 8b | Main Thread | Returns to PM | Task(agent: "egdesk-pm-agent", prompt: "Previously you said [GUIDE]. I created this plan: [PLAN]. Framework agents found [FINDINGS]. Review?") |
-| 8c | egdesk-pm-agent | Reviews plan | Assessment: "Add Phase 2.5 for preference persistence" |
-| 8d | Main Thread | Revises plan | Updated plan with PM suggestions |
-| 8e | Main Thread | Proceeds to framework investigation | Executes revised plan |
+┌──────┬─────────────────┬──────────────────────────────────────────────────────────────┐
+│ Step │ Entity          │ Action → Output                                              │
+├──────┼─────────────────┼──────────────────────────────────────────────────────────────┤
+│ 8a   │ Main Thread     │ Created plan, wants PM review                                │
+│      │                 │ → Plan: [3-phase implementation]                             │
+├──────┼─────────────────┼──────────────────────────────────────────────────────────────┤
+│ 8b   │ Main Thread     │ Returns to PM                                                │
+│      │                 │ → Task(agent: "egdesk-pm-agent",                             │
+│      │                 │   prompt: "Previously you said [GUIDE].                      │
+│      │                 │   I created this plan: [PLAN]. Framework                     │
+│      │                 │   agents found [FINDINGS]. Review?")                         │
+├──────┼─────────────────┼──────────────────────────────────────────────────────────────┤
+│ 8c   │ egdesk-pm-agent │ Reviews plan                                                 │
+│      │                 │ → Assessment: "Add Phase 2.5 for preference persistence"     │
+├──────┼─────────────────┼──────────────────────────────────────────────────────────────┤
+│ 8d   │ Main Thread     │ Revises plan                                                 │
+│      │                 │ → Updated plan with PM suggestions                           │
+├──────┼─────────────────┼──────────────────────────────────────────────────────────────┤
+│ 8e   │ Main Thread     │ Proceeds to framework investigation                          │
+│      │                 │ → Executes revised plan                                      │
+└──────┴─────────────────┴──────────────────────────────────────────────────────────────┘
 ```
 
 This pattern allows Main Thread to "course-correct" after gathering technical findings but before committing to implementation.
@@ -1827,14 +3582,63 @@ An effective agent swarm flow has:
 
 ### Comprehensive Capability Matrix
 
-| Entity | CAN Do | CANNOT Do | Tools Available |
-|--------|--------|-----------|-----------------|
-| **Main Conversation Thread** | • Analyze and route requests<br>• **Orchestrate agents** (following `@.claude/prompts/agent-orchestration.md`):<br>  - Identify agents (from system prompt - Task tool lists all)<br>  - Create mission prompts<br>  - Plan execution phases<br>  - Identify decision points (분기점)<br>  - Design parallel/sequential workflows<br>• Invoke agents (Task tool)<br>• Synthesize agent outputs<br>• **NEVER Write/Edit application files** (always delegate to coding-agent)<br>• Execute bash commands (build/test/commit)<br>• Run git operations<br>• Commit code<br>• Create PRs<br>• Install packages<br>• Run builds and tests<br>• Make implementation decisions<br>• **Preserve own context** by delegating heavy reading to agents | • **Write/Edit application code** (ALWAYS delegate to coding-agent)<br>• **When orchestrating**: Read domain files (vision docs, codebase) - delegate to agents to preserve context<br>• Delegate simple tasks unnecessarily<br>• Guess framework patterns without agent consultation<br>• Implement EG-DESK features without vision validation | Bash, Task, Read, Glob, Grep (NO Write/Edit for application code) |
-| **Specialized Analyzer Agents**<br>(theia, electron, infinite-canvas, etc.) | • Analyze codebase/documentation<br>• Provide evidence-based guidance<br>• Explain framework patterns<br>• Troubleshoot issues<br>• Reference specific files/APIs<br>• Find proven patterns<br>• Return detailed reports<br>• **Use Bash for READ-ONLY analysis** (inspect outputs, run tests to understand behavior) | • Write ANY code<br>• **Use Bash for implementation** (commits, builds, installations) - contextually restricted<br>• Create files<br>• Edit files<br>• Commit changes<br>• Invoke other agents<br>• Implement features | Bash, Read, Glob, Grep, WebFetch, WebSearch (Bash for analysis only, contextually enforced) |
-| **egdesk-pm-agent** | • **Strategic PM**: Provide implementation guide (technology stack, location, phasing)<br>• **Technology Stack Discovery**: Glob + Read technology-stack.md (NEVER hardcode tech list)<br>• **Technology Stack Selection**: Match requirements to discovered technology capabilities<br>• **Technology Gap Assessment**: Diagnose when current stack has limitations<br>• **Research Planning**: Create detailed, parallel investigation plans for new technologies<br>• **Evaluation Criteria Definition**: Specify criteria for Main Thread to evaluate tech options<br>• **Research Results Evaluation**: Assess Main Thread's findings, recommend vision-aligned choice<br>• **Technology Stack Management**: Update technology-stack.md when new tech added<br>• **Implementation Status Check**: Grep/Glob to verify feature not already implemented (prevent duplicates)<br>• **Plan Reviewer**: Validate Main Thread's plans, suggest improvements<br>• **Documentation Manager**: Create PRDs, update vision/ideas/tech-stack docs<br>• **Institutional Memory**: Recall previous decisions, record new ones<br>• **Insight Provider**: Explain vision conflicts, suggest alternatives<br>• **Dynamic Discovery**: Glob all docs dynamically (vision, tech stack, codebase structure)<br>• **Code Location**: Specify exact package/directory (eg-desk_taehwa/ vs packages/)<br>• **Preserve Main Thread's context**: Read vision/tech docs, synthesize strategic direction | • Write application code (only writes documentation: PRDs, vision docs, tech-stack.md, research docs in ideas&external_references/)<br>• Execute implementation commands (Bash for discovery only)<br>• Commit changes<br>• Invoke other agents<br>• Provide technical patterns (framework agents do this)<br>• **Hardcode technology stack** (always discover from technology-stack.md)<br>• **Do technology research directly** (PM plans research, Main Thread executes) | Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch (Bash for discovery only, Write/Edit for documentation) |
-| **coding-agent** | • **Execute code writing/editing** based on Main Thread instructions<br>• Create new files following provided patterns<br>• Edit existing files precisely<br>• Follow framework patterns from analyzer guidance<br>• Handle multi-file implementations<br>• **Discover EG-DESK codebase dynamically** (Glob eg-desk*/**/*.ts)<br>• **Check for naming conflicts** before implementing EG-DESK features (CODEBASE_STRUCTURE.md)<br>• **STOP immediately** when conflict detected (report to Main Thread, user decides)<br>• **Update structure document** after successful implementation<br>• **Prevent duplicate implementations** (conflict prevention system)<br>• Return implementation status reports | • Make architectural decisions<br>• Choose implementation approaches<br>• **Auto-resolve conflicts** (must report, user decides)<br>• **Hardcode paths** (always discover dynamically)<br>• Execute bash commands<br>• Run builds/tests<br>• Commit changes<br>• Invoke other agents<br>• Analyze frameworks<br>• Validate vision | Write, Edit, Read, Glob, Grep (NO Bash) |
-| **claude-agent-sdk-analyzer-agent** | • **Subagent Architect**: Design and create new specialized agents<br>• Read best practices from `subagent-best-practices.md`<br>• Examine existing agents to extract proven patterns<br>• Write agent definition files (`.claude/agents/*.md`)<br>• **SDK Integration Guidance**: Explain Claude Code SDK patterns<br>• Guide SDK feature implementation into forked apps<br>• Troubleshoot SDK usage issues | • Write application code (only writes agent files)<br>• Execute commands<br>• Commit changes<br>• Invoke other agents | Bash, Read, Write, Glob, Grep, WebFetch, WebSearch (Write for agent files only) |
-| **User** | • Make final decisions at decision points<br>• Provide preferences<br>• Validate experimental results<br>• Approve/reject architectural plans<br>• Request clarifications<br>• Override any recommendation | (User has full authority) | None (human input) |
+```
+┌──────────────────────────┬──────────────────────────────────────────────────────────────────────────────────┬──────────────────────────────────────────────────────┬────────────────────────────────────────┐
+│ Entity                   │ CAN Do                                                                           │ CANNOT Do                                            │ Tools Available                        │
+├──────────────────────────┼──────────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────┼────────────────────────────────────────┤
+│ Main Conversation Thread │ • Analyze/route requests                                                         │ • Write/Edit application code (delegate to coding)   │ Bash, Task, Read, Glob, Grep           │
+│                          │ • Orchestrate agents: Identify, create prompts, plan phases, design workflows   │ • Read domain files when orchestrating (delegate)   │ (NO Write/Edit for app code)           │
+│                          │ • Invoke agents (Task tool), synthesize outputs                                 │ • Delegate simple tasks unnecessarily                │                                        │
+│                          │ • Execute bash (build/test/commit), git ops, PRs, install packages              │ • Guess framework patterns without consultation      │                                        │
+│                          │ • Make implementation decisions, preserve context by delegating heavy reads      │ • Implement EG-DESK features without vision check    │                                        │
+├──────────────────────────┼──────────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────┼────────────────────────────────────────┤
+│ Specialized Analyzer     │ • Analyze codebase/docs, provide evidence-based guidance                        │ • Write ANY code                                     │ Bash (READ-ONLY), Read, Glob, Grep,    │
+│ Agents (theia, electron, │ • Explain framework patterns, troubleshoot, reference files/APIs                │ • Use Bash for implementation (commits, builds)      │ WebFetch, WebSearch                    │
+│ infinite-canvas, etc.)   │ • Find proven patterns, return detailed reports                                 │ • Create/edit files, commit, invoke other agents     │ (Bash contextually enforced)           │
+│                          │ • Use Bash for READ-ONLY analysis (inspect outputs, run tests to understand)    │ • Implement features                                 │                                        │
+├──────────────────────────┼──────────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────┼────────────────────────────────────────┤
+│ egdesk-pm-agent          │ • Strategic PM: implementation guide (tech stack, location, phasing)            │ • Write app code (only writes docs: PRDs, vision,   │ Bash (discovery only), Read, Write,    │
+│                          │ • Tech Stack Discovery: Glob + Read tech-stack.md (NEVER hardcode)              │   tech-stack.md, research in ideas&ext_refs/)        │ Edit (docs only), Glob, Grep,          │
+│                          │ • Tech Stack Selection: match requirements to capabilities                       │ • Execute implementation commands                    │ WebFetch, WebSearch                    │
+│                          │ • Tech Gap Assessment: diagnose stack limitations                                │ • Commit changes, invoke other agents                │                                        │
+│                          │ • Research Planning: create parallel investigation plans                         │ • Provide technical patterns (framework agents do)   │                                        │
+│                          │ • Evaluation Criteria: specify criteria for MT to evaluate tech options          │ • Hardcode technology stack                          │                                        │
+│                          │ • Research Results Evaluation: assess findings, recommend vision-aligned choice  │ • Do tech research directly (PM plans, MT executes)  │                                        │
+│                          │ • Tech Stack Management: update tech-stack.md when new tech added                │                                                      │                                        │
+│                          │ • Implementation Status Check: Grep/Glob verify no duplicates                    │                                                      │                                        │
+│                          │ • Plan Reviewer: validate MT's plans, suggest improvements                       │                                                      │                                        │
+│                          │ • Documentation Manager: create PRDs, update vision/ideas/tech-stack docs        │                                                      │                                        │
+│                          │ • Institutional Memory: recall previous decisions, record new ones               │                                                      │                                        │
+│                          │ • Insight Provider: explain vision conflicts, suggest alternatives               │                                                      │                                        │
+│                          │ • Dynamic Discovery: Glob all docs dynamically (vision, tech, structure)         │                                                      │                                        │
+│                          │ • Code Location: specify exact package/dir (eg-desk_taehwa/ vs packages/)       │                                                      │                                        │
+│                          │ • Preserve MT's context: read vision/tech docs, synthesize strategic direction   │                                                      │                                        │
+├──────────────────────────┼──────────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────┼────────────────────────────────────────┤
+│ coding-agent             │ • Execute code writing/editing based on MT instructions                          │ • Make architectural decisions                       │ Write, Edit, Read, Glob, Grep          │
+│                          │ • Create new files following provided patterns                                  │ • Choose implementation approaches                   │ (NO Bash)                              │
+│                          │ • Edit existing files precisely, follow framework patterns from analyzer         │ • Auto-resolve conflicts (must report, user decides) │                                        │
+│                          │ • Handle multi-file implementations                                              │ • Hardcode paths (always discover dynamically)       │                                        │
+│                          │ • Discover EG-DESK codebase dynamically (Glob eg-desk*/**/*.ts)                  │ • Execute bash, run builds/tests, commit changes     │                                        │
+│                          │ • Check for naming conflicts before implementing (CODEBASE_STRUCTURE.md)        │ • Invoke other agents, analyze frameworks            │                                        │
+│                          │ • STOP immediately when conflict detected (report to MT, user decides)           │ • Validate vision                                    │                                        │
+│                          │ • Update structure document after successful implementation                      │                                                      │                                        │
+│                          │ • Prevent duplicate implementations (conflict prevention system)                 │                                                      │                                        │
+│                          │ • Return implementation status reports                                           │                                                      │                                        │
+├──────────────────────────┼──────────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────┼────────────────────────────────────────┤
+│ claude-agent-sdk-        │ • Subagent Architect: design and create new specialized agents                  │ • Write application code (only writes agent files)   │ Bash, Read, Write (agent files only),  │
+│ analyzer-agent           │ • Read best practices from subagent-best-practices.md                            │ • Execute commands, commit changes                   │ Glob, Grep, WebFetch, WebSearch        │
+│                          │ • Examine existing agents to extract proven patterns                             │ • Invoke other agents                                │                                        │
+│                          │ • Write agent definition files (.claude/agents/*.md)                             │                                                      │                                        │
+│                          │ • SDK Integration Guidance: explain Claude Code SDK patterns                     │                                                      │                                        │
+│                          │ • Guide SDK feature implementation into forked apps                              │                                                      │                                        │
+│                          │ • Troubleshoot SDK usage issues                                                  │                                                      │                                        │
+├──────────────────────────┼──────────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────┼────────────────────────────────────────┤
+│ User                     │ • Make final decisions at decision points                                        │ (User has full authority)                            │ None (human input)                     │
+│                          │ • Provide preferences, validate experimental results                             │                                                      │                                        │
+│                          │ • Approve/reject architectural plans, request clarifications                     │                                                      │                                        │
+│                          │ • Override any recommendation                                                    │                                                      │                                        │
+└──────────────────────────┴──────────────────────────────────────────────────────────────────────────────────┴──────────────────────────────────────────────────────┴────────────────────────────────────────┘
+```
 
 ### Code Ownership Hierarchy
 

@@ -145,7 +145,225 @@ For actual development tasks, multi-step workflows, or cross-framework implement
 - Create plans based on PM's strategic guide
 - Query technical agents as PM directs
 - Execute implementation via coding-agent
+- **Manage subagent reports** (read, comment, cleanup)
 - Build, test, commit
+
+## Subagent Report Management (File-Based Communication)
+
+**CRITICAL**: All subagents use file-based reports for multi-turn communication to eliminate prompt repetition.
+
+### Report Workflow
+
+**Phase 1: Subagent Creates Report**
+
+When you invoke a subagent, it creates:
+```
+subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-name].md
+```
+
+**Phase 2: You Review Report**
+
+1. **Read report**:
+   ```bash
+   Read: subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-name].md
+   ```
+
+2. **If clarification needed**, add inline comments:
+   ```bash
+   Edit: subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-name].md
+   # Insert: <!-- MT (YYYY-MM-DD HH:MM): [Your question/request] -->
+   ```
+
+3. **Re-invoke subagent** for follow-up:
+   ```bash
+   Task(agent: "[agent-name]",
+        prompt: "Update report at subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-name].md
+                 Address Main Thread comments marked <!-- MT: ... -->")
+   ```
+
+**Phase 3: Cleanup When Complete**
+
+When task resolved:
+
+**DELETE** (most cases):
+```bash
+Bash: rm subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-name].md
+```
+
+**ARCHIVE** (if valuable for institutional memory):
+```bash
+Bash: mv subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-name].md ideas&external_references/[topic]-analysis.md
+```
+
+### When to Delete Reports
+
+**Delete immediately when:**
+- ✅ Research incorporated into PRD
+- ✅ Implementation complete, code committed
+- ✅ Error resolved
+- ✅ Investigation answered, no further action needed
+- ✅ Task abandoned/cancelled
+
+**Archive when:**
+- ⚠️ Contains valuable institutional knowledge
+- ⚠️ Research findings worth preserving
+- ⚠️ Debugging insights for future reference
+
+### Report Hygiene
+
+**Keep subagent_reports/ clean:**
+- Run `/codebase-check` after implementations (also checks for stale reports)
+- Delete reports immediately when task complete
+- Don't let resolved tasks linger
+- If report >7 days old, review and delete/archive
+
+### Parallel Workload Delegation
+
+**When subagent detects heavy workload**, it may request parallel delegation instead of processing sequentially.
+
+**Subagent Detection** (triggers when ANY criteria met):
+- 4+ independent research topics/technologies
+- 6+ files requiring deep analysis
+- 4+ packages needing comprehensive pattern extraction
+- Multiple independent subsystems to analyze
+
+**CRITICAL**: Subagents already running as parallel agents (filename contains `-p[N]of[TOTAL]`) will NOT request delegation (prevents nested parallelization).
+
+**Delegation Request Format**:
+
+Subagent outputs directly to you (NOT in report file):
+```
+**PARALLEL_DELEGATION_REQUEST**
+
+I've analyzed this task and detected a heavy workload that would benefit from parallel execution:
+
+**Workload Analysis**:
+- [X independent topics / Y files / Z packages]
+- Sequential estimate: [time]
+- Parallel estimate: [time with N agents]
+
+**Independence Verification**:
+- ✅ Agents operate on independent scopes (no shared state, no sequential dependencies)
+- ✅ Reports can be synthesized without ordering constraints
+
+**Proposed Split**:
+1. Agent 1: [Scope]
+2. Agent 2: [Scope]
+3. Agent 3: [Scope]
+
+**Report Naming**:
+- Agent 1: `subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-type]-p1of3.md`
+- Agent 2: `subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-type]-p2of3.md`
+- Agent 3: `subagent_reports/YYYYMMDD_HHMM_[topic]-[agent-type]-p3of3.md`
+
+**Delegation Prompts** ⚠️ **CRITICAL: Use exact prompts below without modification**:
+[Exact prompt for each parallel agent]
+
+Proceed sequentially or request parallel delegation?
+```
+
+**Your Response Options**:
+
+**Option A - Accept Parallel Delegation** (recommended for large workloads):
+```
+Spawn N agents in single message with provided prompts:
+
+Task(agent: "[agent-type]", prompt: "[Agent 1 exact prompt from request]")
+Task(agent: "[agent-type]", prompt: "[Agent 2 exact prompt from request]")
+Task(agent: "[agent-type]", prompt: "[Agent 3 exact prompt from request]")
+```
+
+Each agent creates report with `-p[N]of[TOTAL]` suffix:
+- `20251021_1600_research-general-p1of3.md`
+- `20251021_1600_research-general-p2of3.md`
+- `20251021_1600_research-general-p3of3.md`
+
+**Option B - Reject and Continue Sequential** (only if time not critical):
+```
+Tell subagent to proceed sequentially with original task.
+Subagent creates single report without `-p` suffix.
+```
+
+**Parallel Report Handling**:
+
+1. **Read all parallel reports**:
+   ```bash
+   Read: subagent_reports/20251021_1600_research-general-p1of3.md
+   Read: subagent_reports/20251021_1600_research-general-p2of3.md
+   Read: subagent_reports/20251021_1600_research-general-p3of3.md
+   ```
+
+2. **Synthesize findings** (no merge needed):
+   - Think holistically across all reports
+   - Reference individual reports when needed
+   - File naming makes sets clear (glob `*-p*of*.md` to find parallel sets)
+
+3. **Cleanup when complete**:
+   ```bash
+   Bash: rm subagent_reports/20251021_1600_research-general-p*.md
+   # Deletes all parallel reports in set
+   ```
+
+**Important**:
+- **PM agent never uses parallel delegation** (strategic decisions require single coherent view)
+- Framework analyzers, research agents, error-recovery agents benefit most from parallelization
+- Always accept parallel delegation for large research tasks (faster user experience)
+
+### Handling Parallel Agent Failures
+
+**If parallel agent fails to create report**:
+
+1. **Detect missing report**: Check for expected file
+   ```bash
+   # Check all parallel reports exist
+   ls subagent_reports/*-p*of*.md
+   # Expected: p1of3, p2of3, p3of3 all present
+   ```
+
+2. **Diagnose**: Review agent output for error
+
+3. **Recovery options**:
+   - **Re-spawn**: `Task(agent: "[agent-type]", prompt: "[same exact prompt]")`
+   - **Partial results**: If scope non-critical, continue with available reports
+   - **User escalation**: If critical scope missing, report to user
+
+### Example: Multi-turn PM Consultation
+
+**Step 1**: Invoke PM
+```bash
+Task(agent: "egdesk-pm-agent",
+     prompt: "User wants 3D visualization. Current stack support?")
+```
+
+**Step 2**: PM creates `20251021_1630_3d-research-pm.md`
+
+**Step 3**: You read report, add comment
+```bash
+Read: subagent_reports/20251021_1630_3d-research-pm.md
+# PM says: "Research Three.js, Babylon.js"
+
+Edit: subagent_reports/20251021_1630_3d-research-pm.md
+# Add: <!-- MT (2025-10-21 17:00): User also mentioned performance critical - can we add FPS benchmark requirement? -->
+```
+
+**Step 4**: Re-invoke PM
+```bash
+Task(agent: "egdesk-pm-agent",
+     prompt: "Update report at subagent_reports/20251021_1630_3d-research-pm.md
+              Address MT comment about FPS benchmarks")
+```
+
+**Step 5**: PM updates report with FPS criteria
+
+**Step 6**: You execute research, return findings to PM (via same report or new consultation)
+
+**Step 7**: PM finalizes recommendation, creates PRD
+
+**Step 8**: You delete report
+```bash
+Bash: rm subagent_reports/20251021_1630_3d-research-pm.md
+# Report content already incorporated into PRD
+```
 
 ### Pattern 3: New Technology Research & Evaluation (capability not in current stack)
 ```
