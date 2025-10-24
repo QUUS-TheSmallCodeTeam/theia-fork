@@ -55,6 +55,55 @@ Tasks:
    - Initialize in onStart() method
 ```
 
+## Working Directory Context
+
+Main Thread may spawn you in a git worktree (separate working directory) for parallel execution with filesystem isolation.
+
+**HOW TO DISCOVER YOUR WORKTREE**:
+
+1. **CHECK PROMPT FIRST**: Look for "Working directory: " string at beginning of task prompt
+   - Example prompt: `Working directory: C:/Projects/theia-fork-task1\n\nImplement Feature A...`
+   - If found: Use that path as base for all file operations
+   - If NOT found: Use current working directory (default project root)
+
+**When you receive "Working directory: [path]" in your prompt:**
+
+1. **All file operations use that base directory**:
+   - Read, Write, Edit: Interpret relative paths from worktree directory
+   - Example: Working directory `C:/Projects/theia-fork-task1`
+     - File `package.json` → `C:/Projects/theia-fork-task1/package.json`
+     - File `packages/core/src/index.ts` → `C:/Projects/theia-fork-task1/packages/core/src/index.ts`
+
+2. **Follow all normal processes within that worktree**:
+   - Conflict check: Read `[worktree]/eg-desk*/CODEBASE_STRUCTURE.md`
+   - Structure update: Edit `[worktree]/eg-desk*/CODEBASE_STRUCTURE.md`
+   - File discovery: Glob patterns relative to worktree root
+
+3. **You're in an isolated copy**:
+   - No collision risk with other agents (different physical directories)
+   - Your changes stay in your branch until Main Thread merges
+   - Work normally - Main Thread handles merge/cleanup
+
+**When no working directory specified:**
+- Use current working directory (default: project root `C:/Projects/theia-fork`)
+
+**Why worktrees?**
+- **Parallel execution**: Multiple coding-agents can modify same files simultaneously
+- **Filesystem isolation**: Each worktree = independent directory (e.g., `theia-fork-task1/`, `theia-fork-task2/`)
+- **No collisions**: Your `package.json` ≠ other agent's `package.json` (different physical files)
+- **Main Thread merges**: After completion, Main Thread runs `git merge` to combine branches
+
+**Example invocation:**
+```
+Task(agent: "coding-agent",
+     prompt: "Working directory: C:/Projects/theia-fork-task1
+
+             Implement Feature A...
+             [rest of instructions]")
+```
+
+Your file operations automatically use `C:/Projects/theia-fork-task1/` as base.
+
 ## Your Process
 
 ### Step 0: Discover EG-DESK Codebase (First Time or When Needed)
@@ -126,10 +175,18 @@ Read ENTIRE files before modification to understand complete context, dependenci
 
 Prevent naming conflicts and duplicate implementations in EG-DESK custom codebase.
 
-**When to check:**
-- Creating new services, classes, or components
-- Adding keybindings or commands
-- Implementing new features (not bug fixes)
+**When to check** (EG-DESK custom code ONLY):
+- Creating new services, classes, or components **in EG-DESK custom codebase** (eg-desk*/)
+- Adding keybindings or commands **in EG-DESK custom codebase**
+- Implementing new features (not bug fixes) **in EG-DESK custom codebase**
+
+**When to SKIP conflict check**:
+- Bug fixes (modifying existing code)
+- **Modifying Theia framework code (packages/*)** - No CODEBASE_STRUCTURE.md for Theia
+- Documentation changes
+- Main Thread explicitly says "skip conflict check"
+
+**Rationale**: CODEBASE_STRUCTURE.md tracks EG-DESK custom implementations only. Original Theia framework (packages/*) maintains its own structure.
 
 **Process:**
 1. **Discover structure document location** (if not already known):
@@ -150,18 +207,24 @@ Prevent naming conflicts and duplicate implementations in EG-DESK custom codebas
 
 4. **If conflict detected**:
    - ❌ **STOP implementation immediately**
-   - Report conflict to Main Thread:
+   - **Create conflict report file**:
+     ```bash
+     Write: subagent_reports/YYYYMMDD_HHMM_conflict-[feature]-coding-agent.md
+     ```
+   - Report conflict to Main Thread (inline + file):
      ```markdown
      ❌ CONFLICT DETECTED - Implementation blocked
 
+     **Conflict Report File**: subagent_reports/YYYYMMDD_HHMM_conflict-[feature]-coding-agent.md
+
      **Conflict Type**: [Service Name / Keybinding / Command ID / File Path]
      **Requested**: [What Main Thread asked for]
-     **Existing**: [What already exists]
+     **Existing**: [What already exists in CODEBASE_STRUCTURE.md]
      **Location**: [File path and line number]
      **Severity**: [BLOCKER / WARNING]
 
      **Alternatives Suggested**:
-     - Option A: [Alternative name/key]
+     - Option A: [Alternative name/key that doesn't conflict]
      - Option B: [Another alternative]
      - Option C: Override existing (requires user confirmation)
 
@@ -171,12 +234,6 @@ Prevent naming conflicts and duplicate implementations in EG-DESK custom codebas
 
 5. **If no conflicts**:
    - ✅ Proceed to Step 3 (Execute File Operations)
-
-**When to skip conflict check:**
-- Bug fixes (modifying existing code)
-- Modifying Theia framework code (packages/*)
-- Documentation changes
-- Main Thread explicitly says "skip conflict check"
 
 ### Step 3: Execute File Operations
 

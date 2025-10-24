@@ -118,11 +118,10 @@ For actual development tasks, multi-step workflows, or cross-framework implement
    - ✅ Critical features (security, data integrity)
    - ✅ Multi-step workflows
 
-   **Skip validation for:**
-   - ❌ Simple CRUD operations
-   - ❌ Pure UI styling changes
-   - ❌ Documentation updates
-   - ❌ Obvious correctness
+   **Skip validation for:** *(minimal - validate most implementations)*
+   - ❌ Documentation-only updates (no code changes)
+   - ⚠️ Simple CRUD operations (validate if state management involved)
+   - ⚠️ Pure UI styling changes (validate if affects user interactions)
 
    **If validating:**
    ```
@@ -144,7 +143,9 @@ For actual development tasks, multi-step workflows, or cross-framework implement
 - Present user requests to PM
 - Create plans based on PM's strategic guide
 - Query technical agents as PM directs
-- Execute implementation via coding-agent
+- **Execute implementation**:
+  - **Delegate to coding-agent when**: 3+ files, large implementation, preserving MT context critical
+  - **Execute directly when**: 1-2 files, trivial change (<10 lines), MT context not at risk
 - **Manage subagent reports** (read, comment, cleanup)
 - Build, test, commit
 
@@ -264,7 +265,7 @@ Proceed sequentially or request parallel delegation?
 
 **Your Response Options**:
 
-**Option A - Accept Parallel Delegation** (recommended for large workloads):
+**Option A - Simple Parallel Delegation** (independent file analysis):
 ```
 Spawn N agents in single message with provided prompts:
 
@@ -273,154 +274,88 @@ Task(agent: "[agent-type]", prompt: "[Agent 2 exact prompt from request]")
 Task(agent: "[agent-type]", prompt: "[Agent 3 exact prompt from request]")
 ```
 
-Each agent creates report with `-p[N]of[TOTAL]` suffix:
-- `20251021_1600_research-general-p1of3.md`
-- `20251021_1600_research-general-p2of3.md`
-- `20251021_1600_research-general-p3of3.md`
+Each agent creates report with `-p[N]of[TOTAL]` suffix. Use when agents analyze independent scopes (different packages, technologies, or documentation).
 
-**Option B - Reject and Continue Sequential** (only if time not critical):
+**Option B - Worktree-based Parallel Execution** (agents modify shared files):
+
+Use git worktrees for complete filesystem isolation when multiple agents need to modify the same files:
+
+1. **Create worktrees** (one per parallel agent):
+   ```bash
+   Bash: git worktree add ../theia-fork-task1 -b task1-branch
+   Bash: git worktree add ../theia-fork-task2 -b task2-branch
+   Bash: git worktree add ../theia-fork-task3 -b task3-branch
+   ```
+
+2. **Spawn coding-agents with worktree paths**:
+   ```
+   Task(agent: "coding-agent",
+        prompt: "Working directory: C:/Projects/theia-fork-task1
+                 [Agent 1 implementation instructions]")
+
+   Task(agent: "coding-agent",
+        prompt: "Working directory: C:/Projects/theia-fork-task2
+                 [Agent 2 implementation instructions]")
+   ```
+
+3. **Merge branches after completion**:
+   ```bash
+   Bash: git checkout master && git merge task1-branch task2-branch task3-branch
+   ```
+
+4. **Cleanup worktrees**:
+   ```bash
+   Bash: git worktree remove ../theia-fork-task1 ../theia-fork-task2 ../theia-fork-task3
+   ```
+
+**When to use**: Multiple agents modifying same files (package.json, tsconfig.json), experimenting with multiple approaches, or needing zero collision risk.
+
+**Option C - Sequential** (only if time not critical):
 ```
 Tell subagent to proceed sequentially with original task.
 Subagent creates single report without `-p` suffix.
 ```
 
-**Parallel Report Handling**:
+**After Parallel Execution**:
+- Read all reports: `Read: subagent_reports/*-p1of3.md`, etc.
+- Synthesize findings holistically across reports
+- Cleanup: `Bash: rm subagent_reports/20251021_1600_research-general-p*.md`
+- If agent fails: re-spawn with same prompt or continue with partial results
 
-1. **Read all parallel reports**:
-   ```bash
-   Read: subagent_reports/20251021_1600_research-general-p1of3.md
-   Read: subagent_reports/20251021_1600_research-general-p2of3.md
-   Read: subagent_reports/20251021_1600_research-general-p3of3.md
-   ```
-
-2. **Synthesize findings** (no merge needed):
-   - Think holistically across all reports
-   - Reference individual reports when needed
-   - File naming makes sets clear (glob `*-p*of*.md` to find parallel sets)
-
-3. **Cleanup when complete**:
-   ```bash
-   Bash: rm subagent_reports/20251021_1600_research-general-p*.md
-   # Deletes all parallel reports in set
-   ```
-
-**Important**:
-- **PM agent never uses parallel delegation** (strategic decisions require single coherent view)
-- Framework analyzers, research agents, error-recovery agents benefit most from parallelization
-- Always accept parallel delegation for large research tasks (faster user experience)
-
-### Handling Parallel Agent Failures
-
-**If parallel agent fails to create report**:
-
-1. **Detect missing report**: Check for expected file
-   ```bash
-   # Check all parallel reports exist
-   ls subagent_reports/*-p*of*.md
-   # Expected: p1of3, p2of3, p3of3 all present
-   ```
-
-2. **Diagnose**: Review agent output for error
-
-3. **Recovery options**:
-   - **Re-spawn**: `Task(agent: "[agent-type]", prompt: "[same exact prompt]")`
-   - **Partial results**: If scope non-critical, continue with available reports
-   - **User escalation**: If critical scope missing, report to user
+**Important**: PM agent never uses parallel delegation (strategic decisions require single coherent view). Always accept parallel delegation for large research tasks (faster).
 
 ### Example: Multi-turn PM Consultation
 
-**Step 1**: Invoke PM
-```bash
-Task(agent: "egdesk-pm-agent",
-     prompt: "User wants 3D visualization. Current stack support?")
-```
-
-**Step 2**: PM creates `20251021_1630_3d-research-pm.md`
-
-**Step 3**: You read report, add comment
-```bash
-Read: subagent_reports/20251021_1630_3d-research-pm.md
-# PM says: "Research Three.js, Babylon.js"
-
-Edit: subagent_reports/20251021_1630_3d-research-pm.md
-# Add: <!-- MT (2025-10-21 17:00): User also mentioned performance critical - can we add FPS benchmark requirement? -->
-```
-
-**Step 4**: Re-invoke PM
-```bash
-Task(agent: "egdesk-pm-agent",
-     prompt: "Update report at subagent_reports/20251021_1630_3d-research-pm.md
-              Address MT comment about FPS benchmarks")
-```
-
-**Step 5**: PM updates report with FPS criteria
-
-**Step 6**: You execute research, return findings to PM (via same report or new consultation)
-
-**Step 7**: PM finalizes recommendation, creates PRD
-
-**Step 8**: You delete report
-```bash
-Bash: rm subagent_reports/20251021_1630_3d-research-pm.md
-# Report content already incorporated into PRD
-```
+1. Invoke PM → PM creates `20251021_1630_3d-research-pm.md`
+2. Read report, add inline comment: `<!-- MT: Can we add FPS benchmark requirement? -->`
+3. Re-invoke PM: "Update report, address MT comment"
+4. Execute research, return findings to PM → PM finalizes PRD
+5. Delete report: `Bash: rm subagent_reports/20251021_1630_3d-research-pm.md`
 
 ### Pattern 3: New Technology Research & Evaluation (capability not in current stack)
 ```
 [Analyze: User needs capability that may require new technology]
 
-I'll consult PM to assess if current stack sufficient or if research needed.
-
 [Research Workflow:]
-1. Invoke egdesk-pm-agent: "User wants [capability]. Current stack support?"
-   → PM diagnoses: Current tech X has limitation Y for requirement Z
-   → PM returns: RESEARCH_NEEDED
-     - Limitation diagnosis (WHY research needed)
-     - Evaluation criteria (bundle size, integration, performance)
-     - Investigation scope (Option A, B, C to research)
-     - Parallel execution design
-
-2. Execute parallel research (faster runtime):
-   → Single message with 3 Tasks (all independent):
-     - Task(agent: "general-purpose", "Research Three.js...")
-     - Task(agent: "general-purpose", "Research Babylon.js...")
-     - Task(agent: "general-purpose", "Research Custom WebGL...")
-   → All 3 run simultaneously
-
-3. Organize findings in ideas&external_references/:
-   → Write("ideas&external_references/threejs-research.md", [findings])
-   → Write("ideas&external_references/babylonjs-research.md", [findings])
-   → Write("ideas&external_references/custom-webgl-research.md", [findings])
-   → Preserve institutional memory
-
-4. Query analyzer agents for technical assessment:
-   → Task(agent: "infinite-canvas-analyzer-agent",
-          "Read research docs, assess integration complexity")
-   → Technical analysis (not strategic)
-
-5. Return to PM with research results:
-   → Task(agent: "egdesk-pm-agent",
-          "Research complete. Findings in ideas&external_references/:
-           - threejs-research.md: [summary]
-           - babylonjs-research.md: [summary]
-           Analyzer reported: [integration findings]
-           Evaluate and recommend.")
-   → PM reads research docs
-   → PM scores against criteria
-   → PM recommends vision-aligned choice
-   → PM updates technology-stack.md
-   → PM creates research PRD
-
-6. Proceed to implementation (if approved):
-   → Follow Pattern 2 (PM-Driven Development) with new technology
+1. Invoke PM: "User wants [capability]. Current stack support?" → PM diagnoses limitation, returns RESEARCH_NEEDED with criteria
+2. Execute parallel research: Spawn 3+ general-purpose agents simultaneously (Three.js, Babylon.js, WebGL, etc.)
+3. Organize findings in subagent_reports/:
+   → Write("subagent_reports/YYYYMMDD_HHMM_threejs-research.md", [findings])
+   → Write("subagent_reports/YYYYMMDD_HHMM_babylonjs-research.md", [findings])
+   → Write("subagent_reports/YYYYMMDD_HHMM_custom-webgl-research.md", [findings])
+   → Temporary workspace (PM reviews before institutional memory)
+4. Query analyzer agents: Technical assessment of integration complexity
+5. Return to PM: "/pm-research-evaluation" with findings → PM scores, recommends, updates technology-stack.md, creates PRD
+   → PM moves approved research to ideas&external_references/ after user approval
+6. Implement (if approved): Follow Pattern 2 with new technology
 ```
 
 **Key Points:**
 - PM diagnoses limitation (not chooses framework)
 - Main Thread does research (parallel for speed)
-- Main Thread organizes findings in ideas&external_references/
+- Main Thread organizes findings in subagent_reports/ (temporary)
 - PM evaluates results (vision-aligned recommendation)
-- Research preserved (institutional memory)
+- PM moves approved research to ideas&external_references/ (institutional memory)
 
 **Examples:**
 - "Add 3D visualization - which framework?" → Pattern 3
@@ -485,41 +420,12 @@ After receiving PM's initial strategic guide, you **may return for additional co
 
 ### ✅ Return to PM when:
 
-**1. Plan Review** (complex implementations):
-- You've created an execution plan and want PM validation
-- Framework agents revealed constraints that change the approach
-- Found existing implementation that significantly changes strategy
-- Multiple integration points need vision alignment check
-
-**2. Clarification** (ambiguous guidance):
-- PM's guide has multiple valid interpretations
-- Missing critical information (e.g., desktop vs web implementation?)
-- Technology choice unclear between multiple options
-- Code location ambiguous (custom vs framework modification?)
-
-**3. Progressive Phases** (multi-stage work):
-- Phase N complete, need guidance for Phase N+1
-- Phase N revealed new requirements or constraints
-- Approach needs adjustment based on implementation results
-- Discovered complexity that splits work into more phases
-
-**4. Decision Support** (multiple valid options):
-- Framework agents suggest multiple approaches (A, B, C)
-- Need vision-aligned choice between technically equivalent solutions
-- Tradeoff decision requires strategic input
-- User asks "which way should we go?"
-
-**5. Conflict Resolution** (discovered issues):
-- Found feature already partially implemented
-- Existing code conflicts with proposed approach
-- Vision documents seem contradictory
-- Implementation reveals architectural tension
-
-**6. Research Results Evaluation** (technology investigation complete):
-- Completed parallel technology research per PM's plan
-- Organized findings in ideas&external_references/
-- Analyzer agents provided technical assessment
-- Need PM to evaluate and recommend vision-aligned choice
+**1. Plan Review**: Created plan needing validation, framework constraints change approach, or multiple integration points need alignment
+**2. Clarification**: Ambiguous guidance, missing critical info (desktop vs web?), unclear technology choice
+**3. Progressive Phases**: Phase N complete, need Phase N+1 guidance, or discovered new complexity
+**4. Decision Support**: Multiple valid approaches (A/B/C), need vision-aligned choice, tradeoff decisions
+**5. Conflict Resolution**: Found partial implementation, code conflicts, contradictory vision docs, architectural tension
+**6. Research Evaluation**: Completed parallel research, organized findings, need PM to evaluate and recommend
 
 ### ❌ Do NOT return to PM for:
 
@@ -557,11 +463,7 @@ Provide guidance for Phase 2.")
 
 ### Smart Multi-turn Judgment:
 
-- **Trust your judgment**: If guide is clear, execute. If uncertain, consult.
-- **Preserve PM's context**: Include previous guidance in follow-up queries
-- **Be specific**: Ask precise questions, provide relevant findings
-- **Don't over-consult**: Simple execution details don't need PM input
-- **Do consult strategically**: Complex decisions benefit from vision alignment
+Trust judgment (clear guide = execute, uncertain = consult). Always include previous guidance in follow-up queries. Be specific with questions. Don't over-consult simple details; do consult strategic decisions.
 
 ## Execution Patterns
 
@@ -580,6 +482,10 @@ I'll consult PM for strategic guidance, then execute the implementation.
 
 [PM-Driven Workflow:]
 1. Invoke egdesk-pm-agent: "User wants [feature]. Provide strategic guide."
+   → Task(agent: "egdesk-pm-agent",
+          prompt: "/pm-strategic-guide
+                   User wants [feature].
+                   Provide strategic guide.")
    → PM returns: Framework, location, phasing, considerations, creates PRD
 
 2. Plan framework investigation based on PM's guide:
@@ -591,14 +497,45 @@ I'll consult PM for strategic guidance, then execute the implementation.
    → Receive: Patterns, file lists (CREATE/MODIFY/DELETE/REFERENCE)
 
 4. (Optional) Return to PM for plan review if complex:
-   → "I created this implementation plan: [...]. Agent reports: [...]. Review?"
+   → Task(agent: "egdesk-pm-agent",
+          prompt: "/pm-plan-review
+                   Previously you provided: [quote entire guide]
+                   I created this plan: [plan]
+                   Framework agent reports: [findings]
+                   Review against vision.")
    → PM validates or suggests improvements
 
 5. Create implementation plan:
    → Synthesize: PM guide + framework patterns → coding instructions
    → Direction + File list with specific actions
 
-6. Spawn coding-agent(s) with synthesized instructions
+6. Spawn coding-agent(s) with synthesized instructions:
+
+   **Option A - Sequential** (single agent):
+   Task(agent: "coding-agent", prompt: "[Complete instructions]")
+
+   **Option B - Simple Parallel** (independent files):
+   Task(agent: "coding-agent", prompt: "[Agent 1: files X, Y]")
+   Task(agent: "coding-agent", prompt: "[Agent 2: files A, B]")
+
+   **Option C - Worktree Parallel** (shared file modifications):
+   # Create worktrees
+   Bash: git worktree add ../theia-fork-task1 -b task1-branch
+   Bash: git worktree add ../theia-fork-task2 -b task2-branch
+
+   # Spawn agents in different worktrees
+   Task(agent: "coding-agent",
+        prompt: "Working directory: C:/Projects/theia-fork-task1
+                 [Agent 1 instructions]")
+   Task(agent: "coding-agent",
+        prompt: "Working directory: C:/Projects/theia-fork-task2
+                 [Agent 2 instructions]")
+
+   # Merge and cleanup after completion
+   Bash: git checkout master && git merge task1-branch task2-branch
+   Bash: git worktree remove ../theia-fork-task1 ../theia-fork-task2
+
+   Decision: Single task → A | Multiple tasks, independent files → B | Multiple tasks, shared files → C
 
 7. Build, test, commit
 ```
