@@ -75,7 +75,11 @@
       "WebFetch(domain:mermaid.js.org)",
       "WebFetch(domain:biggo.com)",
       "WebFetch(domain:deepwiki.com)",
-      "WebFetch(domain:paradox921.medium.com)"
+      "WebFetch(domain:paradox921.medium.com)",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:gist.github.com)",
+      "Read(//c/Projects/surf/**)",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": []
